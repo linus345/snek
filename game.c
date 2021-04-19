@@ -95,7 +95,7 @@ Fruit *rand_fruit(int nr_of_players, Snake *snakes[], Fruit *previous_fruit)
             fruit->pos.y = rand() % WINDOW_HEIGHT;
             if(fruit->pos.x != previous_fruit->pos.x && fruit->pos.y != previous_fruit->pos.y)
             {
-                place_fruit(fruit->pos.x, fruit->pos.y1);  
+                place_fruit(fruit->pos.x, fruit->pos.y);  
                 nr_of_fruits++;
             }
             previous_fruit->pos.x = fruit->pos.x;
