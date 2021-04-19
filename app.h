@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#define WINDOW_WIDTH 700
-#define WINDOW_HEIGHT 700
+#define WINDOW_WIDTH 960
+#define WINDOW_HEIGHT 960
 
 typedef struct {
     bool running;
@@ -12,7 +12,7 @@ typedef struct {
     SDL_Renderer *renderer;
 } App;
 
-int init_app();
-void quit_app();
+App *init_app();
+void quit_app(App *app);
 
 #endif
