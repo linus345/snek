@@ -41,4 +41,11 @@ typedef struct {
 
 Player *new_player(int host, int port, int player_nr);
 
+typedef struct {
+    int randomX;
+    int randomY;
+} Cherry;
+
+Cherry *rand_cherry(int nr_of_players, Snake *snakes[], Cherry *previous_cherry); 
+
 #endif

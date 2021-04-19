@@ -1,13 +1,18 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_image.h>
 #include "app.h"
 #include "game.h"
 
+
+
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
+
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
         return 1;
