@@ -11,6 +11,13 @@ typedef struct {
     int y;
 } Pos;
 
+typedef struct {
+    int angle;
+    Pos pos;
+} Body_Part;
+
+void load_texture(App *app, SDL_Texture **texture, char *path);
+
 enum Dir {
     Up,
     Down,
@@ -23,10 +30,11 @@ typedef struct {
     int speed;
     int vel_x;
     int vel_y;
+    int angle;
     enum Dir dir;
-    Pos head;
-    Pos body[MAX_SNAKE_LENGTH];
-    Pos tail;
+    Body_Part head;
+    Body_Part body[MAX_SNAKE_LENGTH];
+    Body_Part tail;
 } Snake;
 
 Snake *new_snake(int player_nr);
