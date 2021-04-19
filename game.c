@@ -82,12 +82,22 @@ Player *new_player(int host, int port, int player_nr)
     return player;
 }
 
-Cherry *rand_cherry(int nr_of_players, Snake *snakes[], Cherry *previous_cherry)
+Fruit *rand_fruit(int nr_of_players, Snake *snakes[], Fruit *previous_fruit)
 {
-    randomX = rand() % WINDOW_WIDTH;
-    randomY = rand() % WINDOW_HEIGHT;
+    //allocate memory on heap
+    Fruit *fruit = malloc(sizeof(Fruit));
 
-    previous_cherry
-
-    not_on_snake
+    while(nr_of_players > 0)
+    {
+        if(nr_of_fruits <= nr_of_players)
+        {
+            fruit->pos.x = rand() % WINDOW_WIDTH;
+            fruit->pos.y = rand() % WINDOW_HEIGHT;
+            place_fruit(fruit->pos.x, fruit->pos.y1);  
+            nr_of_fruits++;
+            previous_fruit.x1 = cherry.x1;
+            previous_fruit.y1 = cherry.y1;
+        }
+    }
 }
+
