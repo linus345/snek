@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_image.h>
@@ -18,14 +19,21 @@ int main(int argc, char *argv[])
     }
     printf("successfully initialized SDL_net\n");
 
-    SDL_Surface *surface = IMG_Load("../snake-test/textures/snakehead.png");
-    if(!surface) {
-        fprintf(stderr, "error creating surface\n");
-        return 3;
-    }
-    printf("SDL_image works\n");
+    App *app = init_app();
 
-    SDLNet_Quit();
-    SDL_Quit();
+    while (app->running) {
+        SDL_Event event;
+        // check for event
+        if (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    // exit main loop
+                    app->running = false;
+                    break;
+            }
+        }
+    }
+
+    quit_app(app);
     return 0;
 }
