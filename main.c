@@ -6,7 +6,7 @@
 #include "app.h"
 #include "game.h"
 
-int main(int argc, char *argv[])
+int main(void)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
