@@ -87,17 +87,21 @@ Fruit *rand_fruit(int nr_of_players, Snake *snakes[], Fruit *previous_fruit)
     //allocate memory on heap
     Fruit *fruit = malloc(sizeof(Fruit));
 
-    while(nr_of_players > 0)
+    while(nr_of_players > 0 && snakes[Fruit->pos.x][Fruit->pos.y])
     {
         if(nr_of_fruits <= nr_of_players)
         {
             fruit->pos.x = rand() % WINDOW_WIDTH;
             fruit->pos.y = rand() % WINDOW_HEIGHT;
-            place_fruit(fruit->pos.x, fruit->pos.y1);  
-            nr_of_fruits++;
-            previous_fruit.x1 = cherry.x1;
-            previous_fruit.y1 = cherry.y1;
+            if(fruit->pos.x != previous_fruit->pos.x && fruit->pos.y != previous_fruit->pos.y)
+            {
+                place_fruit(fruit->pos.x, fruit->pos.y1);  
+                nr_of_fruits++;
+            }
+            previous_fruit->pos.x = fruit->pos.x;
+            previous_fruit->pos.y = fruit->pos.y;
         }
     }
+    return fruit;
 }
 
