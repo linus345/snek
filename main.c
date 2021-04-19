@@ -21,14 +21,44 @@ int main(int argc, char *argv[])
 
     App *app = init_app();
 
+    // test singleplayer
+    Player *singleplayer = new_player(0, 0, 1);
+
     while (app->running) {
         SDL_Event event;
         // check for event
-        if (SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
                     // exit main loop
                     app->running = false;
+                    break;
+                case SDL_KEYDOWN:
+                    // key pressed?
+                    switch (event.key.keysym.sym){                  /* event.key.keysym.scancode */
+                        case SDLK_UP:
+                        case SDLK_w:                                /* SDL_SCANCODE_W */
+                            if (singleplayer->snake->dir != Down)
+                                singleplayer->snake->dir = Up;
+                            break;
+                        case SDLK_DOWN:
+                        case SDLK_s:
+                            if (singleplayer->snake->dir != Up)
+                                singleplayer->snake->dir = Down;
+                            break;
+                        case SDLK_RIGHT:
+                        case SDLK_d:
+                            if (singleplayer->snake->dir != Left)
+                                singleplayer->snake->dir = Right;
+                            break;
+                        case SDLK_LEFT:
+                        case SDLK_a:
+                            if (singleplayer->snake->dir != Right)
+                                singleplayer->snake->dir = Left;
+                            break;
+                        default:
+                            break;
+                    }
                     break;
             }
         }
