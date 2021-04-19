@@ -81,3 +81,13 @@ Player *new_player(int host, int port, int player_nr)
 
     return player;
 }
+
+Cherry *rand_cherry(int nr_of_players, Snake *snakes[], Cherry *previous_cherry)
+{
+    randomX = rand() % WINDOW_WIDTH;
+    randomY = rand() % WINDOW_HEIGHT;
+
+    previous_cherry
+
+    not_on_snake
+}
