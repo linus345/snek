@@ -6,12 +6,17 @@
 
 Snake *new_snake(int player_nr)
 {
+    // allocate memory on heap
     Snake *snake = malloc(sizeof(Snake));
 
+    // snake initially has 1 body part + head and tail
     snake->body_length = 1;
+    // initialize start speed
     snake->speed = SPEED;
 
+    // position snake differently depending on player
     switch(player_nr) {
+        // position snake top left, moving to the right
         case 1:
             snake->vel_x = snake->speed;
             snake->vel_y = 0;
@@ -23,6 +28,7 @@ Snake *new_snake(int player_nr)
             snake->tail.x = snake->head.x - CELL_SIZE * 2;
             snake->tail.y = snake->head.y;
             break;
+        // position snake top right, moving to downwards
         case 2:
             snake->vel_x = 0;
             snake->vel_y = snake->speed;
@@ -34,6 +40,7 @@ Snake *new_snake(int player_nr)
             snake->tail.x = snake->head.x;
             snake->tail.y = snake->head.y - CELL_SIZE * 2;
             break;
+        // position snake bottom right, moving to the left
         case 3:
             snake->vel_x = -snake->speed;
             snake->vel_y = 0;
@@ -45,6 +52,7 @@ Snake *new_snake(int player_nr)
             snake->tail.x = snake->head.x + CELL_SIZE * 2;
             snake->tail.y = snake->head.y;
             break;
+        // position snake bottom left, moving upwards
         case 4:
             snake->vel_x = 0;
             snake->vel_y = -snake->speed;
@@ -57,6 +65,8 @@ Snake *new_snake(int player_nr)
             snake->tail.y = snake->head.y + CELL_SIZE * 2;
             break;
     }
+
+    return snake;
 }
 
 Player *new_player(int host, int port, int player_nr)
@@ -68,4 +78,6 @@ Player *new_player(int host, int port, int player_nr)
     player->host = host;
     player->port = port;
     player->snake = new_snake(player_nr);
+
+    return player;
 }
