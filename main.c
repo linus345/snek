@@ -81,9 +81,11 @@ int main(int argc, char *argv[])
 
         // update snake velocity based on direction state
         change_snake_velocity(player1->snake);
+        // test singleplayer position update
+        new_snake_pos(player1->snake);
 
         SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
-        SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
+        SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};     //snake head rec
 
         SDL_Rect body_src[MAX_SNAKE_LENGTH];
         SDL_Rect body_dst[MAX_SNAKE_LENGTH];
@@ -100,6 +102,9 @@ int main(int argc, char *argv[])
         }
         SDL_Rect tail_src = {snake_texture[2].x, snake_texture[2].y, CELL_SIZE, CELL_SIZE};
         SDL_Rect tail_dst = {player1->snake->tail.pos.x, player1->snake->tail.pos.y, CELL_SIZE, CELL_SIZE};
+
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
 
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, player1->snake->head.angle, NULL, SDL_FLIP_NONE);
         for(int i = 0; i < player1->snake->body_length; i++) {
