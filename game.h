@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #define MAX_SNAKE_LENGTH 256
-#define SPEED 3
+#define SPEED 1
 #define CELL_SIZE 32
 
 typedef struct {
@@ -38,6 +38,8 @@ typedef struct {
 } Snake;
 
 Snake *new_snake(int player_nr);
+
+void new_snake_pos(Snake *snake);
 
 typedef struct {
     int points;

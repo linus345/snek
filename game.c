@@ -82,6 +82,24 @@ Snake *new_snake(int player_nr)
     return snake;
 }
 
+void new_snake_pos(Snake *snake)
+{
+    /*
+     // body update
+    snake->tail.pos.x += snake->head.pos.x + (snake->body_length+2)*CELL_SIZE;
+    snake->tail.pos.y += snake->head.pos.y + (snake->body_length+2)*CELL_SIZE;  
+    for(int i=snake->body_length; i>-1; i--){
+        snake->body[i].pos.x = snake->body[i-1].pos.x + CELL_SIZE;
+        snake->body[i].pos.y = snake->body[i-1].pos.y + CELL_SIZE;
+    }
+    */
+    // head part update
+    snake->head.pos.x += snake->vel_x;
+    snake->head.pos.y += snake->vel_y;
+
+    return;
+}
+
 Player *new_player(int host, int port, int player_nr)
 {
     Player *player = malloc(sizeof(Player));
