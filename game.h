@@ -54,6 +54,6 @@ typedef struct {
     int points;
 } Fruit;
 
-Fruit *rand_fruit(int nr_of_players, Snake *snakes[], Fruit *previous_fruit); 
+Fruit *rand_fruit(int nr_of_players, int nr_of_fruits, Snake *snakes[], Fruit *fruits[]); 
 
 #endif

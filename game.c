@@ -82,26 +82,39 @@ Player *new_player(int host, int port, int player_nr)
     return player;
 }
 
-Fruit *rand_fruit(int nr_of_players, Snake *snakes[], Fruit *previous_fruit)
+Fruit *rand_fruit(int nr_of_players, int nr_of_fruits, Snake *snakes[], Fruit *fruits[])
 {
     //allocate memory on heap
     Fruit *fruit = malloc(sizeof(Fruit));
 
-    while(nr_of_players > 0 && snakes[Fruit->pos.x][Fruit->pos.y])
+    if(nr_of_fruits < nr_of_players)
     {
-        if(nr_of_fruits <= nr_of_players)
+        fruit->pos.x = rand() % WINDOW_WIDTH;
+        fruit->pos.y = rand() % WINDOW_HEIGHT;
+        //place fruit at location not previously occupied by another fruit
+        if(fruit->pos.x != fruits[0]->pos.x && fruit->pos.y != fruits[0]->pos.y)
         {
-            fruit->pos.x = rand() % WINDOW_WIDTH;
-            fruit->pos.y = rand() % WINDOW_HEIGHT;
-            if(fruit->pos.x != previous_fruit->pos.x && fruit->pos.y != previous_fruit->pos.y)
+            if (fruit->pos.x != Snake->pos.head && fruit->pos.x != Snake->pos.body[] && fruit->pos.x != Snake->pos.tail)                        // !!!
             {
-                place_fruit(fruit->pos.x, fruit->pos.y);  
-                nr_of_fruits++;
-            }
-            previous_fruit->pos.x = fruit->pos.x;
-            previous_fruit->pos.y = fruit->pos.y;
+                if (fruit->pos.y != Snake->pos.head && fruit->pos.y != Snake->pos.body[] && fruit->pos.y != Snake->pos.tail)                    // !!!
+                {
+                    fruits[0]->pos.x = fruit->pos.x;                   // !!!
+                    fruits[0]->pos.y = fruit->pos.y; 
+                    place_fruit(fruits[0]);
+                    nr_of_fruits++;
+                }
+            }  
         }
+        for (int i = 0; i < nr_of_fruits-1; i++)                // !!!
+        {
+            fruits[i] = fruits[i+1];
+        }        
     }
-    return fruit;
+    return nr_of_fruits;
+}
+
+void place_fruit(SDL_Renderer *renderer, Fruit *fruits[])
+{
+    
 }
 
