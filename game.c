@@ -14,6 +14,7 @@ Snake *new_snake(int player_nr)
     snake->body_length = 1;
     // initialize start speed
     snake->speed = SPEED;
+    snake->next_dir = None;
 
     // position snake differently depending on player
     switch(player_nr) {
@@ -81,6 +82,52 @@ Snake *new_snake(int player_nr)
 
     return snake;
 }
+
+void change_snake_velocity(Snake *snake)
+{
+    switch(snake->dir) {
+        case Up:
+            // check if head is aligned with the 32x32 grid, if it is, change velocity
+            // otherwise, indicate that there is a velocity change that should take place
+            // when it is aligned with the 32x32 grid.
+            if(snake->head.pos.x % CELL_SIZE == 0 && snake->head.pos.y % CELL_SIZE == 0) {
+                snake->vel_x = 0;
+                snake->vel_y = -snake->speed;
+                snake->next_dir = None;
+            } else {
+                snake->next_dir = Up;
+            }
+            break;
+        case Down:
+            if(snake->head.pos.x % CELL_SIZE == 0 && snake->head.pos.y % CELL_SIZE == 0) {
+                snake->vel_x = 0;
+                snake->vel_y = snake->speed;
+                snake->next_dir = None;
+            } else {
+                snake->next_dir = Down;
+            }
+            break;
+        case Left:
+            if(snake->head.pos.x % CELL_SIZE == 0 && snake->head.pos.y % CELL_SIZE == 0) {
+                snake->vel_x = -snake->speed;
+                snake->vel_y = 0;
+                snake->next_dir = None;
+            } else {
+                snake->next_dir = Left;
+            }
+            break;
+        case Right:
+            if(snake->head.pos.x % CELL_SIZE == 0 && snake->head.pos.y % CELL_SIZE == 0) {
+                snake->vel_x = snake->speed;
+                snake->vel_y = 0;
+                snake->next_dir = None;
+            } else {
+                snake->next_dir = Right;
+            }
+            break;
+        default:
+            break;
+    }
 
 void new_snake_pos(Snake *snake)
 {

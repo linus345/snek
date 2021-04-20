@@ -19,6 +19,7 @@ typedef struct {
 void load_texture(App *app, SDL_Texture **texture, char *path);
 
 enum Dir {
+    None, // None is used to indicate that there is no next direction for snake.next_dir
     Up,
     Down,
     Left,
@@ -32,12 +33,14 @@ typedef struct {
     int vel_y;
     int angle;
     enum Dir dir;
+    enum Dir next_dir; // used to wait for snake to be aligned with 32x32 grid before changing velocity
     Body_Part head;
     Body_Part body[MAX_SNAKE_LENGTH];
     Body_Part tail;
 } Snake;
 
 Snake *new_snake(int player_nr);
+void change_snake_velocity(Snake *snake);
 
 void new_snake_pos(Snake *snake);
 

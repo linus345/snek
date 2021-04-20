@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
             }
         }
 
+        // update snake velocity based on direction state
+        change_snake_velocity(player1->snake);
         // test singleplayer position update
         new_snake_pos(player1->snake);
 
