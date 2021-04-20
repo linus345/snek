@@ -40,6 +40,10 @@ int main(int argc, char *argv[])
     SDL_Texture *snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
 
+    // background texture
+    SDL_Texture *background_tex;
+    load_texture(app, &background_tex, "./resources/background.png");
+
     while (app->running) {
         SDL_Event event;
         // check for event
@@ -97,6 +101,9 @@ int main(int argc, char *argv[])
         }
         SDL_Rect tail_src = {snake_texture[2].x, snake_texture[2].y, CELL_SIZE, CELL_SIZE};
         SDL_Rect tail_dst = {player1->snake->tail.pos.x, player1->snake->tail.pos.y, CELL_SIZE, CELL_SIZE};
+
+        SDL_Rect background_dst = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+        SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, player1->snake->head.angle, NULL, SDL_FLIP_NONE);
         for(int i = 0; i < player1->snake->body_length; i++) {
