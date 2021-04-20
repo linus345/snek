@@ -89,10 +89,27 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (snake->head.x <= 0 || snake->head.y <= 0 || snake->head.x >= WINDOW_WIDTH - CELL_SIZE || pos.y >= WINDOW_HEIGHT - CELL_SIZE.h)
+        // Checks collison with walls
+        if (player1->snake->head.pos.x <= 0 || player1->snake->head.pos.y <= 0 || player1->snake->head.pos.x >= WINDOW_WIDTH - CELL_SIZE || player1->snake->head.pos.y >= WINDOW_HEIGHT - CELL_SIZE)
         {
             app->running = false;
         }
+        // Checks collison with snake body
+        for (int i = 0; i < player1->snake->body_length; i++)
+        {
+            if (player1->snake->head.pos.x ==  player1->snake->body[i].pos.x && player1->snake->head.pos.y == player1->snake->body[i].pos.y)
+            {
+                app->running = false;
+            }
+            
+        }
+        // Checks collison with snake tail
+        if (player1->snake->head.pos.x == player1->snake->tail.pos.x && player1->snake->head.pos.y == player1->snake->tail.pos.y)
+        {
+            app->running = false;
+        }
+        
+        
 
         SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
         SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
