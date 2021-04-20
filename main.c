@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
             }
         }
 
+        // update snake velocity based on direction state
+        change_snake_velocity(player1->snake);
+
         SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
         SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
 
