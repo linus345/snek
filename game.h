@@ -41,8 +41,8 @@ typedef struct {
 
 Snake *new_snake(int player_nr);
 void change_snake_velocity(Snake *snake);
-
 void new_snake_pos(Snake *snake);
+void snake_texture_rotation(Snake *snake);
 
 typedef struct {
     int points;

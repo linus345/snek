@@ -94,6 +94,7 @@ void change_snake_velocity(Snake *snake)
                 snake->vel_x = 0;
                 snake->vel_y = -snake->speed;
                 snake->next_dir = None;
+                snake->head.angle = 0;
             } else {
                 snake->next_dir = Up;
             }
@@ -103,6 +104,7 @@ void change_snake_velocity(Snake *snake)
                 snake->vel_x = 0;
                 snake->vel_y = snake->speed;
                 snake->next_dir = None;
+                snake->head.angle = 180;
             } else {
                 snake->next_dir = Down;
             }
@@ -112,6 +114,7 @@ void change_snake_velocity(Snake *snake)
                 snake->vel_x = -snake->speed;
                 snake->vel_y = 0;
                 snake->next_dir = None;
+                snake->head.angle = 270;
             } else {
                 snake->next_dir = Left;
             }
@@ -121,6 +124,7 @@ void change_snake_velocity(Snake *snake)
                 snake->vel_x = snake->speed;
                 snake->vel_y = 0;
                 snake->next_dir = None;
+                snake->head.angle = 90;
             } else {
                 snake->next_dir = Right;
             }

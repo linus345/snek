@@ -88,9 +88,11 @@ int main(int argc, char *argv[])
         // test singleplayer position update
         new_snake_pos(player1->snake);
 
+        // snake head rendering
         SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
-        SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};     //snake head rec
+        SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
 
+        // snake body rendering
         SDL_Rect body_src[MAX_SNAKE_LENGTH];
         SDL_Rect body_dst[MAX_SNAKE_LENGTH];
         for(int i = 0; i < player1->snake->body_length; i++) {
