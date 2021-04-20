@@ -32,6 +32,10 @@ int main(int argc, char *argv[])
                     break;
             }
         }
+        if (snake->head.x <= 0 || snake->head.y <= 0 || snake->head.x >= WINDOW_WIDTH - CELL_SIZE || pos.y >= WINDOW_HEIGHT - CELL_SIZE.h)
+        {
+            game.state = QUIT_STATE; // Kills the program
+        }
     }
 
     quit_app(app);
