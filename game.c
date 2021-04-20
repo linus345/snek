@@ -128,6 +128,7 @@ void change_snake_velocity(Snake *snake)
         default:
             break;
     }
+}
 
 void new_snake_pos(Snake *snake)
 {
