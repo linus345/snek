@@ -28,14 +28,14 @@ int main(int argc, char *argv[])
     snake_texture[0].x = 0;
     snake_texture[0].y = 0;
     // body
-    snake_texture[1].x = 64;
+    snake_texture[1].x = 32;
     snake_texture[1].y = 0;
     // tail
-    snake_texture[2].x = 0;
-    snake_texture[2].y = 64;
+    snake_texture[2].x = 32;
+    snake_texture[2].y = 32;
     // turning bodypart
-    snake_texture[3].x = 64;
-    snake_texture[3].y = 64;
+    snake_texture[3].x = 0;
+    snake_texture[3].y = 32;
     
     SDL_Texture *snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
