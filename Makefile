@@ -19,7 +19,7 @@ else
 	endif
 endif
 
-$(EXEC): main.o game.o app.o snake.o player.o
+$(EXEC): main.o game.o app.o snake.o player.o fruit.o
 	$(CC) *.o $(CFLAGS) -o $(EXEC)
 
 main.o: main.c
@@ -30,6 +30,9 @@ game.o: game.c
 
 app.o: app.c
 	$(CC) app.c -c $(CFLAGS)
+	
+fruit.o: fruit.c
+	$(CC) fruit.c -c $(CFLAGS)
 
 snake.o: snake.c
 	$(CC) snake.c -c $(CFLAGS)
