@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #define MAX_SNAKE_LENGTH 256
-#define SPEED 1
+#define SPEED 300      // ms
 #define CELL_SIZE 32
 
 typedef struct {
@@ -13,8 +13,18 @@ typedef struct {
 
 typedef struct {
     int angle;
+    bool is_turn;
+    bool should_flip_vertical;
+    bool should_flip_horizontal;
+    int turn_rotation;
     Pos pos;
 } Body_Part;
+
+typedef struct {
+    int angle;
+    bool has_turned;
+    Pos pos;
+} Head_Part;
 
 void load_texture(App *app, SDL_Texture **texture, char *path);
 
@@ -34,7 +44,7 @@ typedef struct {
     int angle;
     enum Dir dir;
     enum Dir next_dir; // used to wait for snake to be aligned with 32x32 grid before changing velocity
-    Body_Part head;
+    Head_Part head;
     Body_Part body[MAX_SNAKE_LENGTH];
     Body_Part tail;
 } Snake;

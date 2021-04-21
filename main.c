@@ -61,6 +61,9 @@ int main(int argc, char *argv[])
     SDL_Texture *background_tex;
     load_texture(app, &background_tex, "./resources/background.png");
 
+    // timer
+    unsigned last_time = 0, current_time;
+
     while (app->running) {
         SDL_Event event;
         // check for event
@@ -100,10 +103,16 @@ int main(int argc, char *argv[])
             }
         }
 
-        // update snake velocity based on direction state
-        change_snake_velocity(player1->snake);
-        // test singleplayer position update
-        new_snake_pos(player1->snake);
+        current_time = SDL_GetTicks();
+        if(current_time > last_time + player1->snake->speed) {
+            change_snake_velocity(player1->snake);
+
+            // update snake velocity based on direction state
+            // test singleplayer position update
+            new_snake_pos(player1->snake);
+
+            last_time = current_time;
+        }
 
         // snake head rendering
         SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
@@ -113,8 +122,13 @@ int main(int argc, char *argv[])
         SDL_Rect body_src[MAX_SNAKE_LENGTH];
         SDL_Rect body_dst[MAX_SNAKE_LENGTH];
         for(int i = 0; i < player1->snake->body_length; i++) {
-            body_src[i].x = snake_texture[1].x;
-            body_src[i].y = snake_texture[1].y;
+            if(player1->snake->body[i].is_turn) {
+                body_src[i].x = snake_texture[3].x;
+                body_src[i].y = snake_texture[3].y;
+            } else {
+                body_src[i].x = snake_texture[1].x;
+                body_src[i].y = snake_texture[1].y;
+            }
             body_src[i].w = CELL_SIZE;
             body_src[i].h = CELL_SIZE;
 
