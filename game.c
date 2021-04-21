@@ -82,6 +82,7 @@ Snake *new_snake(int player_nr)
     return snake;
 }
 
+//Initializing new player snake
 Player *new_player(int host, int port, int player_nr)
 {
     Player *player = malloc(sizeof(Player));
@@ -95,8 +96,10 @@ Player *new_player(int host, int port, int player_nr)
     return player;
 }
 
+//Texture loading function
 void load_texture(App *app, SDL_Texture **texture, char *path)
 {
+    //Loading texture dadto to RAM from destination
     printf("Loading texture: %s\n", path);
     SDL_Surface *surface = IMG_Load(path);
     if(!surface) {

@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     snake_texture[3].x = 64;
     snake_texture[3].y = 64;
     
+    // Snake spritesheet
     SDL_Texture *snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
 
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
     SDL_Texture *background_tex;
     load_texture(app, &background_tex, "./resources/background.png");
 
+    // Keyboard input translator
     while (app->running) {
         SDL_Event event;
         // check for event
@@ -83,9 +85,11 @@ int main(int argc, char *argv[])
             }
         }
 
-        SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
-        SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
+        // Texture selection from localizing coordinates on spritesheet
+        SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};                 // Snake Head
+        SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE}; // Assigned to player 1
 
+        // Body texture and growth engine
         SDL_Rect body_src[MAX_SNAKE_LENGTH];
         SDL_Rect body_dst[MAX_SNAKE_LENGTH];
         for(int i = 0; i < player1->snake->body_length; i++) {

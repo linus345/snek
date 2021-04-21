@@ -18,6 +18,7 @@ typedef struct {
 
 void load_texture(App *app, SDL_Texture **texture, char *path);
 
+//Keyboard input direction variables
 enum Dir {
     Up,
     Down,
@@ -25,20 +26,22 @@ enum Dir {
     Right
 };
 
+//Player snake body struct
 typedef struct {
-    int body_length;
-    int speed;
+    int body_length;                        //Number of body parts and their coordinates
+    int speed;                              //Game clock and player score multiplied to calculate player speed
     int vel_x;
     int vel_y;
-    int angle;
+    int angle;                              //Current player direction
     enum Dir dir;
     Body_Part head;
-    Body_Part body[MAX_SNAKE_LENGTH];
+    Body_Part body[MAX_SNAKE_LENGTH]; 
     Body_Part tail;
 } Snake;
 
 Snake *new_snake(int player_nr);
 
+//Player values
 typedef struct {
     int points;
     bool alive;
