@@ -8,21 +8,23 @@
 #include "snake.h"
 
 Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fruits[])
-{
+{/*
     if (*nr_of_fruits >= nr_of_players)
     {
-        return NULL;
+        return 0;//NULL;
     }
-
+*/
     //allocate memory on heap
+    //if (*nr_of_fruits < nr_of_players){
     Fruit *fruit = malloc(sizeof(Fruit));
+    //}
 
     bool check_pos = true;
     int fruit_type;
     if (*nr_of_fruits < nr_of_players)
     {
-        fruit->pos.x = rand() % WINDOW_WIDTH;
-        fruit->pos.y = rand() % WINDOW_HEIGHT;
+        fruit->pos.x = rand() % (WINDOW_WIDTH / CELL_SIZE)*CELL_SIZE;
+        fruit->pos.y = rand() % (WINDOW_HEIGHT / CELL_SIZE)*CELL_SIZE;
         fruit_type = rand() % (NR_OF_FRUIT_TYPES-1);
         // place fruit at location not previously occupied by another fruit or snake
         // Check if the fruit spawns on a snake head
@@ -60,8 +62,12 @@ Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fru
             //place_fruit(fruits[i], int i);
             (*nr_of_fruits)++;
         }
+        return fruit;
     }
-    return fruit;
+    else{
+        free(fruit);
+    }
+    return NULL; //fruit;
 }
 
 

@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // intilaze fruits array
     Fruit *fruits[MAX_PLAYERS];
     int nr_of_fruits = 0;
-    bool start_up_fruit = true;
+    //bool start_up_fruit = true;
 
     Pos fruit_texture[4];
     //cherry
@@ -194,14 +194,18 @@ int main(int argc, char *argv[])
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        SDL_Rect fruit_src[NR_OF_FRUIT_TYPES];
-        SDL_Rect fruit_dst[NR_OF_FRUIT_TYPES];
+        SDL_Rect fruit_src[nr_of_fruits];
+        SDL_Rect fruit_dst[nr_of_fruits];
 
-        int nr_of_players = 4;
-        nr_of_fruits = 4;
-        for(int i = 0; i < nr_of_players; i++) {
-            fruits[nr_of_fruits] = rand_fruit(nr_of_players, &nr_of_fruits, player1->snake, fruits);
-        }
+
+        //nr_of_fruits = 0;
+
+        //for (int i = 0; i < nr_of_fruits+1; i++){
+         //   fruits[nr_of_fruits] = rand_fruit(4, &nr_of_fruits, player1->snake, fruits);
+        //}
+if (nr_of_fruits < 4){
+    fruits[nr_of_fruits] = rand_fruit(4, &nr_of_fruits, player1->snake, fruits);
+}
         for (int i = 0; i < nr_of_fruits; i++)
         {
             fruit_src[i].x = fruit_texture[fruits[i]->type].x;
@@ -213,7 +217,8 @@ int main(int argc, char *argv[])
             fruit_dst[i].y = fruits[i]->pos.y;
             fruit_dst[i].w = CELL_SIZE;
             fruit_dst[i].h = CELL_SIZE;
-
+        }
+        for (int i = 0; i < nr_of_fruits; i++){
             SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
         }
 
@@ -240,6 +245,8 @@ int main(int argc, char *argv[])
         SDL_Delay(1000 / 60);
     }
 
+    printf("%d", nr_of_fruits);
     quit_app(app);
+    
     return 0;
 }
