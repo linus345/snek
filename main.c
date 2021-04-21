@@ -5,6 +5,8 @@
 #include <SDL2/SDL_image.h>
 #include "app.h"
 #include "game.h"
+#include "player.h"
+#include "snake.h"
 
 int main(int argc, char *argv[])
 {
