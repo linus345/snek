@@ -28,14 +28,14 @@ int main(int argc, char *argv[])
     snake_texture[0].x = 0;
     snake_texture[0].y = 0;
     // body
-    snake_texture[1].x = 64;
+    snake_texture[1].x = 32;
     snake_texture[1].y = 0;
     // tail
-    snake_texture[2].x = 0;
-    snake_texture[2].y = 64;
+    snake_texture[2].x = 32;
+    snake_texture[2].y = 32;
     // turning bodypart
-    snake_texture[3].x = 64;
-    snake_texture[3].y = 64;
+    snake_texture[3].x = 0;
+    snake_texture[3].y = 32;
     
     SDL_Texture *snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
@@ -100,9 +100,16 @@ int main(int argc, char *argv[])
             }
         }
 
+        // update snake velocity based on direction state
+        change_snake_velocity(player1->snake);
+        // test singleplayer position update
+        new_snake_pos(player1->snake);
+
+        // snake head rendering
         SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
         SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
 
+        // snake body rendering
         SDL_Rect body_src[MAX_SNAKE_LENGTH];
         SDL_Rect body_dst[MAX_SNAKE_LENGTH];
         for(int i = 0; i < player1->snake->body_length; i++) {
@@ -118,6 +125,9 @@ int main(int argc, char *argv[])
         }
         SDL_Rect tail_src = {snake_texture[2].x, snake_texture[2].y, CELL_SIZE, CELL_SIZE};
         SDL_Rect tail_dst = {player1->snake->tail.pos.x, player1->snake->tail.pos.y, CELL_SIZE, CELL_SIZE};
+
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
 
         SDL_Rect background_dst = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
