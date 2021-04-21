@@ -197,8 +197,11 @@ int main(int argc, char *argv[])
         SDL_Rect fruit_src[NR_OF_FRUIT_TYPES];
         SDL_Rect fruit_dst[NR_OF_FRUIT_TYPES];
 
-        fruits[nr_of_fruits] = rand_fruit(4, &nr_of_fruits, player1->snake, fruits);
-
+        int nr_of_players = 4;
+        nr_of_fruits = 4;
+        for(int i = 0; i < nr_of_players; i++) {
+            fruits[nr_of_fruits] = rand_fruit(nr_of_players, &nr_of_fruits, player1->snake, fruits);
+        }
         for (int i = 0; i < nr_of_fruits; i++)
         {
             fruit_src[i].x = fruit_texture[fruits[i]->type].x;
