@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <SDL2/SDL.h>
+#include "app.h"
 #define CELL_SIZE 32
 
 typedef struct {
