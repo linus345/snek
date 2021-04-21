@@ -11,7 +11,7 @@ Snake *new_snake(int player_nr)
     Snake *snake = malloc(sizeof(Snake));
 
     // snake initially has 1 body part + head and tail
-    snake->body_length = 1;
+    snake->body_length = 2;
     // initialize start speed
     snake->speed = SPEED;
     snake->next_dir = None;
@@ -20,6 +20,10 @@ Snake *new_snake(int player_nr)
     snake->body[0].should_flip_vertical = false;
     snake->body[0].should_flip_horizontal = false;
     snake->body[0].turn_rotation = 0;
+    snake->body[1].is_turn = false;
+    snake->body[1].should_flip_vertical = false;
+    snake->body[1].should_flip_horizontal = false;
+    snake->body[1].turn_rotation = 0;
 
     // position snake differently depending on player
     switch(player_nr) {
@@ -29,13 +33,16 @@ Snake *new_snake(int player_nr)
             snake->vel_y = 0;
             snake->head.angle = 90;
             snake->body[0].angle = 90;
+            snake->body[1].angle = 90;
             snake->tail.angle = 90;
             snake->head.pos.x = 100;
             snake->head.pos.y = CELL_SIZE;
             snake->dir = Right;
             snake->body[0].pos.x = snake->head.pos.x - CELL_SIZE;
             snake->body[0].pos.y = snake->head.pos.y;
-            snake->tail.pos.x = snake->head.pos.x - CELL_SIZE * 2;
+            snake->body[1].pos.x = snake->head.pos.x - CELL_SIZE * 2;
+            snake->body[1].pos.y = snake->head.pos.y;
+            snake->tail.pos.x = snake->head.pos.x - CELL_SIZE * 3;
             snake->tail.pos.y = snake->head.pos.y;
             break;
         // position snake top right, moving to downwards
@@ -166,10 +173,43 @@ void new_snake_pos(Snake *snake)
             }
             break;
         case 90: // old direction was right
+            if(snake->dir == Up) {
+                snake->body[0].is_turn = true;
+                snake->body[0].should_flip_vertical = false;
+                snake->body[0].should_flip_horizontal = false;
+                snake->body[0].turn_rotation = 90;
+            } else if (snake->dir == Down) {
+                snake->body[0].is_turn = true;
+                snake->body[0].should_flip_vertical = false;
+                snake->body[0].should_flip_horizontal = true;
+                snake->body[0].turn_rotation = 90;
+            }
             break;
         case 180: // old direction was down
+            if(snake->dir == Left) {
+                snake->body[0].is_turn = true;
+                snake->body[0].should_flip_vertical = true;
+                snake->body[0].should_flip_horizontal = false;
+                snake->body[0].turn_rotation = 0;
+            } else if (snake->dir == Right) {
+                snake->body[0].is_turn = true;
+                snake->body[0].should_flip_vertical = false;
+                snake->body[0].should_flip_horizontal = false;
+                snake->body[0].turn_rotation = 180;
+            }
             break;
         case 270: // old direction was left
+            if(snake->dir == Up) {
+                snake->body[0].is_turn = true;
+                snake->body[0].should_flip_vertical = true;
+                snake->body[0].should_flip_horizontal = false;
+                snake->body[0].turn_rotation = 90;
+            } else if (snake->dir == Down) {
+                snake->body[0].is_turn = true;
+                snake->body[0].should_flip_vertical = false;
+                snake->body[0].should_flip_horizontal = false;
+                snake->body[0].turn_rotation = 270;
+            }
             break;
     }
     /* snake->body[0].is_turn = snake->head.has_turned; */

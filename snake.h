@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "game.h"
 #define MAX_SNAKE_LENGTH 256
-#define SPEED 300      // ms
+#define SPEED 400      // ms
 
 typedef struct {
     int angle;
