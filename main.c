@@ -189,10 +189,6 @@ int main(int argc, char *argv[])
             }
             SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[i], &body_dst[i], rotation, NULL, flip);
         }
-        for (int i = 0; i < player1->snake->body_length; i++)
-        {
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[i], &body_dst[i], player1->snake->body[i].angle, NULL, SDL_FLIP_NONE);
-        }
         // render tail
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, player1->snake->tail.angle, NULL, SDL_FLIP_NONE);
 

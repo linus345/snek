@@ -2,6 +2,7 @@
 #define FRUIT_H
 
 #include "game.h"
+#include "snake.h"
 
 enum Fruit_type {
     Apple,

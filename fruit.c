@@ -5,6 +5,7 @@
 #include "app.h"
 #include "fruit.h"
 #include "game.h"
+#include "snake.h"
 
 #define FRUIT_LENGHT 4
 
