@@ -138,6 +138,7 @@ int main(int argc, char *argv[])
         int rotation;
         for(int i = 0; i < player1->snake->body_length; i++) {
             rotation = player1->snake->body[i].angle;
+            flip = SDL_FLIP_NONE;
             if(player1->snake->body[i].is_turn) {
                 rotation = player1->snake->body[i].turn_rotation;
                 if(player1->snake->body[i].should_flip_vertical) {
