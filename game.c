@@ -230,13 +230,7 @@ Fruit *rand_fruit(int nr_of_players, int nr_of_fruits, Snake *snakes[], Fruit *f
     }
     return fruit;
 }
-
-void place_fruit(Fruit *fruits[], Pos fruit_texture[], SDL_Texture fruit_sprite_tex)
-{
-    SDL_Rect fruit_src = {fruit_texture[0].x, fruit_texture[0].y, CELL_SIZE, CELL_SIZE};
-    SDL_Rect fruit_dst = {fruit->pos.x, fruit->pos.y, CELL_SIZE, CELL_SIZE};
-    SDL_RenderCopy(app->renderer, fruit_sprite_tex, &fruit_src, &fruit_dst, NULL, NULL);
-}*/
+*/
 
 void load_texture(App *app, SDL_Texture **texture, char *path)
 {

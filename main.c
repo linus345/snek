@@ -152,6 +152,16 @@ int main(int argc, char *argv[])
         }
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, player1->snake->tail.angle, NULL, SDL_FLIP_NONE);
 
+        Fruit fruit;
+        fruit.pos.x = 200;
+        fruit.pos.y = 200;
+        fruit.type = Cherry;
+        fruit.points = 1;
+
+        SDL_Rect fruit_src = {fruit_texture[0].x, fruit_texture[0].y, CELL_SIZE, CELL_SIZE};
+        SDL_Rect fruit_dst = {fruit.pos.x, fruit.pos.y, CELL_SIZE, CELL_SIZE};
+        SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src, &fruit_dst, 0, NULL, SDL_FLIP_NONE);
+
         // present on screen
         SDL_RenderPresent(app->renderer);
 
