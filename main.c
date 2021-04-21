@@ -194,13 +194,24 @@ int main(int argc, char *argv[])
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        SDL_Rect fruit_src[NR_OF_FRUIT_TYPES];
+        SDL_Rect fruit_dst[NR_OF_FRUIT_TYPES];
+
         fruits[nr_of_fruits] = rand_fruit(4, &nr_of_fruits, player1->snake, fruits);
 
         for (int i = 0; i < nr_of_fruits; i++)
         {
-            SDL_Rect fruit_src = {fruit_texture[fruits[i]->type].x, fruit_texture[fruits[i]->type].y, CELL_SIZE, CELL_SIZE};
-            SDL_Rect fruit_dst = {fruits[i]->pos.x, fruits[i]->pos.y, CELL_SIZE, CELL_SIZE};
-            SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src, &fruit_dst, 0, NULL, SDL_FLIP_NONE);
+            fruit_src[i].x = fruit_texture[fruits[i]->type].x;
+            fruit_src[i].y = fruit_texture[fruits[i]->type].y;
+            fruit_src[i].w = CELL_SIZE;
+            fruit_src[i].h = CELL_SIZE;
+
+            fruit_dst[i].x = fruits[i]->pos.x;
+            fruit_dst[i].y = fruits[i]->pos.y;
+            fruit_dst[i].w = CELL_SIZE;
+            fruit_dst[i].h = CELL_SIZE;
+
+            SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
         }
 
         /*

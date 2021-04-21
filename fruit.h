@@ -4,6 +4,8 @@
 #include "game.h"
 #include "snake.h"
 
+#define NR_OF_FRUIT_TYPES 4
+
 enum Fruit_type {
     Cherry = 0,
     Apple = 1,

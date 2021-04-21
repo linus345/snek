@@ -7,8 +7,6 @@
 #include "game.h"
 #include "snake.h"
 
-#define FRUIT_LENGHT 4
-
 Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fruits[])
 {
     if (*nr_of_fruits >= nr_of_players)
@@ -25,7 +23,7 @@ Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fru
     {
         fruit->pos.x = rand() % WINDOW_WIDTH;
         fruit->pos.y = rand() % WINDOW_HEIGHT;
-        fruit_type = rand() % (FRUIT_LENGHT-1);
+        fruit_type = rand() % (NR_OF_FRUIT_TYPES-1);
         // place fruit at location not previously occupied by another fruit or snake
         // Check if the fruit spawns on a snake head
         if (fruit->pos.x == snake->head.pos.x && fruit->pos.y == snake->head.pos.y)
@@ -65,6 +63,7 @@ Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fru
     }
     return fruit;
 }
+
 
 bool fruit_collision(Snake *snake, Fruit *fruits[])
 {
