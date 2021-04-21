@@ -145,6 +145,11 @@ void new_snake_pos(Snake *snake)
         snake->body[i].should_flip_vertical = snake->body[i-1].should_flip_vertical;
         snake->body[i].should_flip_horizontal = snake->body[i-1].should_flip_horizontal;
         snake->body[i].turn_rotation = snake->body[i-1].turn_rotation;
+
+        snake->body[i-1].is_turn = false;
+        snake->body[i-1].should_flip_vertical = false;
+        snake->body[i-1].should_flip_horizontal = false;
+        snake->body[i-1].turn_rotation = 0;
     }
     switch(snake->body[0].angle) {
         case 0: // old direction was up
