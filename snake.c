@@ -10,16 +10,11 @@ Snake *new_snake(int player_nr)
     // allocate memory on heap
     Snake *snake = malloc(sizeof(Snake));
 
-    // snake initially has 1 body part + head and tail
-    snake->body_length = 1;
+    snake->body_length = 0;
     // initialize start speed
     snake->speed = SPEED;
     snake->next_dir = None;
     snake->head.has_turned = false;
-    snake->body[0].is_turn = false;
-    snake->body[0].should_flip_vertical = false;
-    snake->body[0].should_flip_horizontal = false;
-    snake->body[0].turn_rotation = 0;
 
     // position snake differently depending on player
     switch(player_nr) {
@@ -28,13 +23,11 @@ Snake *new_snake(int player_nr)
             snake->vel_x = CELL_SIZE;
             snake->vel_y = 0;
             snake->head.angle = 90;
-            snake->body[0].angle = 90;
             snake->tail.angle = 90;
             snake->head.pos.x = 100;
             snake->head.pos.y = CELL_SIZE;
             snake->dir = Right;
-            snake->body[0].pos.x = snake->head.pos.x - CELL_SIZE;
-            snake->body[0].pos.y = snake->head.pos.y;
+            snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
             snake->tail.pos.x = snake->head.pos.x - CELL_SIZE * 2;
             snake->tail.pos.y = snake->head.pos.y;
             break;
@@ -48,8 +41,7 @@ Snake *new_snake(int player_nr)
             snake->head.pos.x = WINDOW_WIDTH - 100;
             snake->head.pos.y = CELL_SIZE * 3;
             snake->dir = Down;
-            snake->body[0].pos.x = snake->head.pos.x;
-            snake->body[0].pos.y = snake->head.pos.y - CELL_SIZE;
+            snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
             snake->tail.pos.x = snake->head.pos.x;
             snake->tail.pos.y = snake->head.pos.y - CELL_SIZE * 2;
             break;
@@ -63,8 +55,7 @@ Snake *new_snake(int player_nr)
             snake->head.pos.x = WINDOW_WIDTH - CELL_SIZE * 3;
             snake->head.pos.y = WINDOW_HEIGHT - 100;
             snake->dir = Left;
-            snake->body[0].pos.x = snake->head.pos.x + CELL_SIZE;
-            snake->body[0].pos.y = snake->head.pos.y;
+            snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
             snake->tail.pos.x = snake->head.pos.x + CELL_SIZE * 2;
             snake->tail.pos.y = snake->head.pos.y;
             break;
@@ -78,8 +69,7 @@ Snake *new_snake(int player_nr)
             snake->head.pos.x = 100;
             snake->head.pos.y = WINDOW_HEIGHT - CELL_SIZE * 3;
             snake->dir = Up;
-            snake->body[0].pos.x = snake->head.pos.x;
-            snake->body[0].pos.y = snake->head.pos.y + CELL_SIZE;
+            snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
             snake->tail.pos.x = snake->head.pos.x;
             snake->tail.pos.y = snake->head.pos.y + CELL_SIZE * 2;
             break;
@@ -213,4 +203,37 @@ void new_snake_pos(Snake *snake)
     snake->head.pos.x += snake->vel_x;
     snake->head.pos.y += snake->vel_y;
     snake->head.has_turned = false;
+}
+
+Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_length)
+{
+    Body_Part body;
+
+    body.is_turn = false;
+    body.should_flip_vertical = false;
+    body.should_flip_horizontal = false;
+    body.turn_rotation = 0;
+
+    body.angle = angle;
+    switch(body.angle) {
+        case 0: // going up
+            body.pos.x = last_body_part_pos->x;
+            body.pos.y = last_body_part_pos->y + CELL_SIZE;
+            break;
+        case 90: // going right
+            body.pos.x = last_body_part_pos->x - CELL_SIZE;
+            body.pos.y = last_body_part_pos->y;
+            break;
+        case 180: // going down
+            body.pos.x = last_body_part_pos->x;
+            body.pos.y = last_body_part_pos->y - CELL_SIZE;
+            break;
+        case 270: // going left
+            body.pos.x = last_body_part_pos->x + CELL_SIZE;
+            body.pos.y = last_body_part_pos->y;
+            break;
+    }
+
+    (*body_length)++;
+    return body;
 }
