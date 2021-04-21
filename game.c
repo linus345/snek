@@ -96,6 +96,10 @@ Player *new_player(int host, int port, int player_nr)
 }
 
 
+
+
+
+/*
 Fruit *rand_fruit(int nr_of_players, int nr_of_fruits, Snake *snakes[], Fruit *fruits[])
 {
     //allocate memory on heap
@@ -105,30 +109,39 @@ Fruit *rand_fruit(int nr_of_players, int nr_of_fruits, Snake *snakes[], Fruit *f
     {
         fruit->pos.x = rand() % WINDOW_WIDTH;
         fruit->pos.y = rand() % WINDOW_HEIGHT;
-        //place fruit at location not previously occupied by another fruit
-        for (int i = 0; i < nr_of_fruits-1; i++) 
+        //place fruit at location not previously occupied by another fruit or snake
+        for (int i = 0; i < nr_of_fruits; i++) 
         {
             if(fruit->pos.x != fruits[i]->pos.x && fruit->pos.y != fruits[i]->pos.y)
             {
-                if (fruit->pos.x != Snake->pos.head && fruit->pos.x != Snake->pos.body[] && fruit->pos.x != Snake->pos.tail)                        // !!!
-                {
-                    if (fruit->pos.y != Snake->pos.head && fruit->pos.y != Snake->pos.body[] && fruit->pos.y != Snake->pos.tail)                    // !!!
+                if (fruit->pos.x != player1->snake->head->pos.x && fruit->pos.y != player1->snake->head->pos.y)
+                { 
+                    for(int j = 0; j < player1->snake->body_length; j++)
                     {
-                        fruits[0]->pos.x = fruit->pos.x;                   // !!!
-                        fruits[0]->pos.y = fruit->pos.y; 
-                        place_fruit(fruits[0]);
-                        nr_of_fruits++;
-                    }
-                }  
+                        if(fruit->pos.x != player1->snake->body[j]->pos.x && fruit->pos.y != player1->snake->body[j]->pos.y)
+                        {
+                            if(fruit->pos.x != player1->snake->tail->pos.x && fruit->pos.y != player1->snake->tail->pos.y)
+                            {
+                                fruits[i]->pos.x = fruit->pos.x;                   
+                                fruits[i]->pos.y = fruit->pos.y;
+                                place_fruit(fruits[i]);
+                                nr_of_fruits++; 
+                            }
+                        }
+                    } 
+                }
             }
         }
     }
-    return nr_of_fruits;
+    return fruit;
 }
 
-void place_fruit(SDL_Renderer *renderer, Fruit *fruits[])
+void place_fruit(Fruit *fruits[], Pos fruit_texture[], SDL_Texture fruit_sprite_tex)
 {
-
+    SDL_Rect fruit_src = {fruit_texture[0].x, fruit_texture[0].y, CELL_SIZE, CELL_SIZE};
+    SDL_Rect fruit_dst = {fruit->pos.x, fruit->pos.y, CELL_SIZE, CELL_SIZE};
+    SDL_RenderCopy(app->renderer, fruit_sprite_tex, &fruit_src, &fruit_dst, NULL, NULL);
+}*/
 
 void load_texture(App *app, SDL_Texture **texture, char *path)
 {

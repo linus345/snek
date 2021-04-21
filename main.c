@@ -40,6 +40,23 @@ int main(int argc, char *argv[])
     SDL_Texture *snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
 
+    Pos fruit_texture[4];
+    //cherry
+    fruit_texture[0].x = 0;
+    fruit_texture[0].y = 0;
+    //apple
+    fruit_texture[1].x = 32;
+    fruit_texture[1].y = 0;
+    //pear
+    fruit_texture[2].x = 0;
+    fruit_texture[2].y = 32;
+    //mango
+    fruit_texture[3].x = 32;
+    fruit_texture[3].y = 32;
+
+    SDL_Texture *fruit_sprite_tex;
+    load_texture(app, &fruit_sprite_tex, "./resources/fruit-sprite.png");
+
     // background texture
     SDL_Texture *background_tex;
     load_texture(app, &background_tex, "./resources/background.png");

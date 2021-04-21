@@ -59,7 +59,7 @@ enum Fruit_type {
 
 typedef struct {
     Pos pos;
-    Fruit_type type;
+    enum Fruit_type type;
     int points;
 } Fruit;
 
