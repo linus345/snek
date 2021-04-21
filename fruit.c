@@ -20,11 +20,12 @@ Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fru
     Fruit *fruit = malloc(sizeof(Fruit));
 
     bool check_pos = true;
-
+    int fruit_type;
     if (*nr_of_fruits < nr_of_players)
     {
         fruit->pos.x = rand() % WINDOW_WIDTH;
         fruit->pos.y = rand() % WINDOW_HEIGHT;
+        fruit_type = rand() % (FRUIT_LENGHT-1);
         // place fruit at location not previously occupied by another fruit or snake
         // Check if the fruit spawns on a snake head
         if (fruit->pos.x == snake->head.pos.x && fruit->pos.y == snake->head.pos.y)
@@ -57,6 +58,7 @@ Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fru
         {
             fruits[*nr_of_fruits]->pos.x = fruit->pos.x;
             fruits[*nr_of_fruits]->pos.y = fruit->pos.y;
+            fruits[*nr_of_fruits]->type = fruit_type;
             //place_fruit(fruits[i], int i);
             (*nr_of_fruits)++;
         }

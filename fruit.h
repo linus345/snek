@@ -5,10 +5,10 @@
 #include "snake.h"
 
 enum Fruit_type {
-    Apple,
-    Cherry,
-    Pear,
-    Mango
+    Cherry = 0,
+    Apple = 1,
+    Pear = 2,
+    Mango = 3
 };
 
 typedef struct {

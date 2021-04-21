@@ -192,10 +192,18 @@ int main(int argc, char *argv[])
         // render tail
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, player1->snake->tail.angle, NULL, SDL_FLIP_NONE);
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        fruits[nr_of_fruits] = rand_fruit(1, &nr_of_fruits, player1->snake, fruits);
+        fruits[nr_of_fruits] = rand_fruit(4, &nr_of_fruits, player1->snake, fruits);
 
+        for (int i = 0; i < nr_of_fruits; i++)
+        {
+            SDL_Rect fruit_src = {fruit_texture[fruits[i]->type].x, fruit_texture[fruits[i]->type].y, CELL_SIZE, CELL_SIZE};
+            SDL_Rect fruit_dst = {fruits[i]->pos.x, fruits[i]->pos.y, CELL_SIZE, CELL_SIZE};
+            SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src, &fruit_dst, 0, NULL, SDL_FLIP_NONE);
+        }
+
+        /*
         if (start_up_fruit)
         {
             SDL_Rect fruit_src = {fruit_texture[0].x, fruit_texture[0].y, CELL_SIZE, CELL_SIZE};
@@ -203,18 +211,14 @@ int main(int argc, char *argv[])
             SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src, &fruit_dst, 0, NULL, SDL_FLIP_NONE);
             start_up_fruit = false;
         }
+    
 
         if (fruit_collision(player1->snake, fruits))
         {
-            for (int i = 0; i < 1; i++)
-            {
-                SDL_Rect fruit_src = {fruit_texture[0].x, fruit_texture[0].y, CELL_SIZE, CELL_SIZE};
-                SDL_Rect fruit_dst = {fruits[0]->pos.x, fruits[0]->pos.y, CELL_SIZE, CELL_SIZE};
-                SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src, &fruit_dst, 0, NULL, SDL_FLIP_NONE);
-            }
+            
         }
-        
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        */
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // present on screen
         SDL_RenderPresent(app->renderer);
