@@ -92,29 +92,28 @@ Fruit *rand_fruit(int nr_of_players, int nr_of_fruits, Snake *snakes[], Fruit *f
         fruit->pos.x = rand() % WINDOW_WIDTH;
         fruit->pos.y = rand() % WINDOW_HEIGHT;
         //place fruit at location not previously occupied by another fruit
-        if(fruit->pos.x != fruits[0]->pos.x && fruit->pos.y != fruits[0]->pos.y)
+        for (int i = 0; i < nr_of_fruits-1; i++) 
         {
-            if (fruit->pos.x != Snake->pos.head && fruit->pos.x != Snake->pos.body[] && fruit->pos.x != Snake->pos.tail)                        // !!!
+            if(fruit->pos.x != fruits[i]->pos.x && fruit->pos.y != fruits[i]->pos.y)
             {
-                if (fruit->pos.y != Snake->pos.head && fruit->pos.y != Snake->pos.body[] && fruit->pos.y != Snake->pos.tail)                    // !!!
+                if (fruit->pos.x != Snake->pos.head && fruit->pos.x != Snake->pos.body[] && fruit->pos.x != Snake->pos.tail)                        // !!!
                 {
-                    fruits[0]->pos.x = fruit->pos.x;                   // !!!
-                    fruits[0]->pos.y = fruit->pos.y; 
-                    place_fruit(fruits[0]);
-                    nr_of_fruits++;
-                }
-            }  
+                    if (fruit->pos.y != Snake->pos.head && fruit->pos.y != Snake->pos.body[] && fruit->pos.y != Snake->pos.tail)                    // !!!
+                    {
+                        fruits[0]->pos.x = fruit->pos.x;                   // !!!
+                        fruits[0]->pos.y = fruit->pos.y; 
+                        place_fruit(fruits[0]);
+                        nr_of_fruits++;
+                    }
+                }  
+            }
         }
-        for (int i = 0; i < nr_of_fruits-1; i++)                // !!!
-        {
-            fruits[i] = fruits[i+1];
-        }        
     }
     return nr_of_fruits;
 }
 
 void place_fruit(SDL_Renderer *renderer, Fruit *fruits[])
 {
-    
+
 }
 
