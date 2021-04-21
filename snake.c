@@ -24,7 +24,7 @@ Snake *new_snake(int player_nr)
             snake->vel_y = 0;
             snake->head.angle = 90;
             snake->tail.angle = 90;
-            snake->head.pos.x = 100;
+            snake->head.pos.x = CELL_SIZE * 3;
             snake->head.pos.y = CELL_SIZE;
             snake->dir = Right;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
@@ -38,7 +38,7 @@ Snake *new_snake(int player_nr)
             snake->head.angle = 180;
             snake->body[0].angle = 180;
             snake->tail.angle = 180;
-            snake->head.pos.x = WINDOW_WIDTH - 100;
+            snake->head.pos.x = WINDOW_WIDTH - CELL_SIZE * 3;
             snake->head.pos.y = CELL_SIZE * 3;
             snake->dir = Down;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
@@ -53,7 +53,7 @@ Snake *new_snake(int player_nr)
             snake->body[0].angle = 270;
             snake->tail.angle = 270;
             snake->head.pos.x = WINDOW_WIDTH - CELL_SIZE * 3;
-            snake->head.pos.y = WINDOW_HEIGHT - 100;
+            snake->head.pos.y = WINDOW_HEIGHT - CELL_SIZE * 3;
             snake->dir = Left;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
             snake->tail.pos.x = snake->head.pos.x + CELL_SIZE * 2;
@@ -66,7 +66,7 @@ Snake *new_snake(int player_nr)
             snake->head.angle = 0;
             snake->body[0].angle = 0;
             snake->tail.angle = 0;
-            snake->head.pos.x = 100;
+            snake->head.pos.x = CELL_SIZE * 3;
             snake->head.pos.y = WINDOW_HEIGHT - CELL_SIZE * 3;
             snake->dir = Up;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
