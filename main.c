@@ -5,6 +5,8 @@
 #include <SDL2/SDL_image.h>
 #include "app.h"
 #include "game.h"
+#include "player.h"
+#include "snake.h"
 
 int main(int argc, char *argv[])
 {
@@ -146,10 +148,25 @@ int main(int argc, char *argv[])
         SDL_Rect background_dst = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
+        // render head
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, player1->snake->head.angle, NULL, SDL_FLIP_NONE);
+        // render body
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        int rotation;
         for(int i = 0; i < player1->snake->body_length; i++) {
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[i], &body_dst[i], player1->snake->body[i].angle, NULL, SDL_FLIP_NONE);
+            rotation = player1->snake->body[i].angle;
+            flip = SDL_FLIP_NONE;
+            if(player1->snake->body[i].is_turn) {
+                rotation = player1->snake->body[i].turn_rotation;
+                if(player1->snake->body[i].should_flip_vertical) {
+                    flip = SDL_FLIP_VERTICAL;
+                } else if(player1->snake->body[i].should_flip_horizontal) {
+                    flip = SDL_FLIP_HORIZONTAL;
+                }
+            }
+            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[i], &body_dst[i], rotation, NULL, flip);
         }
+        // render tail
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, player1->snake->tail.angle, NULL, SDL_FLIP_NONE);
 
         Fruit fruit;
