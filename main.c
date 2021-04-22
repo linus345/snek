@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     while (app->running) {
         SDL_Event event;
         // check for event
-        while (SDL_PollEvent(&event) {
+        while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
                     // exit main loop

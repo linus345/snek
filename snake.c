@@ -10,7 +10,7 @@ Snake *new_snake(int player_nr)
     // allocate memory on heap
     Snake *snake = malloc(sizeof(Snake));
 
-    snake->body_length = 5;
+    snake->body_length = 0;
     // initialize start speed
     snake->speed = SPEED;
     snake->next_dir = None;
@@ -238,7 +238,8 @@ Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_leng
     return body;
 }
 
-bool collison_with_wall(Snake *snake) {
+bool collison_with_wall(Snake *snake)
+{
         // Checks collison with walls
     if (snake->head.pos.x < 0 || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
         // Collison detected
@@ -247,7 +248,9 @@ bool collison_with_wall(Snake *snake) {
     else
     return false;
 }
-bool collison_with_snake(Snake *snake) {
+
+bool collison_with_snake(Snake *snake)
+{
     // Checks collison with snake body
     for (int i = 0; i < snake->body_length; i++) {
         if (snake->head.pos.x == snake->body[i].pos.x && snake->head.pos.y == snake->body[i].pos.y) {
