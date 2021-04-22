@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     printf("successfully initialized SDL\n");
+
     if (SDLNet_Init() != 0) {
         fprintf(stderr, "Error: SDLNet_Init: %s\n", SDLNet_GetError());
         return 2;
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
     while (app->running) {
         SDL_Event event;
         // check for event
-        while (SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event) {
             switch (event.type) {
                 case SDL_QUIT:
                     // exit main loop
@@ -116,6 +117,17 @@ int main(int argc, char *argv[])
             }
         }
 
+        // Checks if any collisons has occured with the walls
+        if (collison_with_wall(player1->snake))
+        {
+            app->running = false;
+        }
+        // Checks if any collisons has occured with a snake
+        if (collison_with_snake(player1->snake))
+        {
+            app->running = false;
+        }
+                
         current_time = SDL_GetTicks();
         if (current_time > last_time + player1->snake->speed) {
             change_snake_velocity(player1->snake);
