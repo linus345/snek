@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     Player *player1 = new_player(1, 1, 1);
     nr_of_players++;
 
-    Pos snake_texture[5];
+    Pos snake_texture[6];
     // head
     snake_texture[0].x = 0;
     snake_texture[0].y = 0;
@@ -48,6 +48,9 @@ int main(int argc, char *argv[])
     // mouth_open
     snake_texture[4].x = 64;
     snake_texture[4].y = 0;
+    // mouth eating
+    snake_texture[5].x = 64;
+    snake_texture[5].y = 32;
 
     SDL_Texture *snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
@@ -179,10 +182,14 @@ int main(int argc, char *argv[])
         SDL_Rect head_src;
         SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
         
-        // Snake open mouth rendering
         if (player1->snake->head.mouth_open) {
+            // Snake open mouth next to fruit
             head_src.x = snake_texture[4].x;
             head_src.y = snake_texture[4].y;
+        } else if (player1->snake->head.mouth_eating) {
+            // Snake eating after open mouth
+            head_src.x = snake_texture[5].x;
+            head_src.y = snake_texture[5].y;
         } else {
             // Snake closed mouth, default
             head_src.x = snake_texture[0].x;
