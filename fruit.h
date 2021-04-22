@@ -19,8 +19,7 @@ typedef struct {
     int points;
 } Fruit;
 
-Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fruits[]); 
-
+Fruit *new_fruit(Fruit *fruits[], int nr_of_fruits, Snake *snake);
 bool fruit_collision(Snake *snake, Fruit *fruits[]);
 
 #endif

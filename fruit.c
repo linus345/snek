@@ -7,78 +7,55 @@
 #include "game.h"
 #include "snake.h"
 
-Fruit *rand_fruit(int nr_of_players, int *nr_of_fruits, Snake *snake, Fruit *fruits[])
-{/*
-    if (*nr_of_fruits >= nr_of_players)
-    {
-        return 0;//NULL;
-    }
-*/
-    //allocate memory on heap
-    //if (*nr_of_fruits < nr_of_players){
-    Fruit *fruit = malloc(sizeof(Fruit));
-    //}
-
-    bool check_pos = true;
-    int fruit_type;
-    if (*nr_of_fruits < nr_of_players)
-    {
-        fruit->pos.x = rand() % (WINDOW_WIDTH / CELL_SIZE)*CELL_SIZE;
-        fruit->pos.y = rand() % (WINDOW_HEIGHT / CELL_SIZE)*CELL_SIZE;
-        fruit_type = rand() % (NR_OF_FRUIT_TYPES-1);
-        // place fruit at location not previously occupied by another fruit or snake
-        // Check if the fruit spawns on a snake head
-        if (fruit->pos.x == snake->head.pos.x && fruit->pos.y == snake->head.pos.y)
-        {
-            check_pos = false;
-        }
-        // Check if the fruit spawns on a snake body
-        for (int j = 0; j < snake->body_length; j++)
-        {
-            if (fruit->pos.x == snake->body[j].pos.x && fruit->pos.y == snake->body[j].pos.y)
-            {
-                check_pos = false;
-            }
-        }
-        // Check if the fruit spawns on a snake tail
-        if (fruit->pos.x != snake->tail.pos.x && fruit->pos.y != snake->tail.pos.y)
-        {
-            check_pos = false;
-        }
-        // Check if the fruit spawns on another fruit
-        for (int i = 0; i < *nr_of_fruits; i++)
-        {
-            if (fruit->pos.x == fruits[i]->pos.x && fruit->pos.y == fruits[i]->pos.y)
-            {
-                check_pos = false;
-            }
-        }
-
-        if (check_pos) // No occurenses of snakes or fruits
-        {
-            fruits[*nr_of_fruits]->pos.x = fruit->pos.x;
-            fruits[*nr_of_fruits]->pos.y = fruit->pos.y;
-            fruits[*nr_of_fruits]->type = fruit_type;
-            //place_fruit(fruits[i], int i);
-            (*nr_of_fruits)++;
-        }
-        return fruit;
-    }
-    else{
-        free(fruit);
-    }
-    return NULL; //fruit;
-}
-
-
-bool fruit_collision(Snake *snake, Fruit *fruits[])
+Fruit *new_fruit(Fruit *fruits[], int nr_of_fruits, Snake *snake)
 {
-    if (fruits[0]->pos.x == snake->head.pos.x && fruits[0]->pos.y == snake->head.pos.y)
-    {
-        return true;
+    Fruit *fruit = malloc(sizeof(Fruit));
+
+    // generate random position
+    fruit->pos.x = (rand() % (WINDOW_WIDTH / CELL_SIZE)) * CELL_SIZE;
+    fruit->pos.y = (rand() % (WINDOW_HEIGHT / CELL_SIZE)) * CELL_SIZE;
+    // generate random fruit type
+    fruit->type = rand() % 4;
+    // different points based on fruit type
+    switch(fruit->type) {
+        case Cherry:
+            fruit->points = 10;
+            break;
+        case Apple:
+            fruit->points = 20;
+            break;
+        case Pear:
+            fruit->points = 30;
+            break;
+        case Mango:
+            fruit->points = 40;
+            break;
     }
-    else
-    {
-        return false;
+    // check if position overlaps with snake position
+    // head
+    if(fruit->pos.x == snake->head.pos.x && fruit->pos.y == snake->head.pos.y) {
+        free(fruit);
+        return NULL;
     }
+    // body
+    for(int i = 0; i < snake->body_length; i++) {
+        if(fruit->pos.x == snake->body[i].pos.x && fruit->pos.y == snake->body[i].pos.y) {
+            free(fruit);
+            return NULL;
+        }
+    }
+    // tail
+    if(fruit->pos.x == snake->tail.pos.x && fruit->pos.y == snake->tail.pos.y) {
+        free(fruit);
+        return NULL;
+    }
+    // check if position overlaps with other fruit positions
+    for(int i = 0; i < nr_of_fruits; i++) {
+        if(fruit->pos.x == fruits[i]->pos.x && fruit->pos.y == fruits[i]->pos.y) {
+            free(fruit);
+            return NULL;
+        }
+    }
+    
+    return fruit;
 }
