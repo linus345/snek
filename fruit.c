@@ -59,3 +59,11 @@ Fruit *new_fruit(Fruit *fruits[], int nr_of_fruits, Snake *snake)
     
     return fruit;
 }
+
+bool fruit_collision(Snake *snake, Fruit *fruits[]);
+{
+    if(snake->head->pos.x == fruit->pos.x && snake->head->pos.y == fruit->pos.y) {
+        return true;
+    }
+}
+
