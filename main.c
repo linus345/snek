@@ -126,7 +126,15 @@ int main(int argc, char *argv[])
 
             last_time = current_time;
         }
-        
+        if(fruit_collision(player1->snake, fruits, nr_of_fruits)) {
+            free(fruits[nr_of_fruits-1]);
+            nr_of_fruits--;
+            new_snake_body_part(&player1->snake->body[player1->snake->body_length-1].pos, 
+                player1->snake->body[player1->snake->body_length-1].angle,
+                &player1->snake->body_length);
+            player1->snake->speed -= 100;
+        }
+    
         // fruit rendering
         SDL_Rect fruit_src[MAX_PLAYERS];
         SDL_Rect fruit_dst[MAX_PLAYERS];

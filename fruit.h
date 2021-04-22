@@ -20,6 +20,6 @@ typedef struct {
 } Fruit;
 
 Fruit *new_fruit(Fruit *fruits[], int nr_of_fruits, Snake *snake);
-bool fruit_collision(Snake *snake, Fruit *fruits[]);
+bool fruit_collision(Snake *snake, Fruit *fruits[], int nr_of_fruits);
 
 #endif
