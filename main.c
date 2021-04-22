@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
 
         Fruit *temp_fruit = NULL;
         if(nr_of_fruits < nr_of_players) {
+            // spawn new fruit
             while(temp_fruit == NULL) {
                 temp_fruit = new_fruit(fruits, nr_of_fruits, player1->snake);
             }
