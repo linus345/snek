@@ -5,6 +5,8 @@
 #include "app.h"
 #define CELL_SIZE 32
 
+#define MAX_PLAYERS 4
+
 typedef struct {
     int x;
     int y;
