@@ -4,6 +4,10 @@
 #include "app.h"
 #include "game.h"
 #include "snake.h"
+#include "fruit.h"
+
+// TODO: BANDAID FIX, MUST FIX!!! FIX MUCH IMPORTANT!!!!!!!!!
+void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits);
 
 Snake *new_snake(int player_nr)
 {
@@ -203,6 +207,7 @@ void new_snake_pos(Snake *snake)
     snake->head.pos.x += snake->vel_x;
     snake->head.pos.y += snake->vel_y;
     snake->head.has_turned = false;
+    snake->head.mouth_open = false;
 }
 
 Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_length)
@@ -265,4 +270,15 @@ bool collison_with_snake(Snake *snake)
     }
     // No collison detected
     return false;
+}
+
+void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits)
+{
+    for(int i = 0; nr_of_fruits > i; i++) {
+        if(fruits[i]->pos.x == head->pos.x && (fruits[i]->pos.y-CELL_SIZE == head->pos.y || fruits[i]->pos.y+CELL_SIZE == head->pos.y)) {
+            head->mouth_open = true;
+        } else if (fruits[i]->pos.y == head->pos.y && (fruits[i]->pos.x-CELL_SIZE == head->pos.x || fruits[i]->pos.x+CELL_SIZE == head->pos.x)) {
+            head->mouth_open = true;
+        }
+    }
 }

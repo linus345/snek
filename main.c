@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     Player *player1 = new_player(1, 1, 1);
     nr_of_players++;
 
-    Pos snake_texture[4];
+    Pos snake_texture[5];
     // head
     snake_texture[0].x = 0;
     snake_texture[0].y = 0;
@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
     // turning bodypart
     snake_texture[3].x = 0;
     snake_texture[3].y = 32;
+    // mouth_open
+    snake_texture[4].x = 64;
+    snake_texture[4].y = 0;
 
     SDL_Texture *snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
@@ -135,6 +138,7 @@ int main(int argc, char *argv[])
             // update snake velocity based on direction state
             // test singleplayer position update
             new_snake_pos(player1->snake);
+            head_adjecent_with_fruit(&player1->snake->head, fruits, nr_of_fruits);
 
             last_time = current_time;
         }
@@ -172,8 +176,20 @@ int main(int argc, char *argv[])
         }
 
         // snake head rendering
-        SDL_Rect head_src = {snake_texture[0].x, snake_texture[0].y, CELL_SIZE, CELL_SIZE};
+        SDL_Rect head_src;
         SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
+        
+        // Snake open mouth rendering
+        if (player1->snake->head.mouth_open) {
+            head_src.x = snake_texture[4].x;
+            head_src.y = snake_texture[4].y;
+        } else {
+            // Snake closed mouth, default
+            head_src.x = snake_texture[0].x;
+            head_src.y = snake_texture[0].y;
+        }
+        head_src.w = CELL_SIZE;
+        head_src.h = CELL_SIZE;
 
         // snake body rendering
         SDL_Rect body_src[MAX_SNAKE_LENGTH];
