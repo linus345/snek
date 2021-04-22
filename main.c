@@ -93,28 +93,17 @@ int main(int argc, char *argv[])
             }
         }
 
-        // Checks collison with walls
-        if (player1->snake->head.pos.x <= 0 || player1->snake->head.pos.y <= 0 || player1->snake->head.pos.x >= WINDOW_WIDTH - CELL_SIZE || player1->snake->head.pos.y >= WINDOW_HEIGHT - CELL_SIZE)
+        // Checks if any collisons has occured with the walls
+        if (collison_with_wall(player1->snake))
         {
             app->running = false;
         }
-        // Checks collison with snake body
-        for (int i = 0; i < player1->snake->body_length; i++)
-        {
-            if (player1->snake->head.pos.x ==  player1->snake->body[i].pos.x && player1->snake->head.pos.y == player1->snake->body[i].pos.y)
-            {
-                app->running = false;
-            }
-            
-        }
-        // Checks collison with snake tail
-        if (player1->snake->head.pos.x == player1->snake->tail.pos.x && player1->snake->head.pos.y == player1->snake->tail.pos.y)
+        // Checks if any collisons has occured with a snake
+        if (collison_with_snake(player1->snake))
         {
             app->running = false;
         }
-        
-        
-
+                
         current_time = SDL_GetTicks();
         if(current_time > last_time + player1->snake->speed) {
             change_snake_velocity(player1->snake);
@@ -181,6 +170,8 @@ int main(int argc, char *argv[])
 
         // present on screen
         SDL_RenderPresent(app->renderer);
+
+        
 
         SDL_Delay(1000 / 60);
     }
