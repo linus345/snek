@@ -19,6 +19,7 @@ typedef struct {
     int angle;
     bool has_turned;
     bool mouth_open;
+    bool mouth_eating;
     Pos pos;
 } Head_Part;
 
