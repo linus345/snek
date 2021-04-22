@@ -18,6 +18,7 @@ typedef struct {
 typedef struct {
     int angle;
     bool has_turned;
+    bool mouth_open;
     Pos pos;
 } Head_Part;
 
@@ -48,5 +49,6 @@ void new_snake_pos(Snake *snake);
 Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_length);
 bool collison_with_wall(Snake *snake);
 bool collison_with_snake(Snake *snake);
+
 
 #endif
