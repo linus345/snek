@@ -10,12 +10,14 @@
 
 int main(int argc, char *argv[])
 {
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
         return 1;
     }
     printf("successfully initialized SDL\n");
-    if(SDLNet_Init() != 0) {
+    if (SDLNet_Init() != 0)
+    {
         fprintf(stderr, "Error: SDLNet_Init: %s\n", SDLNet_GetError());
         return 2;
     }
@@ -52,42 +54,56 @@ int main(int argc, char *argv[])
     while (app->running) {
         SDL_Event event;
         // check for event
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
-                    // exit main loop
-                    app->running = false;
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                // exit main loop
+                app->running = false;
+                break;
+            case SDL_KEYDOWN:
+                // key pressed?
+                switch (event.key.keysym.sym)
+                { /* event.key.keysym.scancode */
+                case SDLK_UP:
+                case SDLK_w: /* SDL_SCANCODE_W */
+                    if (player1->snake->dir != Down)
+                        player1->snake->dir = Up;
                     break;
-                case SDL_KEYDOWN:
-                    // key pressed?
-                    switch (event.key.keysym.sym){                  /* event.key.keysym.scancode */
-                        case SDLK_UP:
-                        case SDLK_w:                                /* SDL_SCANCODE_W */
-                            if (player1->snake->dir != Down)
-                                player1->snake->dir = Up;
-                            break;
-                        case SDLK_DOWN:
-                        case SDLK_s:
-                            if (player1->snake->dir != Up)
-                                player1->snake->dir = Down;
-                            break;
-                        case SDLK_RIGHT:
-                        case SDLK_d:
-                            if (player1->snake->dir != Left)
-                                player1->snake->dir = Right;
-                            break;
-                        case SDLK_LEFT:
-                        case SDLK_a:
-                            if (player1->snake->dir != Right)
-                                player1->snake->dir = Left;
-                            break;
-                        default:
-                            break;
-                    }
+                case SDLK_DOWN:
+                case SDLK_s:
+                    if (player1->snake->dir != Up)
+                        player1->snake->dir = Down;
                     break;
+                case SDLK_RIGHT:
+                case SDLK_d:
+                    if (player1->snake->dir != Left)
+                        player1->snake->dir = Right;
+                    break;
+                case SDLK_LEFT:
+                case SDLK_a:
+                    if (player1->snake->dir != Right)
+                        player1->snake->dir = Left;
+                    break;
+                default:
+                    break;
+                }
+                break;
             }
         }
 
+        // Checks if any collisons has occured with the walls
+        if (collison_with_wall(player1->snake))
+        {
+            app->running = false;
+        }
+        // Checks if any collisons has occured with a snake
+        if (collison_with_snake(player1->snake))
+        {
+            app->running = false;
+        }
+                
         current_time = SDL_GetTicks();
         if(current_time > last_time + player1->snake->speed) {
             change_snake_velocity(player1->snake);
@@ -155,7 +171,9 @@ int main(int argc, char *argv[])
         // present on screen
         SDL_RenderPresent(app->renderer);
 
-        SDL_Delay(1000/60);
+        
+
+        SDL_Delay(1000 / 60);
     }
 
     quit_app(app);
