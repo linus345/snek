@@ -65,6 +65,7 @@ bool fruit_collision(Snake *snake, Fruit *fruits[], int nr_of_fruits)
     //check if snake head is at fruit position
     for(int i = 0; i < nr_of_fruits; i++) {
         if(fruits[i]->pos.x == snake->head.pos.x && fruits[i]->pos.y == snake->head.pos.y) {
+            snake->head.mouth_eating = true;
             return true;
         }
     }

@@ -281,8 +281,5 @@ void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits
         } else if (fruits[i]->pos.y == head->pos.y && (fruits[i]->pos.x-CELL_SIZE == head->pos.x || fruits[i]->pos.x+CELL_SIZE == head->pos.x)) {
             head->mouth_open = true;
         }
-        if (fruits[i]->pos.x == head->pos.x && fruits[i]->pos.y == head->pos.y) {
-            head->mouth_eating = true;
-        }
     }
 }
