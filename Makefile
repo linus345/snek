@@ -10,11 +10,11 @@ ifeq ($(OS),Windows_NT)
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
-		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image
+		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image -lSDL2_ttf
 		EXEC := snek.out
 	endif
 	ifeq ($(UNAME_S),Darwin)
-		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image
+		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image -lSDL2_ttf
 		EXEC := snek.out
 	endif
 endif
