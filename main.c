@@ -98,14 +98,17 @@ int main(int argc, char *argv[])
 
     SDL_Texture *newGame;
     load_texture(app, &newGame, "./resources/menuButton.png");
-    SDL_Rect newGame_view = {300, 400, 360, 150};
+    SDL_Rect new_game_view = {300, 400, 360, 150};
 
     SDL_Texture *exit;
     load_texture(app, &exit, "./resources/menuButton.png");
-    SDL_Rect exit_view = {300, 600, 360, 150};
+    SDL_Rect high_score_view = {300, 600, 360, 150};
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     TTF_Init();
+
+    SDL_Color color_default = { 45, 93, 9 }; // hover = { 9, 34, 3 }
+    SDL_Color color_hover = { 9, 34, 3 };
 
     TTF_Font * font = TTF_OpenFont("./resources/adventure.otf", 250);
     if (font == NULL) {
@@ -113,26 +116,21 @@ int main(int argc, char *argv[])
         return 0;
     }
     
-    SDL_Color color_white = { 255, 255, 255 };
     SDL_Surface * new_game_surface = TTF_RenderText_Blended(font,
-    "New Game", color_white);
-
+    "New Game", color_default);
     SDL_Texture * new_game_text = SDL_CreateTextureFromSurface(app->renderer, new_game_surface);
     SDL_Rect new_game_text_view = {337,430,290,90};
 
-    SDL_Color color_black = { 0, 0, 0 };
     SDL_Surface * high_score_surface = TTF_RenderText_Blended(font,
-    "High Score", color_black);
-
+    "High Score", color_default);
     SDL_Texture * high_score_text = SDL_CreateTextureFromSurface(app->renderer, high_score_surface);
     SDL_Rect high_score_text_view = {337,630,290,90};
+    
     //SDL_DestroyTexture(texture);
     //SDL_FreeSurface(surface);
-    
-    
 
     //menu_init(app, background, newGame, exit);
-
+    int Mx, My;
     while (app->running)
     {
         SDL_Event event;
@@ -150,15 +148,26 @@ int main(int argc, char *argv[])
         SDL_RenderClear(app->renderer);
 
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
-        SDL_RenderCopy(app->renderer, newGame, NULL, &newGame_view);
-        SDL_RenderCopy(app->renderer, exit, NULL, &exit_view);
+        SDL_RenderCopy(app->renderer, newGame, NULL, &new_game_view);
+        SDL_RenderCopy(app->renderer, exit, NULL, &high_score_view);
         SDL_RenderCopy(app->renderer, new_game_text, NULL, &new_game_text_view);
         SDL_RenderCopy(app->renderer, high_score_text, NULL, &high_score_text_view);
+
+        //If-state for wether the text should switch color on hover or not
+        if (Mx >= new_game_view.x && Mx <= new_game_view.x + new_game_view.w && My >= new_game_view.y && My <= new_game_view.y + new_game_view.h) {
+            SDL_SetTextureColorMod(new_game_text, 9, 34, 3);
+        } else if (Mx >= high_score_view.x && Mx <= high_score_view.x + high_score_view.w && My >= high_score_view.y && My <= high_score_view.y + high_score_view.h) {
+            SDL_SetTextureColorMod(high_score_text, 9, 34, 3);
+        } else {
+            SDL_SetTextureColorMod(new_game_text, 45, 93, 9);
+            SDL_SetTextureColorMod(high_score_text, 45, 93, 9);
+        }
 
         // present on screen
         SDL_RenderPresent(app->renderer);
 
         SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
     }
 
 
