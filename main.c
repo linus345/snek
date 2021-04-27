@@ -159,13 +159,6 @@ int main(int argc, char *argv[])
                     break;
             }
         }
-        // fill packet
-        pack_send->channel = -1;
-        sprintf(pack_send->data, "%d %d", player1->snake->head.pos.x, player1->snake->head.pos.y);
-        pack_send->len = 6;
-        pack_send->maxlen = 1024;
-        pack_send->address = addr;
-        SDLNet_UDP_Send(udp_sock, pack_send->channel, pack_send);
 
         //Check for recieved package
         if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
@@ -197,6 +190,14 @@ int main(int argc, char *argv[])
             // test singleplayer position update
             new_snake_pos(player1->snake);
             head_adjecent_with_fruit(&player1->snake->head, fruits, nr_of_fruits);
+
+            // fill packet
+            pack_send->channel = -1;
+            sprintf(pack_send->data, "%d %d", player1->snake->head.pos.x, player1->snake->head.pos.y);
+            pack_send->len = 6;
+            pack_send->maxlen = 1024;
+            pack_send->address = addr;
+            SDLNet_UDP_Send(udp_sock, pack_send->channel, pack_send);
 
             last_time = current_time;
         }
