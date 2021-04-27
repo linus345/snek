@@ -107,14 +107,20 @@ int main(int argc, char *argv[])
     }
 
     // fill packet
-    pack_send->channel = -1;
-    pack_send->data = "hello";
-    pack_send->len = 6;
-    pack_send->maxlen = 1024;
-    pack_send->address = addr;
+    // pack_send->channel = -1;
+    // sprintf(pack_send->data, "%d %d", player1->snake->pos.x, player1->snake->pos.y);
+    // pack_send->len = 6;
+    // pack_send->maxlen = 1024;
+    // pack_send->address = addr;
 
-    SDLNet_UDP_Send(udp_sock, pack_send->channel, pack_send);
 
+    //recieve packet
+    UDPpacket *pack_recv;
+    pack_recv = SDLNet_AllocPacket(1024);
+    if(!pack_recv) {
+        fprintf(stderr, "Error: SDLNet_AllocPacket %s\n", SDLNet_GetError());
+        return 2;
+    }
     while (app->running) {
         SDL_Event event;
         // check for event
@@ -152,6 +158,24 @@ int main(int argc, char *argv[])
                     }
                     break;
             }
+        }
+        // fill packet
+        pack_send->channel = -1;
+        sprintf(pack_send->data, "%d %d", player1->snake->head.pos.x, player1->snake->head.pos.y);
+        pack_send->len = 6;
+        pack_send->maxlen = 1024;
+        pack_send->address = addr;
+        SDLNet_UDP_Send(udp_sock, pack_send->channel, pack_send);
+
+        //Check for recieved package
+        if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
+            // printf("Channel: %d\n", pack_recv->channel);
+            printf("Data: %s\n", pack_recv->data);
+            //    printf("Len: %d\n", pack_recv->len);
+            //    printf("Max len: %d\n", pack_recv->maxlen);
+            // printf("Status: %d\n", pack_recv->status);
+            // printf("src host: %u\n", pack_recv->address.host);
+            // printf("src port: %u\n", pack_recv->address.port);
         }
 
         // Checks if any collisons has occured with the walls
