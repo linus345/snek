@@ -19,7 +19,7 @@ else
 	endif
 endif
 
-$(EXEC): main.o game.o app.o snake.o player.o fruit.o
+$(EXEC): main.o game.o app.o snake.o player.o fruit.o menu.o
 	$(CC) *.o $(CFLAGS) -o $(EXEC)
 
 main.o: main.c
@@ -39,6 +39,9 @@ snake.o: snake.c
 
 player.o: player.c
 	$(CC) player.c -c $(CFLAGS)
+
+menu.o: menu.c
+	$(CC) menu.c -c $(CFLAGS)
 
 clean:
 	rm -f $(EXEC) *.o
