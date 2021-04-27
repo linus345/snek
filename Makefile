@@ -5,7 +5,7 @@ CC := gcc
 CFLAGS := --std=c99 -Wall -Wextra -pedantic
 
 ifeq ($(OS),Windows_NT)
-	CFLAGS += -IC:\libsdl\include -LC:\libsdl\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_net -lSDL2_image
+	CFLAGS += -IC:\libsdl\include -LC:\libsdl\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_net -lSDL2_image -lSDL2_ttf
 	EXEC := snek.exe
 else
 	UNAME_S := $(shell uname -s)

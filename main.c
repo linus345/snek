@@ -90,6 +90,8 @@ int main(int argc, char *argv[])
     unsigned last_time = 0, current_time;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    
     SDL_Texture *background;
     load_texture(app, &background, "./resources/background.png");
     SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
@@ -102,24 +104,31 @@ int main(int argc, char *argv[])
     load_texture(app, &exit, "./resources/menuButton.png");
     SDL_Rect exit_view = {300, 600, 360, 150};
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /*
+    
     TTF_Init();
 
-    TTF_Font * font = TTF_OpenFont("arial.ttf", 25);
+    TTF_Font * font = TTF_OpenFont("./resources/adventure.otf", 250);
     if (font == NULL) {
         fprintf(stderr, "error: font not found\n");
-        exit(EXIT_FAILURE);
+        return 0;
     }
+    
+    SDL_Color color_white = { 255, 255, 255 };
+    SDL_Surface * new_game_surface = TTF_RenderText_Blended(font,
+    "New Game", color_white);
 
-    SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface = TTF_RenderText_Solid(font,
-    "Welcome to Gigi Labs", color);
+    SDL_Texture * new_game_text = SDL_CreateTextureFromSurface(app->renderer, new_game_surface);
+    SDL_Rect new_game_text_view = {337,430,290,90};
 
-    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Color color_black = { 0, 0, 0 };
+    SDL_Surface * high_score_surface = TTF_RenderText_Blended(font,
+    "High Score", color_black);
 
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(surface);
-    */
+    SDL_Texture * high_score_text = SDL_CreateTextureFromSurface(app->renderer, high_score_surface);
+    SDL_Rect high_score_text_view = {337,630,290,90};
+    //SDL_DestroyTexture(texture);
+    //SDL_FreeSurface(surface);
+    
     
 
     //menu_init(app, background, newGame, exit);
@@ -143,12 +152,15 @@ int main(int argc, char *argv[])
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
         SDL_RenderCopy(app->renderer, newGame, NULL, &newGame_view);
         SDL_RenderCopy(app->renderer, exit, NULL, &exit_view);
+        SDL_RenderCopy(app->renderer, new_game_text, NULL, &new_game_text_view);
+        SDL_RenderCopy(app->renderer, high_score_text, NULL, &high_score_text_view);
 
         // present on screen
         SDL_RenderPresent(app->renderer);
 
         SDL_Delay(1000 / 60);
     }
+
 
     while (app->running)
     {
@@ -348,7 +360,7 @@ int main(int argc, char *argv[])
 
         SDL_Delay(1000 / 60);
     }
-
+    TTF_Quit();
     quit_app(app);
     
 
