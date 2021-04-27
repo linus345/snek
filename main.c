@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "app.h"
 #include "game.h"
@@ -89,18 +89,37 @@ int main(int argc, char *argv[])
     // timer
     unsigned last_time = 0, current_time;
 
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SDL_Texture *background;
     load_texture(app, &background, "./resources/background.png");
     SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
     SDL_Texture *newGame;
-    load_texture(app, &newGame, "./resources/new_game_Button.png");
-    SDL_Rect newGame_view = {100, 100, 100, 50};
+    load_texture(app, &newGame, "./resources/menuButton.png");
+    SDL_Rect newGame_view = {300, 400, 360, 150};
 
     SDL_Texture *exit;
-    load_texture(app, &exit, "./resources/button_Exit.png");
-    SDL_Rect exit_view = {200, 200, 100, 50};
+    load_texture(app, &exit, "./resources/menuButton.png");
+    SDL_Rect exit_view = {300, 600, 360, 150};
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    TTF_Init();
+
+    TTF_Font * font = TTF_OpenFont("arial.ttf", 25);
+    if (font == NULL) {
+        fprintf(stderr, "error: font not found\n");
+        exit(EXIT_FAILURE);
+    }
+
+    SDL_Color color = { 255, 255, 255 };
+    SDL_Surface * surface = TTF_RenderText_Solid(font,
+    "Welcome to Gigi Labs", color);
+
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+    
     
 
     //menu_init(app, background, newGame, exit);
@@ -331,6 +350,7 @@ int main(int argc, char *argv[])
     }
 
     quit_app(app);
+    
 
     return 0;
 }
