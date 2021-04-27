@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     load_texture(app, &exit, "./resources/menuButton.png");
     SDL_Rect exit_view = {300, 600, 360, 150};
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+    /*
     TTF_Init();
 
     TTF_Font * font = TTF_OpenFont("arial.ttf", 25);
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(surface);
-    
+    */
     
 
     //menu_init(app, background, newGame, exit);
