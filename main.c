@@ -84,6 +84,37 @@ int main(int argc, char *argv[])
     // timer
     unsigned last_time = 0, current_time;
 
+    // open udp socket
+    UDPsocket udp_sock = SDLNet_UDP_Open(0);
+    if(!udp_sock) {
+        printf("SDLNet_UDP_Open: %s", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+    }
+
+    // allocate memory for receive packet
+    UDPpacket *pack_send;
+    pack_send = SDLNet_AllocPacket(1024);
+    if(!pack_send) {
+        fprintf(stderr, "Error: SDLNet_AllocPacket %s\n", SDLNet_GetError());
+        return 2;
+    }
+
+    int server_port = 1234;
+    IPaddress addr;
+    if(SDLNet_ResolveHost(&addr, "127.0.0.1", server_port) != 0) {
+        fprintf(stderr, "Error: SDLNet_ResolveHost %s\n", SDLNet_GetError());
+        return 2;
+    }
+
+    // fill packet
+    pack_send->channel = -1;
+    pack_send->data = "hello";
+    pack_send->len = 6;
+    pack_send->maxlen = 1024;
+    pack_send->address = addr;
+
+    SDLNet_UDP_Send(udp_sock, pack_send->channel, pack_send);
+
     while (app->running) {
         SDL_Event event;
         // check for event
