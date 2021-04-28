@@ -95,12 +95,15 @@ int main(int argc, char *argv[])
     // allocate memory for sent packet
     UDPpacket *pack_send = allocate_packet(1024);
 
-    // resolve server address
-    int server_port = 1234;
-    IPaddress addr = resolve_host("127.0.0.1", server_port);
-
     // allocate memory for received packet
     UDPpacket *pack_recv = allocate_packet(1024);
+
+    // resolve server address
+    int server_port = 1234;
+    IPaddress server_addr = resolve_host("127.0.0.1", server_port);
+
+    // send join game request
+    join_game_request(udp_sock, server_addr, pack_send);
 
     //////////////////////////////////
 
@@ -168,14 +171,7 @@ int main(int argc, char *argv[])
             // test singleplayer position update
             new_snake_pos(player1->snake);
             head_adjecent_with_fruit(&player1->snake->head, fruits, nr_of_fruits);
-
-            // fill packet
-            pack_send->channel = -1;
-            sprintf((char *)pack_send->data, "%d %d", player1->snake->head.pos.x, player1->snake->head.pos.y);
-            pack_send->len = 6;
-            pack_send->maxlen = 1024;
-            pack_send->address = addr;
-            SDLNet_UDP_Send(udp_sock, pack_send->channel, pack_send);
+            send_snake_position(udp_sock, server_addr, pack_send, player1->snake);
 
             last_time = current_time;
         }
@@ -185,7 +181,7 @@ int main(int argc, char *argv[])
             new_snake_body_part(&player1->snake->body[player1->snake->body_length-1].pos, 
                 player1->snake->body[player1->snake->body_length-1].angle,
                 &player1->snake->body_length);
-            player1->snake->speed -= 100;
+            player1->snake->speed -= 50;
         }
     
         // fruit rendering
