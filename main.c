@@ -91,103 +91,36 @@ int main(int argc, char *argv[])
     // timer
     unsigned last_time = 0, current_time;
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    SDL_Texture *background;
-    load_texture(app, &background, "./resources/background.png");
-    SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- /*
-    int button_count = 2, main_button_size[2] = {360,150};
-    for (int i = 0;button_count > i;i++) {
-
-        Button *button = init_menu_button(app, *main_button_size,);
-    }
-    */
-    SDL_Color color_default = { 45, 93, 9 }; // hover = { 9, 34, 3 }
-    SDL_Color color_hover = { 9, 34, 3 };
-
     TTF_Init();
 
+    /*
     TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
     if (font == NULL) {
         fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
         return 0;
     }
-    
-    /*
-    SDL_Surface * new_game_surface = TTF_RenderText_Blended(font,
-    "New Game", color_default);
-    SDL_Texture * new_game_text = SDL_CreateTextureFromSurface(app->renderer, new_game_surface);
-    SDL_Rect new_game_text_view = {337,430,290,90};
-
-    SDL_Surface * high_score_surface = TTF_RenderText_Blended(font,
-    "High Score", color_default);
-    SDL_Texture * high_score_text = SDL_CreateTextureFromSurface(app->renderer, high_score_surface);
-    SDL_Rect high_score_text_view = {337,630,290,90};
     */
-    Button *new_game_background = init_menu_button (app, 300, 400, 360, 150, "./resources/menuButton.png");
-    Button *new_game_button = create_button(app, 337, 430, 290, 90, "New Game", font, color_default);
-    Button *high_score_background = init_menu_button (app, 300, 600, 360, 150, "./resources/menuButton.png");
-    Button *high_score_button = create_button(app, 337, 630, 290, 90, "High Score", font, color_default);
-    //SDL_DestroyTexture(texture);
-    //SDL_FreeSurface(surface);
 
-    //menu_init(app, background, newGame, exit);
-    int Mx, My, button_coordinates[2];
-    bool start_game = false;
+    bool exit_menu = false;
+    int menu_state = 0;
     while (app->running) {
-        //SDL_MouseButtonEvent mouse_event;
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                // exit main loop
-                app->running = false;
-                break;
-
-            case SDL_MOUSEBUTTONDOWN:
-                if (Mx >= new_game_button->rect.x && Mx <= new_game_button->rect.x + new_game_button->rect.w && My >= new_game_button->rect.y && My <= new_game_button->rect.y + new_game_button->rect.h) {
-                    //printf("Bitch work\n");
-                    start_game = true;
-                }
-                break;
-            }
-        }
-        // clear screen before next render
-        SDL_RenderClear(app->renderer);
-
-        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
-        //SDL_RenderCopy(app->renderer, new_game, NULL, &new_game_view);
-        render_button(app, new_game_background);
-        render_button(app, new_game_button);
-        render_button(app, high_score_background);
-        render_button(app, high_score_button);
-        /*
-        SDL_RenderCopy(app->renderer, exit, NULL, &high_score_view);
-        SDL_RenderCopy(app->renderer, new_game_text, NULL, &new_game_text_view);
-        SDL_RenderCopy(app->renderer, high_score_text, NULL, &high_score_text_view);
-        */
-
-        //If-state for wether the text should switch color on hover or not
-        if (Mx >= new_game_button->rect.x && Mx <= new_game_button->rect.x + new_game_button->rect.w && My >= new_game_button->rect.y && My <= new_game_button->rect.y + new_game_button->rect.h) {
-            SDL_SetTextureColorMod(new_game_button->texture, 9, 34, 3);
-            
-        } else if (Mx >= high_score_button->rect.x && Mx <= high_score_button->rect.x + high_score_button->rect.w && My >= high_score_button->rect.y && My <= high_score_button->rect.y + high_score_button->rect.h) {
-            SDL_SetTextureColorMod(high_score_button->texture, 9, 34, 3);
-        } else {
-            SDL_SetTextureColorMod(new_game_button->texture, 45, 93, 9);
-            SDL_SetTextureColorMod(high_score_button->texture, 45, 93, 9);
-        }
-
-        // present on screen
-        SDL_RenderPresent(app->renderer);
-
-        SDL_Delay(1000 / 60);
-        SDL_GetMouseState(&Mx, &My);
-        if (start_game) break;
         
+        switch (menu_state) {
+            case MAIN_MENU:
+                menu_state = main_menu(app);
+                break;
+            case SELECT_GAME:
+                menu_state = select_game_menu(app);
+                break;
+            case HIGH_SCORE:
+                break;
+            case SETTINGS:
+                break;
+            case START_GAME:
+                exit_menu = true;
+                break;
+        }
+        if (exit_menu) break;
     }
 
 
