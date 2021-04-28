@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include "game.h"
 #include "menu.h"
 #include "app.h"
 
@@ -62,4 +65,34 @@ void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Text
         // Tints the texture white if the cursor isn't over the button
     }
     */
+}
+
+// Universal button renderer for menus
+Button *init_menu_button (App *app, int x, int y, int w, int h, char *resource[]) {
+    Button *button = malloc(sizeof(Button));
+    load_texture(app, &button->texture, resource);
+    button->rect.x=x;
+    button->rect.y=y;
+    button->rect.w=w;
+    button->rect.h=h;
+    return button;
+}
+
+// Universal text renderer for buttons
+Button *create_button(App *app, int x, int y, int w, int h, char *text, TTF_Font *font, SDL_Color color) {
+    Button *button = malloc(sizeof(Button));
+    SDL_Surface * surface = TTF_RenderText_Blended(font, text, color);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(app->renderer, surface);
+    SDL_Rect rect;
+    rect.x=x;
+    rect.y=y;
+    rect.w=w;
+    rect.h=h;
+    button->rect=rect;
+    button->texture=texture;
+    return button;
+}
+
+void render_button (App *app, Button *button) {
+    SDL_RenderCopy(app->renderer, button->texture, NULL, &button->rect);
 }
