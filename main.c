@@ -104,6 +104,24 @@ int main(int argc, char *argv[])
 
     // send join game request
     join_game_request(udp_sock, server_addr, pack_send);
+    // wait for server to respond to request, only wait for 3 seconds
+    unsigned time_when_req_sent = SDL_GetTicks();
+    while(player1->client_id < 0) {
+        if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
+            handle_received_packet(pack_recv, &player1->client_id);
+        }
+        // 3 second timer to break out of loop if packet not received yet
+        // or connection failed
+        if (time_when_req_sent > time_when_req_sent + 3000) {
+            printf("join: request timed out\n");
+            break;
+        }
+    }
+    if(player1->client_id < 0) {
+        // connection failed, exit for now
+        printf("couldn't connect to server\n");
+        exit(EXIT_FAILURE);
+    }
 
     //////////////////////////////////
 
@@ -149,7 +167,8 @@ int main(int argc, char *argv[])
 
         //Check for recieved package
         if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
-            handle_received_packet(pack_recv);
+            int temp; // not used
+            handle_received_packet(pack_recv, &temp);
         }
 
         // Checks if any collisons has occured with the walls
@@ -171,7 +190,7 @@ int main(int argc, char *argv[])
             // test singleplayer position update
             new_snake_pos(player1->snake);
             head_adjecent_with_fruit(&player1->snake->head, fruits, nr_of_fruits);
-            send_snake_position(udp_sock, server_addr, pack_send, player1->snake);
+            send_snake_position(udp_sock, server_addr, pack_send, player1->client_id, player1->snake);
 
             last_time = current_time;
         }

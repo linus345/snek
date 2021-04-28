@@ -9,6 +9,7 @@ typedef struct {
     bool alive;
     int host;
     int port;
+    int client_id;
     Snake *snake;
 } Player;
 

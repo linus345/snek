@@ -11,6 +11,8 @@ Player *new_player(int host, int port, int player_nr)
     player->alive = true;
     player->host = host;
     player->port = port;
+    // -1 is used to indicate that the player doesn't have a client_id
+    player->client_id = -1;
     player->snake = new_snake(player_nr);
 
     return player;
