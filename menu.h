@@ -37,7 +37,7 @@ Button *menu_button_text(App *app, int x, int y, int w, int h, char *text, TTF_F
 void render_button (App *app, Button *button);
 bool hover_state (Button *button, int Mx, int My);
 
-void text_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port);
+void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port);
 int main_menu (App *app);
 int select_game_menu (App *app);
 int join_multiplayer (App *app, char *ip_adress);

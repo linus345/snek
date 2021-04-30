@@ -62,12 +62,6 @@ Button *menu_button_text(App *app, int x, int y, int w, int h, char *text, TTF_F
     return button;
 }
 
-/*
-Button input_field() {
-
-}
-*/
-
 void render_button (App *app, Button *button) {
     SDL_RenderCopy(app->renderer, button->texture, NULL, &button->rect);
 }
@@ -79,7 +73,8 @@ bool hover_state (Button *button, int Mx, int My) {
     return false;
 }
 
-void text_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port) {
+// User input for ip address och port number
+void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port) {
 
     bool done = false;
     int Mx, My;
@@ -173,7 +168,7 @@ void text_input (App *app, char input[], int x, int y, int w, int h, bool ip_not
 
     printf("\nthe text input is: %s\n\n",input);
 
-    // Make space on the heap
+    // Makes space on the heap
     free(enter_ip_background);
     free(enter_port_background);
     free(join_background);
@@ -213,6 +208,7 @@ int main_menu (App *app) {
 
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(start_game_button, Mx, My)) {
+                    // Makes space on the heap
                     free(start_game_background);
                     free(start_game_button);
                     free(high_score_background);
@@ -298,6 +294,7 @@ int select_game_menu (App *app) {
 
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(single_player_button, Mx, My)) {
+                    // Makes space on the heap
                     free(single_player_background);
                     free(single_player_button);
                     free(host_multiplayer_background);
@@ -306,7 +303,8 @@ int select_game_menu (App *app) {
                     free(join_multiplayer_button);
                     return START_GAME;
 
-                } else if (hover_state(join_multiplayer_button, Mx, My)) {                    
+                } else if (hover_state(join_multiplayer_button, Mx, My)) {   
+                    // Makes space on the heap                 
                     free(single_player_background);
                     free(single_player_button);
                     free(host_multiplayer_background);
@@ -316,6 +314,7 @@ int select_game_menu (App *app) {
                     return JOIN_MULTIPLAYER;
 
                 } else if (hover_state(return_button, Mx, My)) {
+                    // Makes space on the heap
                     free(single_player_background);
                     free(single_player_button);
                     free(host_multiplayer_background);
@@ -399,21 +398,36 @@ int join_multiplayer (App *app, char *input) {
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(enter_ip_background, Mx, My)) {
                     // Gets input from user
-                    text_input(app, input, 280, 290, 410, 110, false);
+                    port_ip_input(app, input, 280, 290, 410, 110, false);
                     strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
                 else if (hover_state(enter_port_background, Mx, My)) {
                     // Gets input from user
-                    text_input(app, input, 350, 420, 250, 90, true);
+                    port_ip_input(app, input, 350, 420, 250, 90, true);
                     strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
                 else if (hover_state(return_button, Mx, My)) {
+                    // Makes space on the heap
+                    free(enter_ip_background);
+                    free(enter_port_background);
+                    free(join_background);
+                    free(enter_ip);
+                    free(enter_port);
+                    free(join_button);
+                    free(return_button);
                     return SELECT_GAME;
                 }
                 else if (hover_state(join_background, Mx, My)) {
+                    // Makes space on the heap
+                    free(enter_ip_background);
+                    free(enter_port_background);
+                    free(join_background);
+                    free(enter_ip);
+                    free(enter_port);
+                    free(join_button);
+                    free(return_button);
                     return START_GAME;
                 }
-                
                 break;
             }
         }
@@ -427,7 +441,6 @@ int join_multiplayer (App *app, char *input) {
         
         render_button(app, enter_ip);
         render_button(app, enter_port); 
-        
 
         render_button(app, join_button);
         render_button(app, return_button);
