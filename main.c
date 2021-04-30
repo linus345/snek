@@ -114,12 +114,16 @@ int main(int argc, char *argv[])
                 menu_state = select_game_menu(app);
                 break;
             case JOIN_MULTIPLAYER:
-                menu_state = join_multiplayer(app, &ip_adress);
+                menu_state = join_multiplayer(app, ip_adress, port);
+                break;
+            case HOST_MULTIPLAYER:
+                menu_state = host_multiplayer(app);
                 break;
             case HIGH_SCORE:
+                menu_state = high_score(app);
                 break;
-
             case SETTINGS:
+                menu_state = settings(app);
                 break;
             case START_GAME:
                 exit_menu = true;

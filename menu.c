@@ -214,9 +214,23 @@ int main_menu (App *app) {
                     free(high_score_background);
                     free(high_score_button);
                     return SELECT_GAME;
+                } else if (hover_state(high_score_button, Mx, My)) {
+                    // Makes space on the heap
+                    free(start_game_background);
+                    free(start_game_button);
+                    free(high_score_background);
+                    free(high_score_button);
+                    return HIGH_SCORE;
+                } else if (hover_state(settings_button, Mx, My))
+                {
+                    // Makes space on the heap
+                    free(start_game_background);
+                    free(start_game_button);
+                    free(high_score_background);
+                    free(high_score_button);
+                    return SETTINGS;
                 } else if (hover_state(exit_button, Mx, My)) {
                     app->running = false;
-
                 }
                 break;
             }
@@ -312,8 +326,20 @@ int select_game_menu (App *app) {
                     free(join_multiplayer_background);
                     free(join_multiplayer_button);
                     return JOIN_MULTIPLAYER;
+                
 
-                } else if (hover_state(return_button, Mx, My)) {
+                } else if (hover_state(host_multiplayer_button, Mx, My)) {
+                    // Makes space on the heap
+                    free(single_player_background);
+                    free(single_player_button);
+                    free(host_multiplayer_background);
+                    free(host_multiplayer_button);
+                    free(join_multiplayer_background);
+                    free(join_multiplayer_button);
+                    return HOST_MULTIPLAYER;
+                
+                
+                }else if (hover_state(return_button, Mx, My)) {
                     // Makes space on the heap
                     free(single_player_background);
                     free(single_player_button);
@@ -365,7 +391,7 @@ int select_game_menu (App *app) {
     }
 }
 
-int join_multiplayer (App *app, char *input) {
+int join_multiplayer (App *app, char *ip_address, char *port_nr) {
 
     int Mx, My;
 
@@ -398,12 +424,12 @@ int join_multiplayer (App *app, char *input) {
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(enter_ip_background, Mx, My)) {
                     // Gets input from user
-                    port_ip_input(app, input, 280, 290, 410, 110, false);
+                    port_ip_input(app, ip_address, 280, 290, 410, 110, false);
                     strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
                 else if (hover_state(enter_port_background, Mx, My)) {
                     // Gets input from user
-                    port_ip_input(app, input, 350, 420, 250, 90, true);
+                    port_ip_input(app, port_nr, 350, 420, 250, 90, true);
                     strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
                 else if (hover_state(return_button, Mx, My)) {
@@ -462,6 +488,171 @@ int join_multiplayer (App *app, char *input) {
             SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
             SDL_SetTextureColorMod(enter_port->texture, 255, 255, 255);
             SDL_SetTextureColorMod(enter_ip->texture, 255, 255, 255);
+        }
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
+    }
+}
+
+int host_multiplayer (App *app) {
+
+    int Mx, My;
+
+    SDL_Texture *background;
+    load_texture(app, &background, "./resources/background.png");
+    SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+    TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
+    
+
+    Button *return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    
+    while (app->running) {
+
+        //SDL_MouseButtonEvent mouse_event;
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                // exit main loop
+                app->running = false;
+                break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(return_button, Mx, My)) {
+                    // Makes space on the heap
+                    free(return_button);
+                    return SELECT_GAME;
+                }
+            }
+                break;
+        }
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+
+        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
+        render_button(app, return_button);
+
+        //If-state for wether the text should switch color on hover or not
+        if (hover_state(return_button, Mx, My)) {
+            SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
+
+        } else {
+            SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
+        }
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
+    }
+}
+
+int high_score (App *app) {
+
+    int Mx, My;
+
+    SDL_Texture *background;
+    load_texture(app, &background, "./resources/background.png");
+    SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+    TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
+    
+
+    Button *return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    
+    while (app->running) {
+
+        //SDL_MouseButtonEvent mouse_event;
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                // exit main loop
+                app->running = false;
+                break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(return_button, Mx, My)) {
+                    // Makes space on the heap
+                    free(return_button);
+                    return MAIN_MENU;
+                }
+            }
+                break;
+        }
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+
+        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
+        render_button(app, return_button);
+
+        //If-state for wether the text should switch color on hover or not
+        if (hover_state(return_button, Mx, My)) {
+            SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
+
+        } else {
+            SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
+        }
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
+    }
+}
+
+int settings (App *app) {
+
+    int Mx, My;
+
+    SDL_Texture *background;
+    load_texture(app, &background, "./resources/background.png");
+    SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+    TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
+    
+
+    Button *return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    
+    while (app->running) {
+
+        //SDL_MouseButtonEvent mouse_event;
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                // exit main loop
+                app->running = false;
+                break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(return_button, Mx, My)) {
+                    // Makes space on the heap
+                    free(return_button);
+                    return MAIN_MENU;
+                }
+            }
+                break;
+        }
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+
+        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
+        render_button(app, return_button);
+
+        //If-state for wether the text should switch color on hover or not
+        if (hover_state(return_button, Mx, My)) {
+            SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
+
+        } else {
+            SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
         }
 
         // present on screen

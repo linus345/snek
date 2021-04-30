@@ -40,6 +40,9 @@ bool hover_state (Button *button, int Mx, int My);
 void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port);
 int main_menu (App *app);
 int select_game_menu (App *app);
-int join_multiplayer (App *app, char *ip_adress);
+int join_multiplayer (App *app, char *ip_adress, char *port_nr);
+int host_multiplayer (App *app);
+int high_score (App *app);
+int settings (App *app);
 
 #endif
