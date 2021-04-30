@@ -10,64 +10,6 @@
 #include "menu.h"
 #include "app.h"
 
-void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Texture *exit)
-{
-    //Let's make the menu's background
-    
-    load_texture(app, &background, "./resources/background.png");
-    //Now the Background's rect, it should give us power to control it's size and location
-    SDL_Rect *background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-    //Now, our background should start from the top left since it's coordinates are in 
-    //(0, 0) and it should stretch 400 to the right and 400 down making it a square, 400X400
-    
-    //The New Game button
-    
-    load_texture(app, &newGame, "./resources/new_game_Button.png"); 
-    
-    //The game button's rect
-    SDL_Rect newGame_Rect;
-    newGame_Rect.x = 0;
-    newGame_Rect.y = 100;
-    newGame_Rect.w = 50;
-    newGame_Rect.h = 25;
-    
-    //I'll just skip to the exit button
-
-    load_texture(app, &exit, "./resources/button_Exit.png");
-    
-    //The exit button's rect
-    SDL_Rect exit_Rect;
-    exit_Rect.x = 0;
-    exit_Rect.y = 200;
-    exit_Rect.w = 50;
-    exit_Rect.h = 25;
-    
-
-    /*
-    {
-        SDL_SetTextureColorMod(newGame, 250, 0, 0);
-        This would make the texture change color if the mouse is inside the rect,
-    it takes the name of the texture which is newGame, and the following variables
-    are the r, g, and b, if you were to make all except red into 0 then the texture
-    would be tinted red, I assumed you wanted the player to know that it is hovering
-    over the new game so I added this as a bonus
-
-        if (event->type == SDL_MOUSEBUTTONDOWN) //this calls an event, I assume that you already know how to make an event right?
-        {
-            if (event->button.button == SDL_BUTTON_LEFT)
-            { //if it is pressed then play1 becomes true which you could use to initiate the newgame
-                play1 = true;
-            }
-        }
-    }
-    else
-    {
-        SDL_SetTextureColorMod(Gettexture(), 250, 250, 250);
-        // Tints the texture white if the cursor isn't over the button
-    }
-    */
-}
-
 SDL_Color color_select (int selection) {
     SDL_Color
     black = {0, 0, 0},
@@ -137,48 +79,108 @@ bool hover_state (Button *button, int Mx, int My) {
     return false;
 }
 
-void text_input (App *app, int x, int y, int w, int h, char ip_adress[]) {
+void text_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port) {
 
-    int done = 0;
+    bool done = false;
+    int Mx, My;
+
+    SDL_Texture *background;
+    load_texture(app, &background, "./resources/background.png");
+    SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+    TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
+ 
+    Button *enter_ip_background = menu_button_background (app, 230, 250, 500, 180, "./resources/ip_field.png");
+    Button *enter_port_background = menu_button_background (app, 300, 390, 360, 150, "./resources/port_field.png"); 
+    Button *join_background = menu_button_background (app, 300, 600, 360, 150, "./resources/menuButton.png");
+        
+    Button *enter_ip = menu_button_text(app, 280, 290, 410, 110, "Enter IP", font, color_select(WHITE));
+    Button *enter_port = menu_button_text(app, 350, 420, 250, 90, "Enter Port", font, color_select(WHITE));  
+
+    Button *join_button = menu_button_text(app, 337, 630, 290, 90, "Join", font, color_select(GREEN));
+    Button *return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+
+    Button *text;
+
 
     SDL_StartTextInput();
-
-    SDL_Rect tmp;
-    tmp.x = x;
-    tmp.y = y;
-    tmp.w = w;
-    tmp.h = h;
-
-    SDL_SetTextInputRect(&tmp);
-    SDL_RenderDrawRect(app, &tmp);
-    SDL_SetRenderDrawColor(app, 0, 0, 0, 255); // the rect color
-    SDL_RenderFillRect(app, &tmp);
-    SDL_RenderPresent(app); // copy to screen
-
     while (!done) {
         SDL_Event event;
 
         if (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
-                    done = 1;
+                    app->running = false;
+                    done = true;
                     break;
                 case SDL_TEXTINPUT:
                     /* Add new text onto the end of our text */
-                    strcat(ip_adress, event.text.text);
+                    strcat(input, event.text.text);
+                    text = menu_button_text(app, x, y, w, h, input, font, color_select(WHITE));
                     break;
-                case SDL_SCANCODE_KP_ENTER:
-                    done = 1;
+                case SDL_KEYDOWN:
+                // enter key pressed?
+                    switch (event.key.keysym.sym) {
+                        case SDLK_RETURN:
+                            done = true;
+                            break;
+                    }
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    if (hover_state(return_button, Mx, My)) {
+                        done = true;
+                    }
                     break;
             }
         }
-        SDL_RenderDrawRect(app, &tmp);
-        SDL_RenderPresent(app);
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+
+        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
+        render_button(app, enter_ip_background);
+        render_button(app, enter_port_background);
+        render_button(app, join_background);
+
+        // Makes sure the button pressed is not renderd
+        if (ip_not_port)
+        {
+            render_button(app, enter_ip);
+        } else if (!ip_not_port)
+        {
+            render_button(app, enter_port);
+        }
+        
+        render_button(app, text);   // Renders the user input
+        render_button(app, join_button);
+        render_button(app, return_button);
+
+        //If-state for wether the text should switch color on hover or not
+        if (hover_state(return_button, Mx, My)) {
+            SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
+
+        } else {
+            SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
+        }
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
     }
 
     SDL_StopTextInput();
 
-    printf("\nthe text input is: %s\n\n",ip_adress);
+    printf("\nthe text input is: %s\n\n",input);
+
+    // Make space on the heap
+    free(enter_ip_background);
+    free(enter_port_background);
+    free(join_background);
+    free(enter_ip);
+    free(enter_port);
+    free(join_button);
+    free(return_button);
 }
 
 int main_menu (App *app) {
@@ -364,7 +366,7 @@ int select_game_menu (App *app) {
     }
 }
 
-int join_multiplayer (App *app, char *ip_adress) {
+int join_multiplayer (App *app, char *input) {
 
     int Mx, My;
 
@@ -374,15 +376,15 @@ int join_multiplayer (App *app, char *ip_adress) {
 
     TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
     
-    Button *enter_port_background = menu_button_background (app, 300, 390, 360, 150, "./resources/port_field.png");
-    //SDL_Rect port_input = {337, 420, 290, 90};
     
-    Button *enter_ip_background = menu_button_background (app, 230, 250, 500, 180, "./resources/ip_field.png");    
+    Button *enter_ip_background = menu_button_background (app, 230, 250, 500, 180, "./resources/ip_field.png");
+    Button *enter_port_background = menu_button_background (app, 300, 390, 360, 150, "./resources/port_field.png"); 
     Button *join_background = menu_button_background (app, 300, 600, 360, 150, "./resources/menuButton.png");
+    Button *enter_ip = menu_button_text(app, 280, 290, 410, 110, "Enter IP", font, color_select(WHITE));
+    Button *enter_port = menu_button_text(app, 350, 420, 250, 90, "Enter Port", font, color_select(WHITE));
     Button *join_button = menu_button_text(app, 337, 630, 290, 90, "Join", font, color_select(GREEN));
     Button *return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
     
-    text_input(app, 327, 120, 310, 90, ip_adress);
     while (app->running) {
 
         //SDL_MouseButtonEvent mouse_event;
@@ -390,20 +392,28 @@ int join_multiplayer (App *app, char *ip_adress) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_QUIT:
-
                 // exit main loop
                 app->running = false;
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
-                if (hover_state(join_button, Mx, My)) {
-                    return START_GAME;
-                } else if (hover_state(port_input, Mx, My)) {
-                    
-
-                } else if (hover_state(return_button, Mx, My)) {
+                if (hover_state(enter_ip_background, Mx, My)) {
+                    // Gets input from user
+                    text_input(app, input, 280, 290, 410, 110, false);
+                    strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                }
+                else if (hover_state(enter_port_background, Mx, My)) {
+                    // Gets input from user
+                    text_input(app, input, 350, 420, 250, 90, true);
+                    strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                }
+                else if (hover_state(return_button, Mx, My)) {
                     return SELECT_GAME;
                 }
+                else if (hover_state(join_background, Mx, My)) {
+                    return START_GAME;
+                }
+                
                 break;
             }
         }
@@ -414,6 +424,11 @@ int join_multiplayer (App *app, char *ip_adress) {
         render_button(app, enter_ip_background);
         render_button(app, enter_port_background);
         render_button(app, join_background);
+        
+        render_button(app, enter_ip);
+        render_button(app, enter_port); 
+        
+
         render_button(app, join_button);
         render_button(app, return_button);
 
@@ -424,10 +439,16 @@ int join_multiplayer (App *app, char *ip_adress) {
         } else if (hover_state(return_button, Mx, My)) {
             SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
 
+        } else if (hover_state(enter_ip, Mx, My)) {
+            SDL_SetTextureColorMod(enter_ip->texture, 127, 127, 127);
+
+        } else if (hover_state(enter_port, Mx, My)) {
+            SDL_SetTextureColorMod(enter_port->texture, 127, 127, 127);
         } else {
             SDL_SetTextureColorMod(join_button->texture, 45, 93, 9);
             SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
-
+            SDL_SetTextureColorMod(enter_port->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(enter_ip->texture, 255, 255, 255);
         }
 
         // present on screen
