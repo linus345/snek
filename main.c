@@ -16,6 +16,7 @@
 
 int main(int argc, char *argv[])
 {
+    char ip_adress[16], port[5];
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -112,8 +113,12 @@ int main(int argc, char *argv[])
             case SELECT_GAME:
                 menu_state = select_game_menu(app);
                 break;
+            case JOIN_MULTIPLAYER:
+                menu_state = join_multiplayer(app, &ip_adress);
+                break;
             case HIGH_SCORE:
                 break;
+
             case SETTINGS:
                 break;
             case START_GAME:
