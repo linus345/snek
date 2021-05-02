@@ -44,7 +44,7 @@ typedef struct {
     Body_Part tail;
 } Snake;
 
-Snake *new_snake(int player_nr);
+Snake *new_snake(int id);
 void change_snake_velocity(Snake *snake);
 void new_snake_pos(Snake *snake);
 Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_length);

@@ -7,12 +7,11 @@
 typedef struct {
     int points;
     bool alive;
-    int host;
-    int port;
     int client_id;
+    int last_received_packet_nr;
     Snake *snake;
 } Player;
 
-Player *new_player(int host, int port, int player_nr);
+Player *new_player(int id);
 
 #endif

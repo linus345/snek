@@ -9,11 +9,12 @@
 // TODO: BANDAID FIX, MUST FIX!!! FIX MUCH IMPORTANT!!!!!!!!!
 void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits);
 
-Snake *new_snake(int player_nr)
+Snake *new_snake(int id)
 {
     // allocate memory on heap
     Snake *snake = malloc(sizeof(Snake));
 
+    printf("new_snake id: %d\n", id);
     snake->body_length = 0;
     // initialize start speed
     snake->speed = SPEED;
@@ -21,9 +22,9 @@ Snake *new_snake(int player_nr)
     snake->head.has_turned = false;
 
     // position snake differently depending on player
-    switch(player_nr) {
+    switch(id) {
         // position snake top left, moving to the right
-        case 1:
+        case 0:
             snake->vel_x = CELL_SIZE;
             snake->vel_y = 0;
             snake->head.angle = 90;
@@ -36,7 +37,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y;
             break;
         // position snake top right, moving to downwards
-        case 2:
+        case 1:
             snake->vel_x = 0;
             snake->vel_y = CELL_SIZE;
             snake->head.angle = 180;
@@ -50,7 +51,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y - CELL_SIZE * 2;
             break;
         // position snake bottom right, moving to the left
-        case 3:
+        case 2:
             snake->vel_x = CELL_SIZE;
             snake->vel_y = 0;
             snake->head.angle = 270;
@@ -64,7 +65,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y;
             break;
         // position snake bottom left, moving upwards
-        case 4:
+        case 3:
             snake->vel_x = 0;
             snake->vel_y = CELL_SIZE;
             snake->head.angle = 0;
