@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     SDL_Texture *background_tex;
     load_texture(app, &background_tex, "./resources/background.png");
 
-    // timer
+    // timer 1 is for updating snake position, based on snake speed
     unsigned last_time = 0, current_time;
 
 
@@ -187,7 +187,6 @@ int main(int argc, char *argv[])
 
         // Check for recieved package
         if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
-            int temp, id, packet_nr, x, y, dir, angle;
             // get request type from packet
             sscanf(pack_recv->data, "%d", &request_type);
             switch(request_type) {
@@ -195,42 +194,24 @@ int main(int argc, char *argv[])
                     new_client_joined(pack_recv, players, &nr_of_players, &client_id);
                     break;
                 case UPDATE_SNAKE_POS:
-                    // TODO: create function for code below and find out why/if there is a delay/out of sync between clients
-                    // format: type id last_received_packet_nr x y direction angle
-                    sscanf(pack_recv->data, "%d %d %d %d %d %d %d", &temp, &id, &packet_nr, &x, &y, &dir, &angle);
-                    printf("snake pos: id: %d, pack_nr: %d, x: %d, y: %d, dir: %d, angle: %d\n", id, packet_nr, x, y, dir, angle);
-                    if(players[id]->last_received_packet_nr > packet_nr) {
-                        // break early because we've already received a newer packet
-                        break;
-                    }
-                    // update last received packet number to the packet we just got
-                    players[id]->last_received_packet_nr = packet_nr;
-                    // update snake position
-                    players[id]->snake->dir = dir;
-                    players[id]->snake->head.pos.x = x;
-                    players[id]->snake->head.pos.y = y;
-                    players[id]->snake->head.angle = angle;
+                    update_snake_pos_from_req(pack_recv, players, nr_of_players);
                     break;
             }
         }
 
         // Checks if any collisons has occured with the walls
         if (collison_with_wall(players[client_id]->snake)) {
-            /* app->running = false; */
             players[client_id]->alive = false;
         }
         // Checks if any collisons has occured with a snake
         if (collison_with_snake(players[client_id]->snake)) {
-            /* app->running = false; */
             players[client_id]->alive = false;
         }
                 
         current_time = SDL_GetTicks();
         if (current_time > last_time + players[client_id]->snake->speed) {
             /* change_snake_velocity(players[client_id]->snake); */
-
             // update snake velocity based on direction state
-            // test singleplayer position update
             for(int i = 0; i < nr_of_players; i++) {
                 if(players[i] == NULL && players[i]->alive) {
                     // skip current player if player doesn't exist or if player is dead
@@ -244,10 +225,10 @@ int main(int argc, char *argv[])
             /* head_adjecent_with_fruit(&players[client_id]->snake->head, fruits, nr_of_fruits); */
             /* printf("client_id: %d\n", client_id); */
             /* printf("players[]->client_id: %d\n", players[client_id]->client_id); */
-            send_snake_position(udp_sock, server_addr, pack_send, players[client_id]);
-
+            /* send_snake_position(udp_sock, server_addr, pack_send, players[client_id]); */
             last_time = current_time;
         }
+        send_snake_position(udp_sock, server_addr, pack_send, players[client_id]);
         // temporarily disable fruit collision TODO
         /* if(fruit_collision(players[client_id]->snake, fruits, nr_of_fruits)) { */
         /*     free(fruits[nr_of_fruits-1]); */

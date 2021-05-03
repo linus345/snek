@@ -19,6 +19,7 @@ IPaddress resolve_host(char *host, int port);
 void log_packet(UDPpacket *pack_recv);
 void get_client_id(UDPpacket *pack_recv, int *client_id);
 void new_client_joined(UDPpacket *pack_recv, Player *players[], int *nr_of_players, int *client_id);
+void update_snake_pos_from_req(UDPpacket *pack_recv, Player *players[], int nr_of_players);
 void send_packet(UDPsocket socket, UDPpacket *packet);
 void join_game_request(UDPsocket socket, IPaddress server_addr, UDPpacket *packet);
 void send_snake_position(UDPsocket socket, IPaddress server_addr, UDPpacket *packet, Player *player);

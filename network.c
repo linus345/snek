@@ -90,6 +90,25 @@ void new_client_joined(UDPpacket *pack_recv, Player *players[], int *nr_of_playe
     }
 }
 
+void update_snake_pos_from_req(UDPpacket *pack_recv, Player *players[], int nr_of_players)
+{
+    int type, id, packet_nr, x, y, dir, angle;
+    // format: type id last_received_packet_nr x y direction angle
+    sscanf(pack_recv->data, "%d %d %d %d %d %d %d", &type, &id, &packet_nr, &x, &y, &dir, &angle);
+    printf("snake pos: id: %d, pack_nr: %d, x: %d, y: %d, dir: %d, angle: %d\n", id, packet_nr, x, y, dir, angle);
+    if(players[id]->last_received_packet_nr > packet_nr) {
+        // return early because we've already received a newer packet
+        return;
+    }
+    // update last received packet number to the packet number we just got
+    players[id]->last_received_packet_nr = packet_nr;
+    // update snake position
+    players[id]->snake->dir = dir;
+    players[id]->snake->head.pos.x = x;
+    players[id]->snake->head.pos.y = y;
+    players[id]->snake->head.angle = angle;
+}
+
 void send_packet(UDPsocket socket, UDPpacket *packet) {
     int sent;
     sent = SDLNet_UDP_Send(socket, packet->channel, packet);
