@@ -13,6 +13,7 @@ Player *new_player(int id)
     player->client_id = id;
     // initialize last received packet number to 0
     player->last_received_packet_nr = 0;
+    player->packet_nr = 0;
     player->snake = new_snake(id);
 
     return player;

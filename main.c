@@ -213,11 +213,20 @@ int main(int argc, char *argv[])
             /* change_snake_velocity(players[client_id]->snake); */
             // update snake velocity based on direction state
             for(int i = 0; i < nr_of_players; i++) {
-                if(players[i] == NULL && players[i]->alive) {
-                    // skip current player if player doesn't exist or if player is dead
+                // skip current player if player doesn't exist or if player is dead
+                if(players[i] == NULL) {
+                    continue;
+                } else if(!players[i]->alive) {
                     continue;
                 }
                 change_snake_velocity(players[i]->snake);
+                /* if(players[i]->client_id == client_id) { */
+                /*     printf("client_id: %d\n", client_id); */
+                /*     new_snake_pos(players[i]->snake, true); */
+                /* } else { */
+                /*     printf("not client_id: %d\n", i); */
+                /*     new_snake_pos(players[i]->snake, false); */
+                /* } */
                 new_snake_pos(players[i]->snake);
                 head_adjecent_with_fruit(&players[i]->snake->head, fruits, nr_of_fruits);
             }

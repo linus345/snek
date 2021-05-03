@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "game.h"
 #define MAX_SNAKE_LENGTH 256
-#define SPEED 500      // ms
+#define SPEED 1000      // ms
 
 typedef struct {
     int angle;
@@ -21,6 +21,7 @@ typedef struct {
     bool mouth_open;
     bool mouth_eating;
     Pos pos;
+    Pos next_pos;
 } Head_Part;
 
 enum Dir {

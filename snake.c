@@ -20,6 +20,8 @@ Snake *new_snake(int id)
     snake->speed = SPEED;
     snake->next_dir = None;
     snake->head.has_turned = false;
+    snake->head.next_pos.x = -1;
+    snake->head.next_pos.y = -1;
 
     // position snake differently depending on player
     switch(id) {
@@ -204,9 +206,18 @@ void new_snake_pos(Snake *snake)
     snake->body[0].pos.x = snake->head.pos.x;
     snake->body[0].pos.y = snake->head.pos.y;
     snake->body[0].angle = snake->head.angle;
+
     // update head position
-    snake->head.pos.x += snake->vel_x;
-    snake->head.pos.y += snake->vel_y;
+    if(snake->head.next_pos.x > -1 && snake->head.next_pos.y > -1) {
+        snake->head.pos.x = snake->head.next_pos.x;
+        snake->head.pos.y = snake->head.next_pos.y;
+
+        snake->head.next_pos.x = -1;
+        snake->head.next_pos.y = -1;
+    } else {
+        snake->head.pos.x += snake->vel_x;
+        snake->head.pos.y += snake->vel_y;
+    }
     snake->head.has_turned = false;
     snake->head.mouth_open = false;
     snake->head.mouth_eating = false;

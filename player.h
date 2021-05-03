@@ -9,6 +9,7 @@ typedef struct {
     bool alive;
     int client_id;
     int last_received_packet_nr;
+    int packet_nr;
     Snake *snake;
 } Player;
 

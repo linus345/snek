@@ -104,9 +104,9 @@ void update_snake_pos_from_req(UDPpacket *pack_recv, Player *players[], int nr_o
     players[id]->last_received_packet_nr = packet_nr;
     // update snake position
     players[id]->snake->dir = dir;
-    players[id]->snake->head.pos.x = x;
-    players[id]->snake->head.pos.y = y;
-    players[id]->snake->head.angle = angle;
+    players[id]->snake->head.next_pos.x = x;
+    players[id]->snake->head.next_pos.y = y;
+    /* players[id]->snake->head.angle = angle; */
 }
 
 void send_packet(UDPsocket socket, UDPpacket *packet) {
@@ -137,8 +137,10 @@ void join_game_request(UDPsocket socket, IPaddress server_addr, UDPpacket *packe
 void send_snake_position(UDPsocket socket, IPaddress server_addr, UDPpacket *packet, Player *player) {
     // format snake position information before send
     char msg[30];
-    // format: type id last_received_packet_nr x y direction angle
-    sprintf(msg, "%d %d %d %d %d %d %d", UPDATE_SNAKE_POS, player->client_id, player->last_received_packet_nr, player->snake->head.pos.x, player->snake->head.pos.y, player->snake->dir, player->snake->head.angle);
+    // increment how many packets client have sent
+    player->packet_nr++;
+    // format: type id packet_nr x y direction angle
+    sprintf(msg, "%d %d %d %d %d %d %d", UPDATE_SNAKE_POS, player->client_id, player->packet_nr, player->snake->head.pos.x, player->snake->head.pos.y, player->snake->dir, player->snake->head.angle);
     packet->data = msg;
     packet->channel = -1;
     packet->len = sizeof(packet->data)+24;
