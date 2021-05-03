@@ -425,12 +425,12 @@ int join_multiplayer (App *app, char *ip_address, char *port_nr) {
                 if (hover_state(enter_ip_background, Mx, My)) {
                     // Gets input from user
                     port_ip_input(app, ip_address, 280, 290, 410, 110, false);
-                    strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    strcpy(ip_address,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
                 else if (hover_state(enter_port_background, Mx, My)) {
                     // Gets input from user
                     port_ip_input(app, port_nr, 350, 420, 250, 90, true);
-                    strcpy(input,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    strcpy(port_nr,""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
                 else if (hover_state(return_button, Mx, My)) {
                     // Makes space on the heap
