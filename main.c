@@ -137,18 +137,18 @@ int main(int argc, char *argv[]) {
     
         SDL_Event event;
         // check for event
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
+        while (SDL_PollEvent(&event)) {
+        
+            switch (event.type) {
+            
             case SDL_QUIT:
                 // exit main loop
                 app->running = false;
                 break;
             case SDL_KEYDOWN:
                 // key pressed?
-                switch (event.key.keysym.sym)
-                {
+                switch (event.key.keysym.sym) {
+                
                 case SDLK_UP:
                 case SDLK_w:
                     if (player1->snake->dir != Down)
@@ -217,8 +217,8 @@ int main(int argc, char *argv[]) {
         if (nr_of_fruits < nr_of_players) {
         
             // spawn new fruit
-            while (temp_fruit == NULL)
-            {
+            while (temp_fruit == NULL) {
+            
                 temp_fruit = new_fruit(fruits, nr_of_fruits, player1->snake);
             }
             fruits[nr_of_fruits++] = temp_fruit;
