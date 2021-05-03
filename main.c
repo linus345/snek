@@ -14,19 +14,19 @@
 #include "fruit.h"
 #include "menu.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+
     char ip_adress[16], port[5];
     
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-    {
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
         return 1;
     }
     printf("successfully initialized SDL\n");
 
-    if (SDLNet_Init() != 0)
-    {
+    if (SDLNet_Init() != 0) {
+    
         fprintf(stderr, "Error: SDLNet_Init: %s\n", SDLNet_GetError());
         return 2;
     }
@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
     }
 
 
-    while (app->running)
-    {
+    while (app->running) {
+    
         SDL_Event event;
         // check for event
         while (SDL_PollEvent(&event))
@@ -177,19 +177,19 @@ int main(int argc, char *argv[])
         }
 
         // Checks if any collisons has occured with the walls
-        if (collison_with_wall(player1->snake))
-        {
+        if (collison_with_wall(player1->snake)) {
+        
             app->running = false;
         }
         // Checks if any collisons has occured with a snake
-        if (collison_with_snake(player1->snake))
-        {
+        if (collison_with_snake(player1->snake)) {
+        
             app->running = false;
         }
 
         current_time = SDL_GetTicks();
-        if (current_time > last_time + player1->snake->speed)
-        {
+        if (current_time > last_time + player1->snake->speed) {
+        
             change_snake_velocity(player1->snake);
 
             // update snake velocity based on direction state
@@ -199,8 +199,8 @@ int main(int argc, char *argv[])
 
             last_time = current_time;
         }
-        if (fruit_collision(player1->snake, fruits, nr_of_fruits))
-        {
+        if (fruit_collision(player1->snake, fruits, nr_of_fruits)) {
+        
             free(fruits[nr_of_fruits - 1]);
             nr_of_fruits--;
             new_snake_body_part(&player1->snake->body[player1->snake->body_length - 1].pos,
@@ -214,8 +214,8 @@ int main(int argc, char *argv[])
         SDL_Rect fruit_dst[MAX_PLAYERS];
 
         Fruit *temp_fruit = NULL;
-        if (nr_of_fruits < nr_of_players)
-        {
+        if (nr_of_fruits < nr_of_players) {
+        
             // spawn new fruit
             while (temp_fruit == NULL)
             {
@@ -223,8 +223,8 @@ int main(int argc, char *argv[])
             }
             fruits[nr_of_fruits++] = temp_fruit;
         }
-        for (int i = 0; i < nr_of_fruits; i++)
-        {
+        for (int i = 0; i < nr_of_fruits; i++) {
+        
             fruit_src[i].x = fruit_texture[fruits[i]->type].x;
             fruit_src[i].y = fruit_texture[fruits[i]->type].y;
             fruit_src[i].w = CELL_SIZE;
@@ -240,20 +240,20 @@ int main(int argc, char *argv[])
         SDL_Rect head_src;
         SDL_Rect head_dst = {player1->snake->head.pos.x, player1->snake->head.pos.y, CELL_SIZE, CELL_SIZE};
 
-        if (player1->snake->head.mouth_open)
-        {
+        if (player1->snake->head.mouth_open) {
+        
             // Snake open mouth next to fruit
             head_src.x = snake_texture[4].x;
             head_src.y = snake_texture[4].y;
         }
-        else if (player1->snake->head.mouth_eating)
-        {
+        else if (player1->snake->head.mouth_eating) {
+        
             // Snake eating after open mouth
             head_src.x = snake_texture[5].x;
             head_src.y = snake_texture[5].y;
         }
-        else
-        {
+        else {
+        
             // Snake closed mouth, default
             head_src.x = snake_texture[0].x;
             head_src.y = snake_texture[0].y;
@@ -264,15 +264,15 @@ int main(int argc, char *argv[])
         // snake body rendering
         SDL_Rect body_src[MAX_SNAKE_LENGTH];
         SDL_Rect body_dst[MAX_SNAKE_LENGTH];
-        for (int i = 0; i < player1->snake->body_length; i++)
-        {
-            if (player1->snake->body[i].is_turn)
-            {
+        for (int i = 0; i < player1->snake->body_length; i++) {
+        
+            if (player1->snake->body[i].is_turn) {
+            
                 body_src[i].x = snake_texture[3].x;
                 body_src[i].y = snake_texture[3].y;
             }
-            else
-            {
+            else {
+            
                 body_src[i].x = snake_texture[1].x;
                 body_src[i].y = snake_texture[1].y;
             }
@@ -295,8 +295,8 @@ int main(int argc, char *argv[])
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
         // render fruits
-        for (int i = 0; i < nr_of_fruits; i++)
-        {
+        for (int i = 0; i < nr_of_fruits; i++) {
+        
             SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
         }
 
@@ -305,19 +305,19 @@ int main(int argc, char *argv[])
         // render body
         SDL_RendererFlip flip = SDL_FLIP_NONE;
         int rotation;
-        for (int i = 0; i < player1->snake->body_length; i++)
-        {
+        for (int i = 0; i < player1->snake->body_length; i++) {
+        
             rotation = player1->snake->body[i].angle;
             flip = SDL_FLIP_NONE;
-            if (player1->snake->body[i].is_turn)
-            {
+            if (player1->snake->body[i].is_turn) {
+            
                 rotation = player1->snake->body[i].turn_rotation;
-                if (player1->snake->body[i].should_flip_vertical)
-                {
+                if (player1->snake->body[i].should_flip_vertical) {
+                
                     flip = SDL_FLIP_VERTICAL;
                 }
-                else if (player1->snake->body[i].should_flip_horizontal)
-                {
+                else if (player1->snake->body[i].should_flip_horizontal) {
+                
                     flip = SDL_FLIP_HORIZONTAL;
                 }
             }
