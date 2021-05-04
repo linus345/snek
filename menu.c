@@ -178,13 +178,13 @@ void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_
     free(return_button);
 }
 
-int main_menu (App *app) {
+int main_menu (App *app, SDL_Rect *r) {
     
     int Mx, My;
 
     SDL_Texture *background;
     load_texture(app, &background, "./resources/background.png");
-    SDL_Rect background_view = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+    SDL_Rect background_view = {0, 0, r->w, r->h};
 
     TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
     
@@ -233,6 +233,16 @@ int main_menu (App *app) {
                     app->running = false;
                 }
                 break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                    case SDLK_f:
+                    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    break;
+                case SDLK_ESCAPE:
+                    SDL_SetWindowFullscreen(app->window, NULL);
+                    break; 
+                }
+                break;   
             }
         }
         // clear screen before next render
