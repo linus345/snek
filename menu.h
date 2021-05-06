@@ -2,6 +2,7 @@
 #define MENU_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "game.h"
 #include "app.h"
 
@@ -38,7 +39,7 @@ void render_button (App *app, Button *button);
 bool hover_state (Button *button, int Mx, int My);
 
 void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port);
-int main_menu (App *app, SDL_Rect *r);
+int main_menu (App *app, SDL_Rect *r, bool *fullscreen);
 int select_game_menu (App *app);
 int join_multiplayer (App *app, char *ip_adress, char *port_nr);
 int host_multiplayer (App *app);

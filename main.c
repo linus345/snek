@@ -118,13 +118,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    bool exit_menu = false;
+    bool exit_menu = false, fullscreen=true;
     int menu_state = 0;
     while (app->running) {
 
         switch (menu_state) {
         case MAIN_MENU:
-            menu_state = main_menu(app, &r);
+            menu_state = main_menu(app, &r, &fullscreen);
             break;
         case SELECT_GAME:
             menu_state = select_game_menu(app);
