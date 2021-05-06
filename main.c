@@ -18,6 +18,7 @@
 int main(int argc, char* argv[])
 {
     char ip_adress[16], port[5];
+    bool fullscreen_bool = false;
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
@@ -112,34 +113,36 @@ int main(int argc, char* argv[])
 
     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     
-    SDL_Rect r;
-    if (SDL_GetDisplayBounds(0, &r) != 0) {
+    SDL_Rect fullscreen;
+    if (SDL_GetDisplayBounds(0, &fullscreen) != 0) {
         SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
         return 1;
     }
 
-    bool exit_menu = false, fullscreen=true;
+    
+
+    bool exit_menu = false;
     int menu_state = 0;
     while (app->running) {
 
         switch (menu_state) {
         case MAIN_MENU:
-            menu_state = main_menu(app, &r, &fullscreen);
+            menu_state = main_menu(app, &fullscreen, &fullscreen_bool);
             break;
         case SELECT_GAME:
-            menu_state = select_game_menu(app);
+            menu_state = select_game_menu(app, &fullscreen_bool);
             break;
         case JOIN_MULTIPLAYER:
-            menu_state = join_multiplayer(app, ip_adress, port);
+            menu_state = join_multiplayer(app, ip_adress, port, &fullscreen_bool);
             break;
         case HOST_MULTIPLAYER:
-            menu_state = host_multiplayer(app);
+            menu_state = host_multiplayer(app, &fullscreen_bool);
             break;
         case HIGH_SCORE:
-            menu_state = high_score(app);
+            menu_state = high_score(app, &fullscreen_bool);
             break;
         case SETTINGS:
-            menu_state = settings(app);
+            menu_state = settings(app, &fullscreen_bool);
             break;
         case START_GAME:
             exit_menu = true;
