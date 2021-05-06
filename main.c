@@ -16,7 +16,7 @@
 
 int main(int argc, char *argv[]) {
 
-    char ip_adress[16], port[5];
+    char ip_adress[16] = "", port[5] = "";
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     
