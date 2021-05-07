@@ -94,23 +94,6 @@ int main(int argc, char* argv[])
 
     TTF_Init();
 
-    /*
-    TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
-    if (font == NULL) {
-        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
-        return 0;
-    }
-    
-
-   int SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-     if (font == NULL) {
-        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
-        return 0;
-    }
-    */
-
-
     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     
     SDL_Rect fullscreen;
@@ -118,8 +101,6 @@ int main(int argc, char* argv[])
         SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
         return 1;
     }
-
-    
 
     bool exit_menu = false;
     int menu_state = 0;
