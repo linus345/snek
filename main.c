@@ -17,9 +17,9 @@
 
 int main(int argc, char* argv[])
 {
-    char ip_adress[16], port[5];
+    char ip_adress[16] = "", port[5] = "";
     bool fullscreen_bool = false;
-
+    
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
         return 1;

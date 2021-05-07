@@ -81,13 +81,17 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
     Button* join_button = menu_button_text(app, 337, 630, 290, 90, "Join", font, green, fullscreen_bool);
     Button* return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, white, fullscreen_bool);
 
-    Button* text;
+    Button* text = NULL;
 
     SDL_StartTextInput();
+    SDL_Event event;
     while (!done) {
-        SDL_Event event;
+
+        
+        printf("While loop\n");
 
         if (SDL_PollEvent(&event)) {
+            printf("If-statement successful\n");
             switch (event.type) {
             case SDL_QUIT:
                 app->running = false;
@@ -115,6 +119,7 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
+        printf("Checkpoint\n");
 
         if (fullscreen_bool) {
 
@@ -137,13 +142,14 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
         render_button(app, return_button, fullscreen_bool);
 
         //If-state for wether the text should switch color on hover or not
+        
         if (hover_state(return_button, Mx, My)) {
             SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
 
         } else {
             SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
         }
-
+        printf("Checkpoint\n");
         // present on screen
         SDL_RenderPresent(app->renderer);
 
