@@ -35,7 +35,7 @@ void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Text
 SDL_Color color_select (int selection);
 Button *menu_button_background (App *app, int x, int y, int w, int h, char resource[], bool *fullscreen);
 Button *menu_button_text(App *app, int x, int y, int w, int h, char *text, TTF_Font *font, SDL_Color color, bool *fullscreen_bool);
-void render_button (App* app, Button* button, bool *fullscreen);
+void render_button (App* app, Button* button, bool *fullscreen_bool);
 bool hover_state (Button *button, int Mx, int My);
 
 void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port, bool *fullscreen_bool);

@@ -41,12 +41,18 @@ Button* menu_button_text(App* app, int x, int y, int w, int h, char* text, TTF_F
     rect.y = y;
     rect.w = w;
     rect.h = h;button->rect = rect;
+    if (fullscreen_bool) {
+        optimizeFullscreen(&rect);
+    }
     button->texture = texture;
     return button;
 }
 
-void render_button(App* app, Button* button, bool *fullscreen)
+void render_button(App* app, Button* button, bool *fullscreen_bool)
 {
+    if (fullscreen_bool) {
+        optimizeFullscreen(&button->rect);
+    }
     SDL_RenderCopy(app->renderer, button->texture, NULL, &button->rect);
 }
 
@@ -119,11 +125,7 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-        printf("Checkpoint\n");
-
-        if (fullscreen_bool) {
-
-        }
+        printf("Checkpoint 1\n");
 
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
         render_button(app, enter_ip_background, fullscreen_bool);
@@ -136,20 +138,21 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
         } else if (!ip_not_port) {
             render_button(app, enter_port, fullscreen_bool);
         }
+        printf("Checkpoint 2\n");
 
         render_button(app, text, fullscreen_bool); // Renders the user input
         render_button(app, join_button, fullscreen_bool);
         render_button(app, return_button, fullscreen_bool);
 
         //If-state for wether the text should switch color on hover or not
-        
+        printf("Checkpoint 3\n");
         if (hover_state(return_button, Mx, My)) {
             SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
 
         } else {
             SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
         }
-        printf("Checkpoint\n");
+        printf("Checkpoint 4\n");
         // present on screen
         SDL_RenderPresent(app->renderer);
 
