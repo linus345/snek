@@ -15,16 +15,11 @@ enum Menu_selection {
     SETTINGS = 30,
     START_GAME = 100
 };
-
-enum Color_pallet {
-    BLACK = 0,
-    GRAY = 127,
-    WHITE = 255,
-    GREEN = 1,
-    DARK_GREEN = 2
-    
-};
-
+/*
+typedef struct {
+    SDL_Color color;
+} Color;
+*/
 typedef struct {
     SDL_Rect rect;
     SDL_Texture *texture, *background;
@@ -33,13 +28,13 @@ typedef struct {
 
 void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Texture *exit);
 SDL_Color color_select (int selection);
-Button *menu_button_background (App *app, int x, int y, int w, int h, char resource[], bool *fullscreen);
-Button *menu_button_text(App *app, int x, int y, int w, int h, char *text, TTF_Font *font, SDL_Color color, bool *fullscreen_bool);
+Button *menu_button_background (App *app, char resource[]);
+Button *menu_button_text(App *app, char *text, TTF_Font *font, SDL_Color color);
 void render_button (App* app, Button* button, bool *fullscreen_bool);
 bool hover_state (Button *button, int Mx, int My);
 
 void menu(App* app, char *ip_address, char *port_nr);
-void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port, bool *fullscreen_bool);
+void port_ip_input (App *app, char input[], bool ip_not_port, bool *fullscreen_bool);
 int main_menu (App* app, SDL_Rect* fullscreen, bool* fullscreen_bool);
 int select_game_menu (App *app, bool *fullscreen_bool);
 int join_multiplayer (App *app, char *ip_adress, char *port_nr, bool *fullscreen_bool);
