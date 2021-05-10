@@ -38,6 +38,7 @@ Button *menu_button_text(App *app, int x, int y, int w, int h, char *text, TTF_F
 void render_button (App* app, Button* button, bool *fullscreen_bool);
 bool hover_state (Button *button, int Mx, int My);
 
+void menu(App* app, char *ip_address, char *port_nr);
 void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port, bool *fullscreen_bool);
 int main_menu (App* app, SDL_Rect* fullscreen, bool* fullscreen_bool);
 int select_game_menu (App *app, bool *fullscreen_bool);
