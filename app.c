@@ -4,9 +4,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include "app.h"
+#include "menu.h"
 
-App *init_app()
-{
+App *init_app() {
+
     // allocate enough memory on the heap
     App *app = malloc(sizeof(App));
 
@@ -37,16 +38,8 @@ App *init_app()
     return app;
 }
 
-void optimizeFullscreen (SDL_Rect *rect) {
+void quit_app(App *app) {
 
-    SDL_DisplayMode display;
-    SDL_GetCurrentDisplayMode(0, &display);
-    rect->x = rect->x * 2; //(display.w / 2) - (rect->w / 2);
-    //rect->y = rect->y * 2//rect->y * (display.h / 2);
-}
-
-void quit_app(App *app)
-{
     printf("Exiting...\n");
     // destory window and renderer to free memory
     SDL_DestroyWindow(app->window);

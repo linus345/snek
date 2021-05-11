@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "app.h"
+#include "menu.h"
 #define CELL_SIZE 32
 
 #define MAX_PLAYERS 4
@@ -13,5 +14,7 @@ typedef struct {
 } Pos;
 
 void load_texture(App *app, SDL_Texture **texture, char *path);
+void render_item(App* app, SDL_Rect rect, SDL_Texture* texture, int x, int y, int w, int h, bool* fullscreen_bool);
+void optimizeFullscreen(SDL_Rect* rect);
 
 #endif

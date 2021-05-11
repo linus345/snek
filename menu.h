@@ -7,6 +7,12 @@
 #include "game.h"
 #include "app.h"
 
+typedef struct {
+    SDL_Rect rect;
+    SDL_Texture *texture, *background;
+    SDL_Color color;
+} Button;
+
 enum Menu_selection {
     MAIN_MENU = 0,
     SELECT_GAME = 10,
@@ -32,17 +38,10 @@ enum Button_dimensions {
     EXIT_H = 90
 };
 
-typedef struct {
-    SDL_Rect rect;
-    SDL_Texture *texture, *background;
-    SDL_Color color;
-} Button;
-
 void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Texture *exit);
 SDL_Color color_select (int selection);
 Button *menu_button_background (App *app, char resource[]);
 Button *menu_button_text(App *app, char *text, TTF_Font *font, SDL_Color color);
-void render_button (App* app, Button* button, int x, int y, int h, int w, bool* fullscreen_bool);
 bool hover_state (Button *button, int Mx, int My);
 
 void menu(App* app, char *ip_address, char *port_nr, bool *fullscreen_bool);
