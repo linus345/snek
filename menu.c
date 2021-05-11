@@ -20,7 +20,7 @@ SDL_Color
 
 void menu(App* app, char* ip_address, char* port_nr)
 {
-    int menu_state = 0;
+    int menu_state = MAIN_MENU;
 
     while (app->running) {
 
@@ -32,7 +32,7 @@ void menu(App* app, char* ip_address, char* port_nr)
             menu_state = select_game_menu(app);
             break;
         case JOIN_MULTIPLAYER:
-            menu_state = join_multiplayer(app, ip_address, port_nr);
+            menu_state = join_multiplayer(app);
             break; /*
         case HOST_MULTIPLAYER:
             menu_state = host_multiplayer(app, &fullscreen_bool);
@@ -42,9 +42,9 @@ void menu(App* app, char* ip_address, char* port_nr)
             break;
         case SETTINGS:
             menu_state = settings(app, &fullscreen_bool);
-            break;
+            break;*/
         case START_GAME:
-            return;*/
+            return;
         }
     }
     return;
@@ -115,6 +115,7 @@ int main_menu(App* app)
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(text1, Mx, My)) {
                     // Makes space on the heap
+                    free(background);
                     free(button1);
                     free(button2);
                     free(button3);
@@ -123,8 +124,9 @@ int main_menu(App* app)
                     free(text3);
                     free(exit_button);
                     return SELECT_GAME;
-                } else if (hover_state(text2, Mx, My)) {
+                }/* else if (hover_state(text2, Mx, My)) {
                     // Makes space on the heap
+                    free(background);
                     free(button1);
                     free(button2);
                     free(button3);
@@ -135,6 +137,7 @@ int main_menu(App* app)
                     return HIGH_SCORE;
                 } else if (hover_state(text3, Mx, My)) {
                     // Makes space on the heap
+                    free(background);
                     free(button1);
                     free(button2);
                     free(button3);
@@ -143,38 +146,35 @@ int main_menu(App* app)
                     free(text3);
                     free(exit_button);
                     return SETTINGS;
-                } else if (hover_state(exit_button, Mx, My)) {
+                }*/ else if (hover_state(exit_button, Mx, My)) {
                     app->running = false;
                 }
                 break;
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
-                case SDLK_f:
-                    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                    app->fullscreen = true;
-                    // Makes space on the heap
-                    free(button1);
-                    free(button2);
-                    free(button3);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
-
-                    return MAIN_MENU;
-                case SDLK_ESCAPE:
-                    // return main_menu sätt bool till false
-                    SDL_SetWindowFullscreen(app->window, 0);
-                    app->fullscreen = false;
-                    free(button1);
-                    free(button2);
-                    free(button3);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
-
-                    return MAIN_MENU;
+                    case SDLK_F11:
+                        if (app->fullscreen) {
+                            SDL_SetWindowFullscreen(app->window, 0);
+                            app->fullscreen = false;
+                        } else {
+                            SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                            app->fullscreen = true;
+                        }
+                        // Makes space on the heap
+                        free(background);
+                        free(button1);
+                        free(button2);
+                        free(button3);
+                        free(text1);
+                        free(text2);
+                        free(text3);
+                        free(exit_button);
+                        return MAIN_MENU;
+                        break;
+                    case SDLK_ESCAPE:
+                        // exit main loop
+                        app->running = false;
+                        break;
                 }
                 break;
             }
@@ -265,18 +265,7 @@ int select_game_menu(App* app)
                     free(exit_button);
                     return START_GAME;
 
-                } else if (hover_state(text2, Mx, My)) {
-                    // Makes space on the heap
-                    free(button1);
-                    free(text1);
-                    free(button2);
-                    free(text2);
-                    free(button3);
-                    free(text3);
-                    free(exit_button);
-                    return JOIN_MULTIPLAYER;
-
-                } else if (hover_state(text3, Mx, My)) {
+                } /* else if (hover_state(text2, Mx, My)) {
                     // Makes space on the heap
                     free(button1);
                     free(text1);
@@ -286,6 +275,17 @@ int select_game_menu(App* app)
                     free(text3);
                     free(exit_button);
                     return HOST_MULTIPLAYER;
+
+                } */ else if (hover_state(text3, Mx, My)) {
+                    // Makes space on the heap
+                    free(button1);
+                    free(text1);
+                    free(button2);
+                    free(text2);
+                    free(button3);
+                    free(text3);
+                    free(exit_button);
+                    return JOIN_MULTIPLAYER;
 
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Makes space on the heap
@@ -301,34 +301,30 @@ int select_game_menu(App* app)
                 break;
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
-                    case SDLK_f:
-                        SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                        app->fullscreen = true;
-                        // Makes space on the heap
-                        free(button1);
-                        free(button2);
-                        free(button3);
-                        free(text1);
-                        free(text2);
-                        free(text3);
-                        free(exit_button);
-
-                        return MAIN_MENU;
-                    case SDLK_ESCAPE:
-                        // return main_menu sätt bool till false
-                        SDL_SetWindowFullscreen(app->window, 0);
-                        app->fullscreen = false;
-                        free(button1);
-                        free(button2);
-                        free(button3);
-                        free(text1);
-                        free(text2);
-                        free(text3);
-                        free(exit_button);
-
-                        return MAIN_MENU;
-                    }
-                    break;
+                        case SDLK_F11:
+                            if (app->fullscreen) {
+                                SDL_SetWindowFullscreen(app->window, 0);
+                                app->fullscreen = false;
+                                } else {
+                                SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                                app->fullscreen = true;
+                                }
+                                // Makes space on the heap
+                                free(background);
+                                free(button1);
+                                free(button2);
+                                free(button3);
+                                free(text1);
+                                free(text2);
+                                free(text3);
+                                free(exit_button);
+                                return SELECT_GAME;
+                        case SDLK_ESCAPE:
+                            // exit main loop
+                            return MAIN_MENU;
+                    break;               
+                }
+                break;
             }
         }
         // clear screen before next render
@@ -373,20 +369,18 @@ int select_game_menu(App* app)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
+    SDL_StopTextInput();
     return 0;
 }
 
-int join_multiplayer(App* app, char* ip_address, char* port_nr)
+int join_multiplayer(App* app)
 {
 
     int Mx, My;
 
-    SDL_Texture* background;
-    load_texture(app, &background, "./resources/background.png");
-    SDL_Rect background_view = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
-
+    
+    Screen_item* background = menu_button_background(app, "./resources/background.png");
     Screen_item* background1 = menu_button_background(app, "./resources/ip_field.png");
     Screen_item* background2 = menu_button_background(app, "./resources/port_field.png");
     Screen_item* button = menu_button_background(app, "./resources/menuButton.png");
@@ -395,11 +389,14 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
     Screen_item* text3 = menu_button_text(app, "Join", font, white);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
+    SDL_StartTextInput();
+
     while (app->running) {
 
         //SDL_MouseButtonEvent mouse_event;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
+
             switch (event.type) {
             case SDL_QUIT:
                 // exit main loop
@@ -408,13 +405,22 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
 
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(background1, Mx, My)) {
-                    // Gets input from user
-                    port_ip_input(app, ip_address, false);
-                    strcpy(ip_address, ""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    text1 = menu_button_text(app, app->ip, font, white);
+
                 } else if (hover_state(background2, Mx, My)) {
-                    // Gets input from user
-                    port_ip_input(app, port_nr, true);
-                    strcpy(port_nr, ""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    text2 = menu_button_text(app, app->port, font, white);
+
+                } else if (hover_state(button, Mx, My)) {
+                    // Makes space on the heap
+                    free(background1);
+                    free(background2);
+                    free(button);
+                    free(text1);
+                    free(text2);
+                    free(text3);
+                    free(exit_button);
+                    return START_GAME;
+
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Makes space on the heap
                     free(background1);
@@ -425,31 +431,29 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
                     free(text3);
                     free(exit_button);
                     return SELECT_GAME;
-                } else if (hover_state(background2, Mx, My)) {
-                    // Makes space on the heap
-                    free(background1);
-                    free(background2);
-                    free(button);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
-                    return START_GAME;
                 }
+                break;
+
+            case SDL_TEXTINPUT:
+                // Add new text onto the end of our text
+                strcat(app->ip, event.text.text);
                 break;
             }
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
+        if (app->fullscreen) {
+            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
+        } else {
+            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        }
+
         render_item(app, &background1->rect, background1->texture, 230, 250, 500, 180);
         render_item(app, &background2->rect, background2->texture, 300, 390, 360, 150);
         render_item(app, &button->rect, button->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H);
-
         render_item(app, &text1->rect, text1->texture, 280, 290, 410, 110);
         render_item(app, &text2->rect, text2->texture, 350, 420, 250, 90);
-
         render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H);
         render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
 
@@ -480,25 +484,21 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
     }
     return 0;
 }
-void port_ip_input(App* app, char input[], bool ip_not_port)
+/*
+void port_ip_input(App* app, bool ip_not_port)
 {
 
     bool done = false;
     int Mx, My;
 
-    SDL_Texture* background;
-    load_texture(app, &background, "./resources/background.png");
-    SDL_Rect background_view = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
+    Screen_item* background = menu_button_background(app, "./resources/background.png");
     Screen_item* enter_ip_background = menu_button_background(app, "./resources/ip_field.png");
     Screen_item* enter_port_background = menu_button_background(app, "./resources/port_field.png");
     Screen_item* join_background = menu_button_background(app, "./resources/menuButton.png");
-
     Screen_item* enter_ip = menu_button_text(app, "Enter IP", font, white);
     Screen_item* enter_port = menu_button_text(app, "Enter Port", font, white);
-
     Screen_item* join_button = menu_button_text(app, "Join", font, green);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
@@ -507,8 +507,6 @@ void port_ip_input(App* app, char input[], bool ip_not_port)
     SDL_StartTextInput();
     SDL_Event event;
     while (!done) {
-
-        printf("While loop\n");
 
         if (SDL_PollEvent(&event)) {
             printf("If-statement successful\n");
@@ -539,9 +537,13 @@ void port_ip_input(App* app, char input[], bool ip_not_port)
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-        //printf("Checkpoint 1\n");
+        
+        if (app->fullscreen) {
+            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
+        } else {
+            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        }
 
-        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
         render_item(app, &enter_ip_background->rect, enter_ip_background->texture, 230, 250, 500, 180);
         render_item(app, &enter_port_background->rect, enter_port_background->texture, 300, 390, 360, 150);
         render_item(app, &join_background->rect, join_background->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H);
@@ -587,7 +589,7 @@ void port_ip_input(App* app, char input[], bool ip_not_port)
     free(join_button);
     free(exit_button);
     return;
-}
+}*/
 /*
 int host_multiplayer(App* app, bool* fullscreen_bool)
 {
