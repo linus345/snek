@@ -10,6 +10,45 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+void menu(App* app, char* ip_address, char* port_nr)
+{
+    bool fullscreen_bool = true;
+    int menu_state = 0;
+    SDL_Rect fullscreen;
+
+    if (SDL_GetDisplayBounds(0, &fullscreen) != 0) {
+        SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
+        return;
+    }
+
+    while (app->running) {
+
+        switch (menu_state) {
+        case MAIN_MENU:
+            menu_state = main_menu(app, &fullscreen, &fullscreen_bool);
+            break;
+        case SELECT_GAME:
+            menu_state = select_game_menu(app, &fullscreen, &fullscreen_bool);
+            break;
+        case JOIN_MULTIPLAYER:
+            menu_state = join_multiplayer(app, ip_address, port_nr, &fullscreen, &fullscreen_bool);
+            break; 
+        case HOST_MULTIPLAYER:
+            menu_state = host_multiplayer(app, &fullscreen, &fullscreen_bool);
+            break;
+        case HIGH_SCORE:
+            menu_state = high_score(app, &fullscreen, &fullscreen_bool);
+            break;
+        case SETTINGS:
+            menu_state = settings(app, &fullscreen, &fullscreen_bool);
+            break;
+        case START_GAME:
+            return;
+        }
+    }
+}
+
+
 SDL_Color color_select(int selection)
 {
     SDL_Color
@@ -79,6 +118,8 @@ bool hover_state(Button* button, int Mx, int My)
     return false;
 }
 
+
+
 // User input for ip address och port number
 void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_not_port)
 {
@@ -102,13 +143,16 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
     Button* join_button = menu_button_text(app, 337, 630, 290, 90, "Join", font, color_select(GREEN));
     Button* return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
 
-    Button* text;
+    Button* text = NULL;
 
     SDL_StartTextInput();
+    SDL_Event event;
     while (!done) {
-        SDL_Event event;
+
+        printf("While loop\n");
 
         if (SDL_PollEvent(&event)) {
+            printf("If-statement successful\n");
             switch (event.type) {
             case SDL_QUIT:
                 app->running = false;
@@ -136,6 +180,7 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
+        printf("Checkpoint\n");
 
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
         render_button(app, enter_ip_background);
@@ -148,19 +193,22 @@ void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_n
         } else if (!ip_not_port) {
             render_button(app, enter_port);
         }
-
-        render_button(app, text); // Renders the user input
+        printf("Checkpoint\n");
+        if (text != NULL) {
+            render_button(app, text);
+        } // Renders the user input
         render_button(app, join_button);
         render_button(app, return_button);
 
         //If-state for wether the text should switch color on hover or not
+
         if (hover_state(return_button, Mx, My)) {
             SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
 
         } else {
             SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
         }
-
+        printf("Checkpoint\n");
         // present on screen
         SDL_RenderPresent(app->renderer);
 
@@ -202,6 +250,8 @@ int main_menu(App* app, SDL_Rect* r, bool* fullscreen)
     Button* exit_button = NULL;
 
     if (*fullscreen) {
+        background_view.h = r->h;
+        background_view.w = r->w;
         start_game_background = menu_button_background(app, r->w / 2 - 150, 400, 360, 150, "./resources/menuButton.png");
         start_game_button = menu_button_text(app, r->w / 2 - 115, 430, 290, 90, "Start Game", font, color_select(GREEN));
         high_score_background = menu_button_background(app, r->w / 2 - 150, 550, 360, 150, "./resources/menuButton.png");
@@ -210,6 +260,8 @@ int main_menu(App* app, SDL_Rect* r, bool* fullscreen)
         settings_button = menu_button_text(app, r->w / 2 - 115, 730, 290, 90, "Settings", font, color_select(GREEN));
         exit_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Exit Game", font, color_select(WHITE));
     } else if (!*fullscreen) {
+        background_view.h = WINDOW_HEIGHT;
+        background_view.w = WINDOW_WIDTH;
         start_game_background = menu_button_background(app, 300, 400, 360, 150, "./resources/menuButton.png");
         start_game_button = menu_button_text(app, 337, 430, 290, 90, "Start Game", font, color_select(GREEN));
         high_score_background = menu_button_background(app, 300, 550, 360, 150, "./resources/menuButton.png");
@@ -268,7 +320,7 @@ int main_menu(App* app, SDL_Rect* r, bool* fullscreen)
                 switch (event.key.keysym.sym) {
                 case SDLK_f:
                     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                    *fullscreen=true;
+                    *fullscreen = true;
                     // Makes space on the heap
                     free(start_game_background);
                     free(start_game_button);
@@ -277,12 +329,12 @@ int main_menu(App* app, SDL_Rect* r, bool* fullscreen)
                     free(settings_background);
                     free(settings_button);
                     free(exit_button);
-                    
+
                     return MAIN_MENU;
                 case SDLK_ESCAPE:
                     // return main_menu sätt bool till false
-                    SDL_SetWindowFullscreen(app->window, NULL);
-                    *fullscreen=false;
+                    SDL_SetWindowFullscreen(app->window, 0);
+                    *fullscreen = false;
                     free(start_game_background);
                     free(start_game_button);
                     free(high_score_background);
@@ -290,7 +342,7 @@ int main_menu(App* app, SDL_Rect* r, bool* fullscreen)
                     free(settings_background);
                     free(settings_button);
                     free(exit_button);
-                    
+
                     return MAIN_MENU;
                 }
                 break;
@@ -336,25 +388,45 @@ int main_menu(App* app, SDL_Rect* r, bool* fullscreen)
     }
 }
 
-int select_game_menu(App* app)
+int select_game_menu(App* app, SDL_Rect* r, bool* fullscreen)
 {
-
     int Mx, My;
-    char input_ip[13], input_port[5];
 
     SDL_Texture* background;
     load_texture(app, &background, "./resources/background.png");
-    SDL_Rect background_view = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+    SDL_Rect background_view = { 0, 0, r->w, r->h };
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* single_player_background = menu_button_background(app, 300, 400, 360, 150, "./resources/menuButton.png");
-    Button* single_player_button = menu_button_text(app, 337, 430, 290, 90, "Single Player", font, color_select(GREEN));
-    Button* host_multiplayer_background = menu_button_background(app, 300, 550, 360, 150, "./resources/menuButton.png");
-    Button* host_multiplayer_button = menu_button_text(app, 337, 580, 290, 90, "Host Multiplayer", font, color_select(GREEN));
-    Button* join_multiplayer_background = menu_button_background(app, 300, 700, 360, 150, "./resources/menuButton.png");
-    Button* join_multiplayer_button = menu_button_text(app, 337, 730, 290, 90, "Join Multiplayer", font, color_select(GREEN));
-    Button* return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    Button* single_player_background = NULL;
+    Button* single_player_button = NULL;
+    Button* host_multiplayer_background = NULL;
+    Button* host_multiplayer_button = NULL;
+    Button* join_multiplayer_background = NULL;
+    Button* join_multiplayer_button = NULL;
+    Button* return_button = NULL;
+
+    if (*fullscreen) {
+        background_view.h = r->h;
+        background_view.w = r->w;
+        single_player_background = menu_button_background(app, r->w / 2 - 150, 400, 360, 150, "./resources/menuButton.png");
+        single_player_button = menu_button_text(app, r->w / 2 - 115, 430, 290, 90, "Single Player", font, color_select(GREEN));
+        host_multiplayer_background = menu_button_background(app, r->w / 2 - 150, 550, 360, 150, "./resources/menuButton.png");
+        host_multiplayer_button = menu_button_text(app, r->w / 2 - 115, 580, 290, 90, "Host Multiplayer", font, color_select(GREEN));
+        join_multiplayer_background = menu_button_background(app, r->w / 2 - 150, 700, 360, 150, "./resources/menuButton.png");
+        join_multiplayer_button = menu_button_text(app, r->w / 2 - 115, 730, 290, 90, "Join Multiplayer", font, color_select(GREEN));
+        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Back", font, color_select(WHITE));
+    } else if (!*fullscreen) {
+        background_view.h = WINDOW_HEIGHT;
+        background_view.w = WINDOW_WIDTH;
+        single_player_background = menu_button_background(app, 300, 400, 360, 150, "./resources/menuButton.png");
+        single_player_button = menu_button_text(app, 337, 430, 290, 90, "Single Player", font, color_select(GREEN));
+        host_multiplayer_background = menu_button_background(app, 300, 550, 360, 150, "./resources/menuButton.png");
+        host_multiplayer_button = menu_button_text(app, 337, 580, 290, 90, "Host Multiplayer", font, color_select(GREEN));
+        join_multiplayer_background = menu_button_background(app, 300, 700, 360, 150, "./resources/menuButton.png");
+        join_multiplayer_button = menu_button_text(app, 337, 730, 290, 90, "Join Multiplayer", font, color_select(GREEN));
+        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    }
 
     while (app->running) {
 
@@ -377,6 +449,7 @@ int select_game_menu(App* app)
                     free(host_multiplayer_button);
                     free(join_multiplayer_background);
                     free(join_multiplayer_button);
+                    free(return_button);
                     return START_GAME;
 
                 } else if (hover_state(join_multiplayer_button, Mx, My)) {
@@ -387,6 +460,7 @@ int select_game_menu(App* app)
                     free(host_multiplayer_button);
                     free(join_multiplayer_background);
                     free(join_multiplayer_button);
+                    free(return_button);
                     return JOIN_MULTIPLAYER;
 
                 } else if (hover_state(host_multiplayer_button, Mx, My)) {
@@ -397,6 +471,7 @@ int select_game_menu(App* app)
                     free(host_multiplayer_button);
                     free(join_multiplayer_background);
                     free(join_multiplayer_button);
+                    free(return_button);
                     return HOST_MULTIPLAYER;
 
                 } else if (hover_state(return_button, Mx, My)) {
@@ -407,7 +482,38 @@ int select_game_menu(App* app)
                     free(host_multiplayer_button);
                     free(join_multiplayer_background);
                     free(join_multiplayer_button);
+                    free(return_button);
                     return MAIN_MENU;
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_f:
+                    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    *fullscreen = true;
+                    // Makes space on the heap
+                    free(single_player_background);
+                    free(single_player_button);
+                    free(host_multiplayer_background);
+                    free(host_multiplayer_button);
+                    free(join_multiplayer_background);
+                    free(join_multiplayer_button);
+                    free(return_button);
+
+                    return SELECT_GAME;
+                case SDLK_ESCAPE:
+                    // return main_menu sätt bool till false
+                    SDL_SetWindowFullscreen(app->window, 0);
+                    *fullscreen = false;
+                    free(single_player_background);
+                    free(single_player_button);
+                    free(host_multiplayer_background);
+                    free(host_multiplayer_button);
+                    free(join_multiplayer_background);
+                    free(join_multiplayer_button);
+                    free(return_button);
+
+                    return SELECT_GAME;
                 }
                 break;
             }
@@ -451,9 +557,8 @@ int select_game_menu(App* app)
     }
 }
 
-int join_multiplayer(App* app, char* ip_address, char* port_nr)
+int join_multiplayer(App* app, char* ip_address, char* port_nr, SDL_Rect* r, bool* fullscreen)
 {
-
     int Mx, My;
 
     SDL_Texture* background;
@@ -462,13 +567,35 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* enter_ip_background = menu_button_background(app, 230, 250, 500, 180, "./resources/ip_field.png");
-    Button* enter_port_background = menu_button_background(app, 300, 390, 360, 150, "./resources/port_field.png");
-    Button* join_background = menu_button_background(app, 300, 600, 360, 150, "./resources/menuButton.png");
-    Button* enter_ip = menu_button_text(app, 280, 290, 410, 110, "Enter IP", font, color_select(WHITE));
-    Button* enter_port = menu_button_text(app, 350, 420, 250, 90, "Enter Port", font, color_select(WHITE));
-    Button* join_button = menu_button_text(app, 337, 630, 290, 90, "Join", font, color_select(GREEN));
-    Button* return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    Button* enter_ip_background = NULL;
+    Button* enter_port_background = NULL;
+    Button* join_background = NULL;
+    Button* enter_ip = NULL;
+    Button* enter_port = NULL;
+    Button* join_button = NULL;
+    Button* return_button = NULL;
+
+    if (*fullscreen) {
+        background_view.h = r->h;
+        background_view.w = r->w;
+        enter_ip_background = menu_button_background(app, r->w / 2 - 225, 250, 500, 180, "./resources/ip_field.png");
+        enter_port_background = menu_button_background(app, r->w / 2 - 150, 390, 360, 150, "./resources/port_field.png");
+        join_background = menu_button_background(app, r->w / 2 - 150, 600, 360, 150, "./resources/menuButton.png");
+        enter_ip = menu_button_text(app, r->w / 2 - 175, 290, 410, 110, "Enter IP", font, color_select(WHITE));
+        enter_port = menu_button_text(app, r->w / 2 - 115, 420, 250, 90, "Enter Port", font, color_select(WHITE));
+        join_button = menu_button_text(app, r->w / 2 - 115, 630, 290, 90, "Join", font, color_select(GREEN));
+        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Back", font, color_select(WHITE));
+    } else if (!*fullscreen) {
+        background_view.h = WINDOW_HEIGHT;
+        background_view.w = WINDOW_WIDTH;
+        enter_ip_background = menu_button_background(app, 230, 250, 500, 180, "./resources/ip_field.png");
+        enter_port_background = menu_button_background(app, 300, 390, 360, 150, "./resources/port_field.png");
+        join_background = menu_button_background(app, 300, 600, 360, 150, "./resources/menuButton.png");
+        enter_ip = menu_button_text(app, 280, 290, 410, 110, "Enter IP", font, color_select(WHITE));
+        enter_port = menu_button_text(app, 350, 420, 250, 90, "Enter Port", font, color_select(WHITE));
+        join_button = menu_button_text(app, 337, 630, 290, 90, "Join", font, color_select(GREEN));
+        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    }
 
     while (app->running) {
 
@@ -485,10 +612,12 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
                 if (hover_state(enter_ip_background, Mx, My)) {
                     // Gets input from user
                     port_ip_input(app, ip_address, 280, 290, 410, 110, false);
+                    //port_ip_input(app, ip_address, 280, 290, 410, 110, false, r, fullscreen);
                     strcpy(ip_address, ""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 } else if (hover_state(enter_port_background, Mx, My)) {
                     // Gets input from user
                     port_ip_input(app, port_nr, 350, 420, 250, 90, true);
+                    //port_ip_input(app, port_nr, 350, 420, 250, 90, true, r, fullscreen);
                     strcpy(port_nr, ""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 } else if (hover_state(return_button, Mx, My)) {
                     // Makes space on the heap
@@ -510,6 +639,37 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
                     free(join_button);
                     free(return_button);
                     return START_GAME;
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_f:
+                    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    *fullscreen = true;
+                    // Makes space on the heap
+                    free(enter_ip_background);
+                    free(enter_port_background);
+                    free(join_background);
+                    free(enter_ip);
+                    free(enter_port);
+                    free(join_button);
+                    free(return_button);
+                    free(return_button);
+
+                    return JOIN_MULTIPLAYER;
+                case SDLK_ESCAPE:
+                    // return main_menu sätt bool till false
+                    SDL_SetWindowFullscreen(app->window, 0);
+                    *fullscreen = false;
+                    free(enter_ip_background);
+                    free(enter_port_background);
+                    free(join_background);
+                    free(enter_ip);
+                    free(enter_port);
+                    free(join_button);
+                    free(return_button);
+
+                    return JOIN_MULTIPLAYER;
                 }
                 break;
             }
@@ -555,7 +715,7 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr)
     }
 }
 
-int host_multiplayer(App* app)
+int host_multiplayer(App* app, SDL_Rect* r, bool* fullscreen)
 {
 
     int Mx, My;
@@ -566,7 +726,17 @@ int host_multiplayer(App* app)
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    Button* return_button = NULL;
+
+    if (*fullscreen) {
+        background_view.h = r->h;
+        background_view.w = r->w;
+        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Back", font, color_select(WHITE));
+    } else if (!*fullscreen) {
+        background_view.h = WINDOW_HEIGHT;
+        background_view.w = WINDOW_WIDTH;
+        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    }
 
     while (app->running) {
 
@@ -585,6 +755,25 @@ int host_multiplayer(App* app)
                     free(return_button);
                     return SELECT_GAME;
                 }
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_f:
+                    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    *fullscreen = true;
+                    // Makes space on the heap
+
+                    free(return_button);
+
+                    return SETTINGS;
+                case SDLK_ESCAPE:
+                    // return main_menu sätt bool till false
+                    SDL_SetWindowFullscreen(app->window, 0);
+                    *fullscreen = false;
+                    free(return_button);
+
+                    return SETTINGS;
+                }
+                break;
             }
             break;
         }
@@ -610,9 +799,8 @@ int host_multiplayer(App* app)
     }
 }
 
-int high_score(App* app)
+int high_score(App* app, SDL_Rect* r, bool* fullscreen)
 {
-
     int Mx, My;
 
     SDL_Texture* background;
@@ -621,7 +809,17 @@ int high_score(App* app)
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    Button* return_button = NULL;
+
+    if (*fullscreen) {
+        background_view.h = r->h;
+        background_view.w = r->w;
+        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Exit Game", font, color_select(WHITE));
+    } else if (!*fullscreen) {
+        background_view.h = WINDOW_HEIGHT;
+        background_view.w = WINDOW_WIDTH;
+        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    }
 
     while (app->running) {
 
@@ -640,8 +838,26 @@ int high_score(App* app)
                     free(return_button);
                     return MAIN_MENU;
                 }
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_f:
+                    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    *fullscreen = true;
+                    // Makes space on the heap
+                    free(return_button);
+
+                    return HIGH_SCORE;
+                case SDLK_ESCAPE:
+                    // return main_menu sätt bool till false
+                    SDL_SetWindowFullscreen(app->window, 0);
+                    *fullscreen = false;
+                    free(return_button);
+
+                    return HIGH_SCORE;
+                }
+                break;
             }
-            break;
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
@@ -665,9 +881,8 @@ int high_score(App* app)
     }
 }
 
-int settings(App* app)
+int settings(App* app, SDL_Rect* r, bool* fullscreen)
 {
-
     int Mx, My;
 
     SDL_Texture* background;
@@ -676,7 +891,17 @@ int settings(App* app)
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    Button* return_button = NULL;
+
+    if (*fullscreen) {
+        background_view.h = r->h;
+        background_view.w = r->w;
+        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Exit Game", font, color_select(WHITE));
+    } else if (!*fullscreen) {
+        background_view.h = WINDOW_HEIGHT;
+        background_view.w = WINDOW_WIDTH;
+        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+    }
 
     while (app->running) {
 
@@ -695,8 +920,27 @@ int settings(App* app)
                     free(return_button);
                     return MAIN_MENU;
                 }
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_f:
+                    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    *fullscreen = true;
+                    // Makes space on the heap
+
+                    free(return_button);
+
+                    return SETTINGS;
+                case SDLK_ESCAPE:
+                    // return main_menu sätt bool till false
+                    SDL_SetWindowFullscreen(app->window, 0);
+                    *fullscreen = false;
+                    free(return_button);
+
+                    return SETTINGS;
+                }
+                break;
             }
-            break;
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);

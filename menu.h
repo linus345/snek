@@ -31,6 +31,7 @@ typedef struct {
     SDL_Color color;
 } Button;
 
+
 void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Texture *exit);
 SDL_Color color_select (int selection);
 Button *menu_button_background (App *app, int x, int y, int w, int h, char *resource[]);
@@ -38,12 +39,14 @@ Button *menu_button_text(App *app, int x, int y, int w, int h, char *text, TTF_F
 void render_button (App *app, Button *button);
 bool hover_state (Button *button, int Mx, int My);
 
-void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port);
 int main_menu (App *app, SDL_Rect *r, bool *fullscreen);
-int select_game_menu (App *app);
-int join_multiplayer (App *app, char *ip_adress, char *port_nr);
-int host_multiplayer (App *app);
-int high_score (App *app);
-int settings (App *app);
+int select_game_menu (App *app, SDL_Rect* r, bool *fullscreen);
+int join_multiplayer(App* app, char* ip_address, char* port_nr, SDL_Rect* r, bool* fullscreen);
+int host_multiplayer (App *app, SDL_Rect* r, bool* fullscreen);
+
+void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_not_port);
+
+int high_score (App *app, SDL_Rect* r, bool* fullscreen);
+int settings (App *app, SDL_Rect* r, bool* fullscreen);
 
 #endif
