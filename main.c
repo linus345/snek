@@ -95,7 +95,40 @@ int main(int argc, char* argv[])
 
     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
+<<<<<<< HEAD
     menu(app, ip_adress, port);
+=======
+    bool exit_menu = false;
+    int menu_state = 0;
+    while (app->running) {
+
+        switch (menu_state) {
+        case MAIN_MENU:
+            menu_state = main_menu(app, &r);
+            break;
+        case SELECT_GAME:
+            menu_state = select_game_menu(app);
+            break;
+        case JOIN_MULTIPLAYER:
+            menu_state = join_multiplayer(app, ip_adress, port);
+            break;
+        case HOST_MULTIPLAYER:
+            menu_state = host_multiplayer(app);
+            break;
+        case HIGH_SCORE:
+            menu_state = high_score(app);
+            break;
+        case SETTINGS:
+            menu_state = settings(app);
+            break;
+        case START_GAME:
+            exit_menu = true;
+            break;
+        }
+        if (exit_menu)
+            break;
+    }
+>>>>>>> parent of 7b89b1b (Testing)
 
     int speed = 100000;
     while (app->running) {
