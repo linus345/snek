@@ -88,6 +88,10 @@ int main(int argc, char* argv[])
     SDL_Texture* background_tex;
     load_texture(app, &background_tex, "./resources/background.png");
 
+    // Scoreboard texture
+    SDL_Texture* scoreboard_tex;
+    load_texture(app, &scoreboard_tex, "./resources/ScoreBoard.jpg");
+
 
     // timer
     unsigned last_time = 0, current_time;
@@ -259,8 +263,11 @@ int main(int argc, char* argv[])
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        SDL_Rect background_dst = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+        SDL_Rect background_dst = { 250, 0, GAME_WIDTH, GAME_HEIGHT };
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
+
+        SDL_Rect scoreboard_dst = { 0, 0, 250, 500};
+        SDL_RenderCopy(app->renderer, scoreboard_tex, NULL, &scoreboard_dst);    
 
         // render fruits
         for (int i = 0; i < nr_of_fruits; i++) {
