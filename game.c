@@ -27,13 +27,13 @@ void load_texture(App *app, SDL_Texture **texture, char *path)
 }
 
 //Renders an item on the screen.
-void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int x, int y, int w, int h, bool* fullscreen_bool)
+void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int x, int y, int w, int h)
 {
     rect->x = x;
     rect->y = y;
     rect->w = w;
     rect->h = h;
-    if (fullscreen_bool) {
+    if (app->fullscreen) {
         optimizeFullscreen(app, rect);
     }
     SDL_RenderCopy(app->renderer, texture, NULL, rect);

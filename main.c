@@ -17,8 +17,6 @@
 
 int main(int argc, char* argv[])
 {
-    //Determines function behaviour for fullscreen optimization.
-    bool fullscreen = true;
     char ip_adress[16] = "", port[5] = "";
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -97,11 +95,7 @@ int main(int argc, char* argv[])
     // timer
     unsigned last_time = 0, current_time;
 
-    
-
-    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-    menu(app, ip_adress, port, &fullscreen);
+    menu(app, ip_adress, port);
 
     int speed = 100000;
     while (app->running) {

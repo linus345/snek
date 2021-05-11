@@ -8,7 +8,7 @@
 
 //Core window renderer
 typedef struct App {
-    bool running;
+    bool running, fullscreen;
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_DisplayMode display;

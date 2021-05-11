@@ -30,7 +30,7 @@ App *init_app() {
         // exit with failure
         exit(EXIT_FAILURE);
     }
-    
+
     // Collects information about current monitor.
     if (SDL_GetCurrentDisplayMode(0, &app->display) != 0) {
         // print error
@@ -41,6 +41,9 @@ App *init_app() {
 
     // indicate that the app is running, used for main loop
     app->running = true;
+
+    // Indicates wether applicatication is in fullscreen or not
+    app->fullscreen = false;
 
     // return pointer
     return app;

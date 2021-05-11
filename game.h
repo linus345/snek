@@ -14,7 +14,7 @@ typedef struct {
 } Pos;
 
 void load_texture(App *app, SDL_Texture **texture, char *path);
-void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int x, int y, int w, int h, bool* fullscreen_bool);
+void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int x, int y, int w, int h);
 void optimizeFullscreen(App* app, SDL_Rect *rect);
 
 #endif

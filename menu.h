@@ -43,13 +43,13 @@ Screen_item* menu_button_background (App* app, char resource[]);
 Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color);
 bool hover_state (Screen_item* button, int Mx, int My);
 
-void menu(App* app, char *ip_address, char*  port_nr, bool*  fullscreen);
-void port_ip_input (App* app, char input[], bool ip_not_port, bool*  fullscreen);
-int main_menu (App*  app, bool*  fullscreen);
-int select_game_menu (App* app, bool* fullscreen);
-int join_multiplayer (App* app, char* ip_adress, char* port_nr, bool*  fullscreen);
-int host_multiplayer (App* app, bool* fullscreen);
-int high_score (App* app, bool* fullscreen);
-int settings (App* app, bool* fullscreen);
+void menu(App* app, char *ip_address, char* port_nr);
+void port_ip_input (App* app, char input[], bool ip_not_port);
+int main_menu (App*  app);
+int select_game_menu (App* app);
+int join_multiplayer (App* app, char* ip_adress, char* port_nr);
+int host_multiplayer (App* app);
+int high_score (App* app);
+int settings (App* app);
 
 #endif
