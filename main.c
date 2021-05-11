@@ -103,17 +103,17 @@ int main(int argc, char* argv[])
     // background texture
     SDL_Texture* background_tex;
     load_texture(app, &background_tex, "./resources/background.png");
-    SDL_Rect background_dst = { 250, 0, fullscreen_game.w, fullscreen_game.h };
+    SDL_Rect background_dst = { 250, 0, fullscreen_game.w, fullscreen_game.h};
 
     // Scoreboard texture
-
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    SDL_Texture* background_sides;
-    load_texture(app, &background_sides, "./resources/background.png");
-    SDL_Rect background_dst = { 250, 0, fullscreen_game.w, fullscreen_game.h };
+    SDL_Texture* background_sb_tex;
+    load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
+    SDL_Rect background_sb_dst = {0, 0, 250, fullscreen_game.h};
 
-    Button* goal_text = menu_button_text(app, 0, 0, 50, 50, "Goal", font, color_select(GREEN));
+    Button* goal_text = menu_button_text(app, 0, 0, 50, 50, "Goal    250", font, color_select(WHITE));
+    Button* player1_score = menu_button_text(app, 10, 60, 50, 50, "", font, color_select(WHITE));
 
     Button* scoreboard1 = menu_button_background(app, 0, 50, 250, 100, "./resources/menuButton.png");
     Button* scoreboard2 = menu_button_background(app, 0, 150, 250, 100, "./resources/menuButton.png");
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
         }
 
         // Checks if any collisons has occured with the walls
-        if (collison_with_wall(player1->snake)) {
+        if (collison_with_wall(player1->snake, fullscreen, &fullscreen_game)) {
             app->running = false;
         }
         // Checks if any collisons has occured with a snake
@@ -290,8 +290,10 @@ int main(int argc, char* argv[])
         }
 
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
+        SDL_RenderCopy(app->renderer, background_sb_tex, NULL, &background_sb_dst);
 
         render_button(app, goal_text);
+        render_button(app, player1_score);
         render_button(app, scoreboard1);
         render_button(app, scoreboard2);
         render_button(app, scoreboard3);
