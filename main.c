@@ -17,6 +17,7 @@
 
 int main(int argc, char* argv[])
 {
+    bool fullscreen_bool = true;
     char ip_adress[16] = "", port[5] = "";
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -95,7 +96,7 @@ int main(int argc, char* argv[])
 
     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-    menu(app, ip_adress, port);
+    menu(app, ip_adress, port, &fullscreen_bool);
 
     int speed = 100000;
     while (app->running) {

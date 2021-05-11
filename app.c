@@ -41,8 +41,8 @@ void optimizeFullscreen (SDL_Rect *rect) {
 
     SDL_DisplayMode display;
     SDL_GetCurrentDisplayMode(0, &display);
-    rect->x = rect->x * (display.w / WINDOW_WIDTH);
-    rect->y = rect->y * (display.h / WINDOW_HEIGHT);
+    rect->x = rect->x * 2; //(display.w / 2) - (rect->w / 2);
+    //rect->y = rect->y * 2//rect->y * (display.h / 2);
 }
 
 void quit_app(App *app)
