@@ -31,7 +31,7 @@ void menu(App* app, char* ip_address, char* port_nr)
             break;
         case JOIN_MULTIPLAYER:
             menu_state = join_multiplayer(app, ip_address, port_nr, &fullscreen_bool);
-            break;/*
+            break; /*
         case HOST_MULTIPLAYER:
             menu_state = host_multiplayer(app, &fullscreen_bool);
             break;
@@ -49,11 +49,12 @@ void menu(App* app, char* ip_address, char* port_nr)
 
 SDL_Color
 
-    black = { 0, 0, 0, 255},
-    gray = { 127, 127, 127, 255},
-    white = { 255, 255, 255, 255},
-    green = { 45, 93, 9, 255},
-    dark_green = { 9, 34, 3, 255};
+    black
+    = { 0, 0, 0, 255 },
+    gray = { 127, 127, 127, 255 },
+    white = { 255, 255, 255, 255 },
+    green = { 45, 93, 9, 255 },
+    dark_green = { 9, 34, 3, 255 };
 
 // Universal button renderer for menus
 Button* menu_button_background(App* app, char resource[])
@@ -111,14 +112,14 @@ void port_ip_input(App* app, char input[], bool ip_not_port, bool* fullscreen_bo
 
     Button* join_button = menu_button_text(app, "Join", font, green);
     Button* return_button = menu_button_text(app, "Back", font, white);
-    
-        *enter_ip_background = (Button) { .rect.x =230, .rect.y =250, .rect.w =500, .rect.h = 180};
-        *enter_port_background = (Button) { .rect.x =300, .rect.y =390, .rect.w =360, .rect.h = 150};
-        *join_background = (Button) { .rect.x =300, .rect.y =600, .rect.w =360, .rect.h = 150};
-        *enter_ip = (Button) { .rect.x =280, .rect.y =290, .rect.w =410, .rect.h = 110};
-        *enter_port = (Button) { .rect.x =350, .rect.y =420, .rect.w =250, .rect.h = 90};
-        *join_button = (Button) { .rect.x =337, .rect.y =630, .rect.w =290, .rect.h = 90};
-        *return_button = (Button) { .rect.x =380, .rect.y =865, .rect.w =200, .rect.h = 75};
+
+    *enter_ip_background = (Button) { .rect.x = 230, .rect.y = 250, .rect.w = 500, .rect.h = 180 };
+    *enter_port_background = (Button) { .rect.x = 300, .rect.y = 390, .rect.w = 360, .rect.h = 150 };
+    *join_background = (Button) { .rect.x = 300, .rect.y = 600, .rect.w = 360, .rect.h = 150 };
+    *enter_ip = (Button) { .rect.x = 280, .rect.y = 290, .rect.w = 410, .rect.h = 110 };
+    *enter_port = (Button) { .rect.x = 350, .rect.y = 420, .rect.w = 250, .rect.h = 90 };
+    *join_button = (Button) { .rect.x = 337, .rect.y = 630, .rect.w = 290, .rect.h = 90 };
+    *return_button = (Button) { .rect.x = 380, .rect.y = 865, .rect.w = 200, .rect.h = 75 };
 
     Button* text = NULL;
 
@@ -210,7 +211,7 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool* fullscreen_bool)
 {
 
     int Mx, My;
-    
+
     SDL_Texture* background;
     load_texture(app, &background, "./resources/background.png");
     SDL_Rect background_view = { 0, 0, fullscreen->w, fullscreen->h };
@@ -305,15 +306,39 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool* fullscreen_bool)
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-               
-        *button1 = (Button) {.rect.x = 300, .rect.y = 400, .rect.w = 360, .rect.h = 150};
-        *text1 = (Button) { .rect.x = 337, .rect.y = 430, .rect.w = 290, .rect.h = 90};
-        *button2 = (Button) { .rect.x = 300, .rect.y = 550, .rect.w = 360, .rect.h = 150};        
-        *text2 = (Button) { .rect.x = 337, .rect.y = 570, .rect.w = 290, .rect.h = 90};
-        *button3 = (Button) { .rect.x = 300, .rect.y = 700, .rect.w = 360, .rect.h = 150};
-        *text3 = (Button) { .rect.x = 337, .rect.y = 730, .rect.w = 290, .rect.h = 90};
-        *exit_button = (Button) { .rect.x = 380, .rect.y = 865, .rect.w = 290, .rect.h = 90};
-        
+
+        button1->rect.x = 300;
+        button1->rect.y = 400;
+        button1->rect.w = 360;
+        button1->rect.h = 150;
+        text1->rect.x = 337;
+        text1->rect.y = 430;
+        text1->rect.w = 290;
+        text1->rect.h = 90;
+
+        button2->rect.x = 300;
+        button2->rect.y = 550;
+        button2->rect.w = 360;
+        button2->rect.h = 150;
+        text2->rect.x = 337;
+        text2->rect.y = 57;
+        text2->rect.w = 290;
+        text2->rect.h = 90;
+
+        button3->rect.x = 300;
+        button3->rect.y = 700;
+        button3->rect.w = 360;
+        button3->rect.h = 150;
+        text3->rect.x = 337;
+        text3->rect.y = 730;
+        text3->rect.w = 730;
+        text3->rect.h = 90;
+
+        exit_button->rect.x = 380;
+        exit_button->rect.y = 865;
+        exit_button->rect.w = 290;
+        exit_button->rect.h = 90;
+
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
         render_button(app, button1, fullscreen_bool);
         render_button(app, text1, fullscreen_bool);
@@ -430,10 +455,10 @@ int select_game_menu(App* app, bool* fullscreen_bool)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        *single_player_button = (Button) { .rect.x =337, .rect.y =430, .rect.w =290, .rect.h = 90};
-        *host_multiplayer_button = (Button) { .rect.x =337, .rect.y =580, .rect.w =290, .rect.h = 90};
-        *join_multiplayer_button = (Button) { .rect.x =337, .rect.y =730, .rect.w =290, .rect.h = 90};
-        *return_button = (Button) { .rect.x =380, .rect.y =865, .rect.w =200, .rect.h = 75};
+        *single_player_button = (Button) { .rect.x = 337, .rect.y = 430, .rect.w = 290, .rect.h = 90 };
+        *host_multiplayer_button = (Button) { .rect.x = 337, .rect.y = 580, .rect.w = 290, .rect.h = 90 };
+        *join_multiplayer_button = (Button) { .rect.x = 337, .rect.y = 730, .rect.w = 290, .rect.h = 90 };
+        *return_button = (Button) { .rect.x = 380, .rect.y = 865, .rect.w = 200, .rect.h = 75 };
 
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
         //render_button(app, single_player_background, fullscreen_bool);
@@ -538,13 +563,13 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        *enter_ip_background = (Button) { .rect.x =230, .rect.y =250, .rect.w =500, .rect.h = 180};
-        *enter_port_background = (Button) { .rect.x =300, .rect.y =390, .rect.w =360, .rect.h = 150};
-        *join_background = (Button) { .rect.x =300, .rect.y =600, .rect.w =360, .rect.h = 150};
-        *enter_ip = (Button) { .rect.x =280, .rect.y =290, .rect.w =410, .rect.h = 110};
-        *enter_port = (Button) { .rect.x =350, .rect.y =420, .rect.w =250, .rect.h = 90};
-        *join_button = (Button) { .rect.x =337, .rect.y =630, .rect.w =290, .rect.h = 90};
-        *return_button = (Button) { .rect.x =380, .rect.y =865, .rect.w =200, .rect.h = 75};
+        *enter_ip_background = (Button) { .rect.x = 230, .rect.y = 250, .rect.w = 500, .rect.h = 180 };
+        *enter_port_background = (Button) { .rect.x = 300, .rect.y = 390, .rect.w = 360, .rect.h = 150 };
+        *join_background = (Button) { .rect.x = 300, .rect.y = 600, .rect.w = 360, .rect.h = 150 };
+        *enter_ip = (Button) { .rect.x = 280, .rect.y = 290, .rect.w = 410, .rect.h = 110 };
+        *enter_port = (Button) { .rect.x = 350, .rect.y = 420, .rect.w = 250, .rect.h = 90 };
+        *join_button = (Button) { .rect.x = 337, .rect.y = 630, .rect.w = 290, .rect.h = 90 };
+        *return_button = (Button) { .rect.x = 380, .rect.y = 865, .rect.w = 200, .rect.h = 75 };
 
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
         render_button(app, enter_ip_background, fullscreen_bool);
