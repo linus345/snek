@@ -8,11 +8,11 @@
 #include "app.h"
 
 //Menu button creation struct consisting of SDL_Rect, SDL_Texture and SDL_Color.
-typedef struct Button {
+typedef struct Screen_item {
     SDL_Rect rect;
     SDL_Texture *texture, *background;
     SDL_Color color;
-} Button;
+} Screen_item;
 
 //Numreric values to determine menu outcome.
 enum Menu_selection {
@@ -37,19 +37,19 @@ enum Button_dimensions {
     TEXT_H = 90,
 };
 
-void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Texture *exit);
+void menu_init(App* app, SDL_Texture* background, SDL_Texture* newGame, SDL_Texture* exit);
 SDL_Color color_select (int selection);
-Button *menu_button_background (App *app, char resource[]);
-Button *menu_button_text(App *app, char *text, TTF_Font *font, SDL_Color color);
-bool hover_state (Button *button, int Mx, int My);
+Screen_item* menu_button_background (App* app, char resource[]);
+Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color);
+bool hover_state (Screen_item* button, int Mx, int My);
 
-void menu(App* app, char *ip_address, char *port_nr, bool *fullscreen_bool);
-void port_ip_input (App *app, char input[], bool ip_not_port, bool *fullscreen_bool);
-int main_menu (App* app, SDL_Rect* fullscreen, bool* fullscreen_bool);
-int select_game_menu (App *app, bool *fullscreen_bool);
-int join_multiplayer (App *app, char *ip_adress, char *port_nr, bool *fullscreen_bool);
-int host_multiplayer (App *app, bool *fullscreen_bool);
-int high_score (App *app, bool *fullscreen_bool);
-int settings (App *app, bool *fullscreen_bool);
+void menu(App* app, char *ip_address, char*  port_nr, bool*  fullscreen);
+void port_ip_input (App* app, char input[], bool ip_not_port, bool*  fullscreen);
+int main_menu (App*  app, bool*  fullscreen);
+int select_game_menu (App* app, bool* fullscreen);
+int join_multiplayer (App* app, char* ip_adress, char* port_nr, bool*  fullscreen);
+int host_multiplayer (App* app, bool* fullscreen);
+int high_score (App* app, bool* fullscreen);
+int settings (App* app, bool* fullscreen);
 
 #endif

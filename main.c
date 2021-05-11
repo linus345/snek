@@ -18,7 +18,7 @@
 int main(int argc, char* argv[])
 {
     //Determines function behaviour for fullscreen optimization.
-    bool fullscreen_bool = true;
+    bool fullscreen = true;
     char ip_adress[16] = "", port[5] = "";
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -39,22 +39,7 @@ int main(int argc, char* argv[])
     printf("successfully initialized TTF\n");
     srand(time(NULL));
 
-    printf("Checkpoint\n");
-
     App* app = init_app();
-
-    printf("Checkpoint\n");
-    
-    // Collects information about current monitor.
-    if (SDL_GetCurrentDisplayMode(0, &app->display) != 0) {
-        // print error
-        fprintf(stderr, "Error while calling SDL_DisplayMode: %s\n", SDL_GetError());
-        // exit with failure
-        exit(EXIT_FAILURE);
-    }
-    printf("Checkpoint\n");
-    printf("%d\n", app->display.h);
-    printf("Checkpoint\n");
 
     int nr_of_players = 0;
     Player* player1 = new_player(1, 1, 1);
@@ -116,7 +101,7 @@ int main(int argc, char* argv[])
 
     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-    menu(app, ip_adress, port, &fullscreen_bool);
+    menu(app, ip_adress, port, &fullscreen);
 
     int speed = 100000;
     while (app->running) {

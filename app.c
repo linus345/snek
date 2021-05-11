@@ -30,6 +30,14 @@ App *init_app() {
         // exit with failure
         exit(EXIT_FAILURE);
     }
+    
+    // Collects information about current monitor.
+    if (SDL_GetCurrentDisplayMode(0, &app->display) != 0) {
+        // print error
+        fprintf(stderr, "Error while calling SDL_DisplayMode: %s\n", SDL_GetError());
+        // exit with failure
+        exit(EXIT_FAILURE);
+    }
 
     // indicate that the app is running, used for main loop
     app->running = true;

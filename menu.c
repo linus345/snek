@@ -18,26 +18,21 @@ SDL_Color
     green = { 45, 93, 9, 255 },
     dark_green = { 9, 34, 3, 255 };
 
-void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
+void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen)
 {
     int menu_state = 0;
-    SDL_Rect fullscreen;
 
-    if (SDL_GetDisplayBounds(0, &fullscreen) != 0) {
-        SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
-        return;
-    }
     while (app->running) {
 
         switch (menu_state) {
         case MAIN_MENU:
-            menu_state = main_menu(app, &fullscreen, fullscreen_bool);
+            menu_state = main_menu(app, fullscreen);
             break;
         case SELECT_GAME:
-            menu_state = select_game_menu(app, fullscreen_bool);
+            menu_state = select_game_menu(app, fullscreen);
             break;
         case JOIN_MULTIPLAYER:
-            menu_state = join_multiplayer(app, ip_address, port_nr, fullscreen_bool);
+            menu_state = join_multiplayer(app, ip_address, port_nr, fullscreen);
             break; /*
         case HOST_MULTIPLAYER:
             menu_state = host_multiplayer(app, &fullscreen_bool);
@@ -56,17 +51,17 @@ void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
 }
 
 // Button memory allocator and texture loader.
-Button* menu_button_background(App* app, char resource[])
+Screen_item* menu_button_background(App* app, char resource[])
 {
-    Button* button = malloc(sizeof(Button));
+    Screen_item* button = malloc(sizeof(Screen_item));
     load_texture(app, &button->texture, resource);
     return button;
 }
 
 // Universal text renderer for buttons.
-Button* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
+Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
 {
-    Button* button = malloc(sizeof(Button));
+    Screen_item* item = malloc(sizeof(Screen_item));
     SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
     if (surface == NULL) {
         SDL_Log("TTF_RenderText_Blended failed: %s", SDL_GetError());
@@ -77,12 +72,12 @@ Button* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
         SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
         app->running = false;
     }
-    button->texture = texture;
-    return button;
+    item->texture = texture;
+    return item;
 }
 
 //Checks if the mouse is hovering on an SDL_Rect.
-bool hover_state(Button* button, int Mx, int My)
+bool hover_state(Screen_item* button, int Mx, int My)
 {
     if (Mx >= button->rect.x && Mx <= button->rect.x + button->rect.w && My >= button->rect.y && My <= button->rect.y + button->rect.h) {
         return true;
@@ -91,24 +86,21 @@ bool hover_state(Button* button, int Mx, int My)
 }
 
 // User input for ip address och port number
-int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
+int main_menu(App* app, bool *fullscreen)
 {
 
     int Mx, My;
 
-    SDL_Texture* background;
-    load_texture(app, &background, "./resources/background.png");
-    SDL_Rect background_view = { 0, 0, fullscreen->w, fullscreen->h };
-
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* button1 = menu_button_background(app, "./resources/menuButton.png");
-    Button* text1 = menu_button_text(app, "Start Game", font, green);
-    Button* button2 = menu_button_background(app, "./resources/menuButton.png");
-    Button* text2 = menu_button_text(app, "High Score", font, green);
-    Button* button3 = menu_button_background(app, "./resources/menuButton.png");
-    Button* text3 = menu_button_text(app, "Settings", font, green);
-    Button* exit_button = menu_button_text(app, "Exit Game", font, white);
+    Screen_item* background = menu_button_background(app, "./resources/background.png");
+    Screen_item* button1 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* text1 = menu_button_text(app, "Start Game", font, green);
+    Screen_item* button2 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* text2 = menu_button_text(app, "High Score", font, green);
+    Screen_item* button3 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* text3 = menu_button_text(app, "Settings", font, green);
+    Screen_item* exit_button = menu_button_text(app, "Exit Game", font, white);
 
     while (app->running) {
         //SDL_MouseButtonEvent mouse_event;
@@ -159,7 +151,7 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
                 switch (event.key.keysym.sym) {
                 case SDLK_f:
                     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                    *fullscreen_bool = true;
+                    *fullscreen = true;
                     // Makes space on the heap
                     free(button1);
                     free(button2);
@@ -173,9 +165,7 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
                 case SDLK_ESCAPE:
                     // return main_menu sätt bool till false
                     SDL_SetWindowFullscreen(app->window, 0);
-                    background_view.w = WINDOW_WIDTH;
-                    background_view.h = WINDOW_HEIGHT;
-                    *fullscreen_bool = false;
+                    *fullscreen = false;
                     free(button1);
                     free(button2);
                     free(button3);
@@ -191,16 +181,20 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-        
-        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
 
-        render_item(app, &button1->rect, button1->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H, fullscreen_bool);
-        render_item(app, &text1->rect, text1->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &button2->rect, button2->texture, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H, fullscreen_bool);
-        render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H, fullscreen_bool);
-        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H, fullscreen_bool);
+        if (fullscreen) {
+            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h, false);
+        } else {
+            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, false);
+        }
+
+        render_item(app, &button1->rect, button1->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H, fullscreen);
+        render_item(app, &text1->rect, text1->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &button2->rect, button2->texture, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H, fullscreen);
+        render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H, fullscreen);
+        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H, fullscreen);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
@@ -231,24 +225,21 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
     return 0;
 }
 
-int select_game_menu(App* app, bool* fullscreen_bool)
+int select_game_menu(App* app, bool* fullscreen)
 {
 
     int Mx, My;
 
-    SDL_Texture* background;
-    load_texture(app, &background, "./resources/background.png");
-    SDL_Rect background_view = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* button1 = menu_button_background(app, "./resources/menuButton.png");
-    Button* text1 = menu_button_text(app, "Single Player", font, green);
-    Button* button2 = menu_button_background(app, "./resources/menuButton.png");
-    Button* text2 = menu_button_text(app, "Host Multiplayer", font, green);
-    Button* button3 = menu_button_background(app, "./resources/menuButton.png");
-    Button* text3 = menu_button_text(app, "Join Multiplayer", font, green);
-    Button* exit_button = menu_button_text(app, "Back", font, white);
+    Screen_item* background = menu_button_background(app, "./resources/background.png");
+    Screen_item* button1 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* text1 = menu_button_text(app, "Single Player", font, green);
+    Screen_item* button2 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* text2 = menu_button_text(app, "Host Multiplayer", font, green);
+    Screen_item* button3 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* text3 = menu_button_text(app, "Join Multiplayer", font, green);
+    Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
     while (app->running) {
 
@@ -313,18 +304,23 @@ int select_game_menu(App* app, bool* fullscreen_bool)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
-        render_item(app, &button1->rect, button1->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H, fullscreen_bool);
-        render_item(app, &text1->rect, text1->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &button2->rect, button2->texture, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H, fullscreen_bool);
-        render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H, fullscreen_bool);
-        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H, fullscreen_bool);
+        if (fullscreen) {
+            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h, false);
+        } else {
+            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, false);
+        }
+
+        render_item(app, &button1->rect, button1->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H, fullscreen);
+        render_item(app, &text1->rect, text1->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &button2->rect, button2->texture, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H, fullscreen);
+        render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H, fullscreen);
+        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H, fullscreen);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
-            SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
+            SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
 
         } else if (hover_state(text2, Mx, My)) {
             SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
@@ -350,7 +346,7 @@ int select_game_menu(App* app, bool* fullscreen_bool)
     return 0;
 }
 
-int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen_bool)
+int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen)
 {
 
     int Mx, My;
@@ -361,13 +357,13 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* background1 = menu_button_background(app, "./resources/ip_field.png");
-    Button* background2 = menu_button_background(app, "./resources/port_field.png");
-    Button* button = menu_button_background(app, "./resources/menuButton.png");
-    Button* text1 = menu_button_text(app, "Enter IP", font, white);
-    Button* text2 = menu_button_text(app, "Enter Port", font, white);
-    Button* text3 = menu_button_text(app, "Join", font, white);
-    Button* exit_button = menu_button_text(app, "Back", font, white);
+    Screen_item* background1 = menu_button_background(app, "./resources/ip_field.png");
+    Screen_item* background2 = menu_button_background(app, "./resources/port_field.png");
+    Screen_item* button = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* text1 = menu_button_text(app, "Enter IP", font, white);
+    Screen_item* text2 = menu_button_text(app, "Enter Port", font, white);
+    Screen_item* text3 = menu_button_text(app, "Join", font, white);
+    Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
     while (app->running) {
 
@@ -383,11 +379,11 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(background1, Mx, My)) {
                     // Gets input from user
-                    port_ip_input(app, ip_address, false, fullscreen_bool);
+                    port_ip_input(app, ip_address, false, fullscreen);
                     strcpy(ip_address, ""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 } else if (hover_state(background2, Mx, My)) {
                     // Gets input from user
-                    port_ip_input(app, port_nr, true, fullscreen_bool);
+                    port_ip_input(app, port_nr, true, fullscreen);
                     strcpy(port_nr, ""); // !!!!!!!!!!!!!!!!!!!WARNING REMOVE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Makes space on the heap
@@ -417,15 +413,15 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen
         SDL_RenderClear(app->renderer);
 
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
-        render_item(app, &background1->rect, background1->texture, 230, 250, 500, 180,fullscreen_bool);
-        render_item(app, &background2->rect, background2->texture, 300, 390, 360, 150, fullscreen_bool);
-        render_item(app, &button->rect, button->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H, fullscreen_bool);
+        render_item(app, &background1->rect, background1->texture, 230, 250, 500, 180,fullscreen);
+        render_item(app, &background2->rect, background2->texture, 300, 390, 360, 150, fullscreen);
+        render_item(app, &button->rect, button->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H, fullscreen);
 
-        render_item(app, &text1->rect, text1->texture, 280, 290, 410, 110, fullscreen_bool);
-        render_item(app, &text2->rect, text2->texture, 350, 420, 250, 90, fullscreen_bool);
+        render_item(app, &text1->rect, text1->texture, 280, 290, 410, 110, fullscreen);
+        render_item(app, &text2->rect, text2->texture, 350, 420, 250, 90, fullscreen);
 
-        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H, fullscreen_bool);
+        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H, fullscreen);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text3, Mx, My)) {
@@ -454,7 +450,7 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen
     }
     return 0;
 }
-void port_ip_input(App* app, char input[], bool ip_not_port, bool* fullscreen_bool)
+void port_ip_input(App* app, char input[], bool ip_not_port, bool* fullscreen)
 {
 
     bool done = false;
@@ -466,17 +462,17 @@ void port_ip_input(App* app, char input[], bool ip_not_port, bool* fullscreen_bo
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
-    Button* enter_ip_background = menu_button_background(app, "./resources/ip_field.png");
-    Button* enter_port_background = menu_button_background(app, "./resources/port_field.png");
-    Button* join_background = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* enter_ip_background = menu_button_background(app, "./resources/ip_field.png");
+    Screen_item* enter_port_background = menu_button_background(app, "./resources/port_field.png");
+    Screen_item* join_background = menu_button_background(app, "./resources/menuButton.png");
 
-    Button* enter_ip = menu_button_text(app, "Enter IP", font, white);
-    Button* enter_port = menu_button_text(app, "Enter Port", font, white);
+    Screen_item* enter_ip = menu_button_text(app, "Enter IP", font, white);
+    Screen_item* enter_port = menu_button_text(app, "Enter Port", font, white);
 
-    Button* join_button = menu_button_text(app, "Join", font, green);
-    Button* exit_button = menu_button_text(app, "Back", font, white);
+    Screen_item* join_button = menu_button_text(app, "Join", font, green);
+    Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
-    Button* text = NULL;
+    Screen_item* text = NULL;
 
     SDL_StartTextInput();
     SDL_Event event;
@@ -516,21 +512,21 @@ void port_ip_input(App* app, char input[], bool ip_not_port, bool* fullscreen_bo
         //printf("Checkpoint 1\n");
 
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
-        render_item(app, &enter_ip_background->rect, enter_ip_background->texture, 230, 250, 500, 180,fullscreen_bool);
-        render_item(app, &enter_port_background->rect, enter_port_background->texture, 300, 390, 360, 150, fullscreen_bool);
-        render_item(app, &join_background->rect, join_background->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H, fullscreen_bool);
+        render_item(app, &enter_ip_background->rect, enter_ip_background->texture, 230, 250, 500, 180,fullscreen);
+        render_item(app, &enter_port_background->rect, enter_port_background->texture, 300, 390, 360, 150, fullscreen);
+        render_item(app, &join_background->rect, join_background->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H, fullscreen);
 
         // Makes sure the button pressed is not renderd
         if (ip_not_port) {
-            render_item(app, &enter_ip->rect, enter_ip->texture, 280, 290, 410, 110, fullscreen_bool);
+            render_item(app, &enter_ip->rect, enter_ip->texture, 280, 290, 410, 110, fullscreen);
         } else if (!ip_not_port) {
-            render_item(app, &enter_port->rect, enter_port->texture, 350, 420, 250, 90, fullscreen_bool);
+            render_item(app, &enter_port->rect, enter_port->texture, 350, 420, 250, 90, fullscreen);
         }
         //printf("Checkpoint 2\n");
 
-        //render_button(app, text, fullscreen_bool); // Renders the user input
-        render_item(app, &join_button->rect, join_button->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H, fullscreen_bool);
+        //render_button(app, text, fullscreen); // Renders the user input
+        render_item(app, &join_button->rect, join_button->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H, fullscreen);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H, fullscreen);
 
         //If-state for wether the text should switch color on hover or not
         //printf("Checkpoint 3\n");
