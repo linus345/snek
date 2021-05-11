@@ -13,7 +13,6 @@ typedef struct {
 } App;
 
 App *init_app();
-void optimizeFullscreen(SDL_Rect* rect);
 void quit_app(App *app);
 
 #endif

@@ -37,14 +37,6 @@ App *init_app()
     return app;
 }
 
-void optimizeFullscreen (SDL_Rect *rect) {
-
-    SDL_DisplayMode display;
-    SDL_GetCurrentDisplayMode(0, &display);
-    rect->x = rect->x * (display.w / WINDOW_WIDTH);
-    rect->y = rect->y * (display.h / WINDOW_HEIGHT);
-}
-
 void quit_app(App *app)
 {
     printf("Exiting...\n");

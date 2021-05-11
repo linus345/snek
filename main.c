@@ -17,8 +17,8 @@
 
 int main(int argc, char* argv[])
 {
-    char ip_adress[16] = "", port[5] = "";
-    
+    char ip_adress[16], port[5];
+
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
         return 1;
@@ -91,20 +91,40 @@ int main(int argc, char* argv[])
     // timer
     unsigned last_time = 0, current_time;
 
+    TTF_Init();
+
+    /*
+    TTF_Font *font = TTF_OpenFont("./resources/adventure.otf", 250);
+    if (font == NULL) {
+        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
+        return 0;
+    }
     
 
-    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+   int SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-<<<<<<< HEAD
-    menu(app, ip_adress, port);
-=======
-    bool exit_menu = false;
+     if (font == NULL) {
+        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
+        return 0;
+    }
+    */
+
+
+    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    
+    SDL_Rect r;
+    if (SDL_GetDisplayBounds(0, &r) != 0) {
+        SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
+        return 1;
+    }
+
+    bool exit_menu = false, fullscreen=true;
     int menu_state = 0;
     while (app->running) {
 
         switch (menu_state) {
         case MAIN_MENU:
-            menu_state = main_menu(app, &r);
+            menu_state = main_menu(app, &r, &fullscreen);
             break;
         case SELECT_GAME:
             menu_state = select_game_menu(app);
@@ -128,7 +148,6 @@ int main(int argc, char* argv[])
         if (exit_menu)
             break;
     }
->>>>>>> parent of 7b89b1b (Testing)
 
     int speed = 100000;
     while (app->running) {
