@@ -23,6 +23,11 @@ void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
     int menu_state = 0;
     SDL_Rect fullscreen;
 
+    if (TTF_Init() != 0) {
+        SDL_Log("TTF_Init failed: %s", TTF_GetError());
+        return;
+    }
+
     if (SDL_GetDisplayBounds(0, &fullscreen) != 0) {
         SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
         return;
@@ -52,6 +57,7 @@ void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
             return;*/
         }
     }
+    TTF_Quit();
 }
 
 // Button memory allocator and texture loader.
@@ -67,7 +73,15 @@ Button* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
 {
     Button* button = malloc(sizeof(Button));
     SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
+    if (surface == NULL) {
+        SDL_Log("TTF_RenderText_Blended failed: %s", SDL_GetError());
+        app->running = false;
+    }
     SDL_Texture* texture = SDL_CreateTextureFromSurface(app->renderer, surface);
+    if (texture == NULL) {
+        SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
+        app->running = false;
+    }
     button->texture = texture;
     return button;
 }
@@ -189,7 +203,7 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
         render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H, fullscreen_bool);
         render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H, fullscreen_bool);
         render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, EXIT_X, EXIT_Y, EXIT_W, EXIT_H, fullscreen_bool);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H, fullscreen_bool);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
@@ -309,7 +323,7 @@ int select_game_menu(App* app, bool* fullscreen_bool)
         render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H, fullscreen_bool);
         render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H, fullscreen_bool);
         render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, EXIT_X, EXIT_Y, EXIT_W, EXIT_H, fullscreen_bool);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H, fullscreen_bool);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
@@ -414,7 +428,7 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr, bool* fullscreen
         render_item(app, &text2->rect, text2->texture, 350, 420, 250, 90, fullscreen_bool);
 
         render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, EXIT_X, EXIT_Y, EXIT_W, EXIT_H, fullscreen_bool);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H, fullscreen_bool);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text3, Mx, My)) {
@@ -519,7 +533,7 @@ void port_ip_input(App* app, char input[], bool ip_not_port, bool* fullscreen_bo
 
         //render_button(app, text, fullscreen_bool); // Renders the user input
         render_item(app, &join_button->rect, join_button->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H, fullscreen_bool);
-        render_item(app, &exit_button->rect, exit_button->texture, EXIT_X, EXIT_Y, EXIT_W, EXIT_H, fullscreen_bool);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H, fullscreen_bool);
 
         //If-state for wether the text should switch color on hover or not
         //printf("Checkpoint 3\n");

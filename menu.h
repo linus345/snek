@@ -35,10 +35,6 @@ enum Button_dimensions {
     TEXT_Y = 430,
     TEXT_W = 290,
     TEXT_H = 90,
-    EXIT_X = 380,
-    EXIT_Y = 865,
-    EXIT_W = 290,
-    EXIT_H = 90
 };
 
 void menu_init(App *app, SDL_Texture *background, SDL_Texture *newGame, SDL_Texture *exit);

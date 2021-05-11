@@ -17,6 +17,7 @@
 
 int main(int argc, char* argv[])
 {
+    //Determines function behaviour for fullscreen optimization.
     bool fullscreen_bool = true;
     char ip_adress[16] = "", port[5] = "";
     
