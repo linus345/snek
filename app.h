@@ -6,7 +6,8 @@
 #define WINDOW_WIDTH 960
 #define WINDOW_HEIGHT 960
 
-typedef struct {
+//Core window renderer
+typedef struct App {
     bool running;
     SDL_Window *window;
     SDL_Renderer *renderer;

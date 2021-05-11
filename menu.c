@@ -10,6 +10,14 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+SDL_Color
+
+    black = { 0, 0, 0, 255 },
+    gray = { 127, 127, 127, 255 },
+    white = { 255, 255, 255, 255 },
+    green = { 45, 93, 9, 255 },
+    dark_green = { 9, 34, 3, 255 };
+
 void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
 {
     int menu_state = 0;
@@ -46,15 +54,7 @@ void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
     }
 }
 
-SDL_Color
-
-    black = { 0, 0, 0, 255 },
-    gray = { 127, 127, 127, 255 },
-    white = { 255, 255, 255, 255 },
-    green = { 45, 93, 9, 255 },
-    dark_green = { 9, 34, 3, 255 };
-
-// Universal button renderer for menus
+// Button memory allocator and texture loader.
 Button* menu_button_background(App* app, char resource[])
 {
     Button* button = malloc(sizeof(Button));
@@ -62,7 +62,7 @@ Button* menu_button_background(App* app, char resource[])
     return button;
 }
 
-// Universal text renderer for buttons
+// Universal text renderer for buttons.
 Button* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
 {
     Button* button = malloc(sizeof(Button));
@@ -72,6 +72,7 @@ Button* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
     return button;
 }
 
+//Checks if the mouse is hovering on an SDL_Rect.
 bool hover_state(Button* button, int Mx, int My)
 {
     if (Mx >= button->rect.x && Mx <= button->rect.x + button->rect.w && My >= button->rect.y && My <= button->rect.y + button->rect.h) {
@@ -81,8 +82,6 @@ bool hover_state(Button* button, int Mx, int My)
 }
 
 // User input for ip address och port number
-
-
 int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
 {
 
@@ -103,7 +102,7 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
     Button* exit_button = menu_button_text(app, "Exit Game", font, white);
 
     while (app->running) {
-
+        printf("%d\n", button1->rect.x);
         //SDL_MouseButtonEvent mouse_event;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -183,8 +182,8 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
         
-
         SDL_RenderCopy(app->renderer, background, NULL, &background_view);
+
         render_item(app, button1->rect, button1->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H, fullscreen_bool);
         render_item(app, text1->rect, text1->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H, fullscreen_bool);
         render_item(app, button2->rect, button2->texture, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H, fullscreen_bool);

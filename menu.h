@@ -7,12 +7,14 @@
 #include "game.h"
 #include "app.h"
 
-typedef struct {
+//Menu button creation struct consisting of SDL_Rect, SDL_Texture and SDL_Color.
+typedef struct Button {
     SDL_Rect rect;
     SDL_Texture *texture, *background;
     SDL_Color color;
 } Button;
 
+//Numreric values to determine menu outcome.
 enum Menu_selection {
     MAIN_MENU = 0,
     SELECT_GAME = 10,
@@ -23,6 +25,7 @@ enum Menu_selection {
     START_GAME = 100
 };
 
+//Standard dimensions for menu button backgrounds and texts.
 enum Button_dimensions {
     BUTTON_X = 300,
     BUTTON_Y = 400,
