@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include <SDL2/SDL_image.h>
+#include "app.h"
 #include "game.h"
 
 void load_texture(App *app, SDL_Texture **texture, char *path)
@@ -33,17 +34,15 @@ void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int x, int y, i
     rect->w = w;
     rect->h = h;
     if (fullscreen_bool) {
-        optimizeFullscreen(rect);
+        optimizeFullscreen(app, rect);
     }
     SDL_RenderCopy(app->renderer, texture, NULL, rect);
 }
 
 //Converts the size and coordinates of an SDL_Rect to fit fullscreen.
-void optimizeFullscreen (SDL_Rect *rect)
+void optimizeFullscreen (App* app, SDL_Rect *rect)
 {
-    SDL_DisplayMode display;
-    SDL_GetCurrentDisplayMode(0, &display);
-    rect->x = (display.w / 2) - (rect->w / 2);
-    rect->y = rect->y * (display.h / WINDOW_HEIGHT);
+    rect->x = (app->display.w / 2) - (rect->w / 2);
+    rect->y = rect->y * (app->display.h / WINDOW_HEIGHT);
     return;
 }

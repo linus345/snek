@@ -9,8 +9,9 @@
 //Core window renderer
 typedef struct App {
     bool running;
-    SDL_Window *window;
-    SDL_Renderer *renderer;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    SDL_DisplayMode display;
 } App;
 
 App *init_app();

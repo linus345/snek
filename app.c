@@ -47,6 +47,7 @@ void quit_app(App *app) {
     
     // cleanup subsystems before exiting
     SDLNet_Quit();
+    TTF_Quit();
     SDL_Quit();
 
     // successfully exit

@@ -23,11 +23,6 @@ void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
     int menu_state = 0;
     SDL_Rect fullscreen;
 
-    if (TTF_Init() != 0) {
-        SDL_Log("TTF_Init failed: %s", TTF_GetError());
-        return;
-    }
-
     if (SDL_GetDisplayBounds(0, &fullscreen) != 0) {
         SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
         return;
@@ -57,7 +52,7 @@ void menu(App* app, char* ip_address, char* port_nr, bool *fullscreen_bool)
             return;*/
         }
     }
-    TTF_Quit();
+    return;
 }
 
 // Button memory allocator and texture loader.
@@ -178,6 +173,8 @@ int main_menu(App* app, SDL_Rect* fullscreen, bool *fullscreen_bool)
                 case SDLK_ESCAPE:
                     // return main_menu sätt bool till false
                     SDL_SetWindowFullscreen(app->window, 0);
+                    background_view.w = WINDOW_WIDTH;
+                    background_view.h = WINDOW_HEIGHT;
                     *fullscreen_bool = false;
                     free(button1);
                     free(button2);
