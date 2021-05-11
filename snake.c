@@ -248,7 +248,7 @@ Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_leng
 bool collison_with_wall(Snake *snake)
 {
         // Checks collison with walls
-    if (snake->head.pos.x < 0 || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
+    if (snake->head.pos.x < 250 || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
         // Collison detected
         return true; 
     }

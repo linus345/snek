@@ -35,6 +35,22 @@ int main(int argc, char* argv[])
 
     App* app = init_app();
 
+    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    TTF_Init();
+    if (TTF_Init == NULL || SDL_SetWindowFullscreen == NULL) {
+        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
+        return 0;
+    }
+
+    SDL_Rect fullscreen_game;
+    // Shall be moved into game.c latter
+    if (SDL_GetDisplayBounds(0, &fullscreen_game) != 0) {
+        SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
+        return 0;
+    }
+
+    bool fullscreen = true;
+
     int nr_of_players = 0;
     Player* player1 = new_player(1, 1, 1);
     nr_of_players++;
@@ -87,26 +103,26 @@ int main(int argc, char* argv[])
     // background texture
     SDL_Texture* background_tex;
     load_texture(app, &background_tex, "./resources/background.png");
+    SDL_Rect background_dst = { 250, 0, fullscreen_game.w, fullscreen_game.h };
 
     // Scoreboard texture
-    SDL_Texture* scoreboard_tex;
-    load_texture(app, &scoreboard_tex, "./resources/ScoreBoard.jpg");
 
+    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+
+    SDL_Texture* background_sides;
+    load_texture(app, &background_sides, "./resources/background.png");
+    SDL_Rect background_dst = { 250, 0, fullscreen_game.w, fullscreen_game.h };
+
+    Button* goal_text = menu_button_text(app, 0, 0, 50, 50, "Goal", font, color_select(GREEN));
+
+    Button* scoreboard1 = menu_button_background(app, 0, 50, 250, 100, "./resources/menuButton.png");
+    Button* scoreboard2 = menu_button_background(app, 0, 150, 250, 100, "./resources/menuButton.png");
+    Button* scoreboard3 = menu_button_background(app, 0, 250, 250, 100, "./resources/menuButton.png");
+    Button* scoreboard4 = menu_button_background(app, 0, 350, 250, 100, "./resources/menuButton.png");
 
     // timer
     unsigned last_time = 0, current_time;
 
-    TTF_Init();
-    if (TTF_Init == NULL) {
-        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
-        return 0;
-    }
-
-    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    if (SDL_SetWindowFullscreen == NULL) {
-        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
-        return 0;
-    }
     menu(app, ip_adress, port);
 
     int speed = 100000;
@@ -143,9 +159,11 @@ int main(int argc, char* argv[])
                         player1->snake->dir = Left;
                     break;
                 case SDLK_f:
+                    fullscreen = true;
                     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                     break;
                 case SDLK_ESCAPE:
+                    fullscreen = false;
                     SDL_SetWindowFullscreen(app->window, 0);
                     break;
                 default:
@@ -263,11 +281,21 @@ int main(int argc, char* argv[])
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        SDL_Rect background_dst = { 250, 0, GAME_WIDTH, GAME_HEIGHT };
+        if (fullscreen) {
+            background_dst.h = fullscreen_game.h;
+            background_dst.w = fullscreen_game.w;
+        } else if (!fullscreen) {
+            background_dst.h = GAME_HEIGHT;
+            background_dst.w = GAME_WIDTH;
+        }
+
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
-        SDL_Rect scoreboard_dst = { 0, 0, 250, 500};
-        SDL_RenderCopy(app->renderer, scoreboard_tex, NULL, &scoreboard_dst);    
+        render_button(app, goal_text);
+        render_button(app, scoreboard1);
+        render_button(app, scoreboard2);
+        render_button(app, scoreboard3);
+        render_button(app, scoreboard4);
 
         // render fruits
         for (int i = 0; i < nr_of_fruits; i++) {
