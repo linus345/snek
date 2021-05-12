@@ -258,17 +258,17 @@ int main_menu(App* app, SDL_Rect* r, bool* fullscreen)
         high_score_button = menu_button_text(app, r->w / 2 - 115, 580, 290, 90, "High Score", font, color_select(GREEN));
         settings_background = menu_button_background(app, r->w / 2 - 150, 700, 360, 150, "./resources/menuButton.png");
         settings_button = menu_button_text(app, r->w / 2 - 115, 730, 290, 90, "Settings", font, color_select(GREEN));
-        exit_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Exit Game", font, color_select(WHITE));
+        exit_button = menu_button_text(app, r->w / 2 - 70, 865, 200, 75, "Exit Game", font, color_select(WHITE));
     } else if (!*fullscreen) {
         background_view.h = WINDOW_HEIGHT;
         background_view.w = WINDOW_WIDTH;
-        start_game_background = menu_button_background(app, 300, 400, 360, 150, "./resources/menuButton.png");
-        start_game_button = menu_button_text(app, 337, 430, 290, 90, "Start Game", font, color_select(GREEN));
-        high_score_background = menu_button_background(app, 300, 550, 360, 150, "./resources/menuButton.png");
-        high_score_button = menu_button_text(app, 337, 580, 290, 90, "High Score", font, color_select(GREEN));
-        settings_background = menu_button_background(app, 300, 700, 360, 150, "./resources/menuButton.png");
-        settings_button = menu_button_text(app, 337, 730, 290, 90, "Settings", font, color_select(GREEN));
-        exit_button = menu_button_text(app, 380, 865, 200, 75, "Exit Game", font, color_select(WHITE));
+        start_game_background = menu_button_background(app, 450, 400, 360, 150, "./resources/menuButton.png");
+        start_game_button = menu_button_text(app, 485, 430, 290, 90, "Start Game", font, color_select(GREEN));
+        high_score_background = menu_button_background(app, 450, 550, 360, 150, "./resources/menuButton.png");
+        high_score_button = menu_button_text(app, 485, 580, 290, 90, "High Score", font, color_select(GREEN));
+        settings_background = menu_button_background(app, 450, 700, 360, 150, "./resources/menuButton.png");
+        settings_button = menu_button_text(app, 485, 730, 290, 90, "Settings", font, color_select(GREEN));
+        exit_button = menu_button_text(app, 527, 865, 200, 75, "Exit Game", font, color_select(WHITE));
     }
 
     while (app->running) {
@@ -415,17 +415,17 @@ int select_game_menu(App* app, SDL_Rect* r, bool* fullscreen)
         host_multiplayer_button = menu_button_text(app, r->w / 2 - 115, 580, 290, 90, "Host Multiplayer", font, color_select(GREEN));
         join_multiplayer_background = menu_button_background(app, r->w / 2 - 150, 700, 360, 150, "./resources/menuButton.png");
         join_multiplayer_button = menu_button_text(app, r->w / 2 - 115, 730, 290, 90, "Join Multiplayer", font, color_select(GREEN));
-        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Back", font, color_select(WHITE));
+        return_button = menu_button_text(app, r->w / 2 - 70, 865, 200, 75, "Back", font, color_select(WHITE));
     } else if (!*fullscreen) {
         background_view.h = WINDOW_HEIGHT;
         background_view.w = WINDOW_WIDTH;
-        single_player_background = menu_button_background(app, 300, 400, 360, 150, "./resources/menuButton.png");
-        single_player_button = menu_button_text(app, 337, 430, 290, 90, "Single Player", font, color_select(GREEN));
-        host_multiplayer_background = menu_button_background(app, 300, 550, 360, 150, "./resources/menuButton.png");
-        host_multiplayer_button = menu_button_text(app, 337, 580, 290, 90, "Host Multiplayer", font, color_select(GREEN));
-        join_multiplayer_background = menu_button_background(app, 300, 700, 360, 150, "./resources/menuButton.png");
-        join_multiplayer_button = menu_button_text(app, 337, 730, 290, 90, "Join Multiplayer", font, color_select(GREEN));
-        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+        single_player_background = menu_button_background(app, 450, 400, 360, 150, "./resources/menuButton.png");
+        single_player_button = menu_button_text(app, 485, 430, 290, 90, "Single Player", font, color_select(GREEN));
+        host_multiplayer_background = menu_button_background(app, 450, 550, 360, 150, "./resources/menuButton.png");
+        host_multiplayer_button = menu_button_text(app, 485, 580, 290, 90, "Host Multiplayer", font, color_select(GREEN));
+        join_multiplayer_background = menu_button_background(app, 450, 700, 360, 150, "./resources/menuButton.png");
+        join_multiplayer_button = menu_button_text(app, 485, 730, 290, 90, "Join Multiplayer", font, color_select(GREEN));
+        return_button = menu_button_text(app, 527, 865, 200, 75, "Back", font, color_select(WHITE));
     }
 
     while (app->running) {
@@ -584,17 +584,17 @@ int join_multiplayer(App* app, char* ip_address, char* port_nr, SDL_Rect* r, boo
         enter_ip = menu_button_text(app, r->w / 2 - 175, 290, 410, 110, "Enter IP", font, color_select(WHITE));
         enter_port = menu_button_text(app, r->w / 2 - 115, 420, 250, 90, "Enter Port", font, color_select(WHITE));
         join_button = menu_button_text(app, r->w / 2 - 115, 630, 290, 90, "Join", font, color_select(GREEN));
-        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Back", font, color_select(WHITE));
+        return_button = menu_button_text(app, r->w / 2 - 70, 865, 200, 75, "Back", font, color_select(WHITE));
     } else if (!*fullscreen) {
         background_view.h = WINDOW_HEIGHT;
         background_view.w = WINDOW_WIDTH;
-        enter_ip_background = menu_button_background(app, 230, 250, 500, 180, "./resources/ip_field.png");
-        enter_port_background = menu_button_background(app, 300, 390, 360, 150, "./resources/port_field.png");
-        join_background = menu_button_background(app, 300, 600, 360, 150, "./resources/menuButton.png");
-        enter_ip = menu_button_text(app, 280, 290, 410, 110, "Enter IP", font, color_select(WHITE));
-        enter_port = menu_button_text(app, 350, 420, 250, 90, "Enter Port", font, color_select(WHITE));
-        join_button = menu_button_text(app, 337, 630, 290, 90, "Join", font, color_select(GREEN));
-        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+        enter_ip_background = menu_button_background(app, 330, 250, 500, 180, "./resources/ip_field.png");
+        enter_port_background = menu_button_background(app, 450, 390, 360, 150, "./resources/port_field.png");
+        join_background = menu_button_background(app, 450, 600, 360, 150, "./resources/menuButton.png");
+        enter_ip = menu_button_text(app, 380, 290, 410, 110, "Enter IP", font, color_select(WHITE));
+        enter_port = menu_button_text(app, 498, 420, 250, 90, "Enter Port", font, color_select(WHITE));
+        join_button = menu_button_text(app, 485, 630, 290, 90, "Join", font, color_select(GREEN));
+        return_button = menu_button_text(app, 527, 865, 200, 75, "Back", font, color_select(WHITE));
     }
 
     while (app->running) {
@@ -731,11 +731,11 @@ int host_multiplayer(App* app, SDL_Rect* r, bool* fullscreen)
     if (*fullscreen) {
         background_view.h = r->h;
         background_view.w = r->w;
-        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Back", font, color_select(WHITE));
+        return_button = menu_button_text(app, r->w / 2 - 70, 865, 200, 75, "Back", font, color_select(WHITE));
     } else if (!*fullscreen) {
         background_view.h = WINDOW_HEIGHT;
         background_view.w = WINDOW_WIDTH;
-        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+        return_button = menu_button_text(app, 527, 865, 200, 75, "Back", font, color_select(WHITE));
     }
 
     while (app->running) {
@@ -814,11 +814,11 @@ int high_score(App* app, SDL_Rect* r, bool* fullscreen)
     if (*fullscreen) {
         background_view.h = r->h;
         background_view.w = r->w;
-        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Exit Game", font, color_select(WHITE));
+        return_button = menu_button_text(app, r->w / 2 - 70, 865, 200, 75, "Back", font, color_select(WHITE));
     } else if (!*fullscreen) {
         background_view.h = WINDOW_HEIGHT;
         background_view.w = WINDOW_WIDTH;
-        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+        return_button = menu_button_text(app, 527, 865, 200, 75, "Back", font, color_select(WHITE));
     }
 
     while (app->running) {
@@ -896,11 +896,11 @@ int settings(App* app, SDL_Rect* r, bool* fullscreen)
     if (*fullscreen) {
         background_view.h = r->h;
         background_view.w = r->w;
-        return_button = menu_button_text(app, r->w / 2 - 50, 865, 200, 75, "Exit Game", font, color_select(WHITE));
+        return_button = menu_button_text(app, r->w / 2 - 70, 865, 200, 75, "Back", font, color_select(WHITE));
     } else if (!*fullscreen) {
         background_view.h = WINDOW_HEIGHT;
         background_view.w = WINDOW_WIDTH;
-        return_button = menu_button_text(app, 380, 865, 200, 75, "Back", font, color_select(WHITE));
+        return_button = menu_button_text(app, 527, 865, 200, 75, "Back", font, color_select(WHITE));
     }
 
     while (app->running) {

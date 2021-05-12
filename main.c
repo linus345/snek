@@ -112,7 +112,8 @@ int main(int argc, char* argv[])
     load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
     SDL_Rect background_sb_dst = {0, 0, 250, fullscreen_game.h};
 
-    Button* goal_text = menu_button_text(app, 0, 0, 50, 50, "Goal    250", font, color_select(WHITE));
+    Button* goal_text = menu_button_text(app, 0, 0, 50, 50, "Goal", font, color_select(WHITE));
+    Button* goal_nr = menu_button_text(app, 19, 0, 50, 50, "250", font, color_select(WHITE));
     Button* player1_score = menu_button_text(app, 10, 60, 50, 50, "", font, color_select(WHITE));
 
     Button* scoreboard1 = menu_button_background(app, 0, 50, 250, 100, "./resources/menuButton.png");
@@ -293,6 +294,7 @@ int main(int argc, char* argv[])
         SDL_RenderCopy(app->renderer, background_sb_tex, NULL, &background_sb_dst);
 
         render_button(app, goal_text);
+        render_button(app, goal_nr);
         render_button(app, player1_score);
         render_button(app, scoreboard1);
         render_button(app, scoreboard2);
