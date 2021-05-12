@@ -41,10 +41,10 @@ void menu_init(App* app, SDL_Texture* background, SDL_Texture* newGame, SDL_Text
 SDL_Color color_select (int selection);
 Screen_item* menu_button_background (App* app, char resource[]);
 Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color);
+Screen_item* input_text(App* app, Screen_item* item);
 bool hover_state (Screen_item* button, int Mx, int My);
 
-void menu(App* app, char *ip_address, char* port_nr);
-void port_ip_input (App* app, bool ip_not_port);
+void menu(App* app);
 int main_menu (App*  app);
 int select_game_menu (App* app);
 int join_multiplayer (App* app);

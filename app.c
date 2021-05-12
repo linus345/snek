@@ -8,7 +8,7 @@
 
 App *init_app() {
 
-    // allocate enough memory on the heap
+    // Allocate memory for the core program features
     App *app = malloc(sizeof(App));
 
     // initialize window
@@ -38,6 +38,9 @@ App *init_app() {
         // exit with failure
         exit(EXIT_FAILURE);
     }
+    char tmp[1] = "";
+    strcpy(app->ip, tmp);
+    strcpy(app->port, tmp);
 
     // indicate that the app is running, used for main loop
     app->running = true;

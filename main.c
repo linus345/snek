@@ -17,7 +17,6 @@
 
 int main(int argc, char* argv[])
 {
-    char ip_adress[16] = "", port[5] = "";
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
@@ -95,7 +94,7 @@ int main(int argc, char* argv[])
     // timer
     unsigned last_time = 0, current_time;
 
-    menu(app, ip_adress, port);
+    menu(app);
 
     int speed = 100000;
     while (app->running) {

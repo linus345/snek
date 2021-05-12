@@ -8,11 +8,11 @@
 
 //Core window renderer
 typedef struct App {
-    char ip[16], port[5];
     bool running, fullscreen;
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_DisplayMode display;
+    char ip[16], port[5];
 } App;
 
 App *init_app();

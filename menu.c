@@ -11,19 +11,16 @@
 #include <SDL2/SDL_ttf.h>
 
 SDL_Color
-
     black = { 0, 0, 0, 255 },
     gray = { 127, 127, 127, 255 },
     white = { 255, 255, 255, 255 },
     green = { 45, 93, 9, 255 },
     dark_green = { 9, 34, 3, 255 };
 
-void menu(App* app, char* ip_address, char* port_nr)
+void menu(App* app)
 {
     int menu_state = MAIN_MENU;
-
     while (app->running) {
-
         switch (menu_state) {
         case MAIN_MENU:
             menu_state = main_menu(app);
@@ -33,15 +30,15 @@ void menu(App* app, char* ip_address, char* port_nr)
             break;
         case JOIN_MULTIPLAYER:
             menu_state = join_multiplayer(app);
-            break; /*
+            break;/*
         case HOST_MULTIPLAYER:
-            menu_state = host_multiplayer(app, &fullscreen_bool);
+            menu_state = host_multiplayer(app);
             break;
         case HIGH_SCORE:
-            menu_state = high_score(app, &fullscreen_bool);
+            menu_state = high_score(app);
             break;
         case SETTINGS:
-            menu_state = settings(app, &fullscreen_bool);
+            menu_state = settings(app);
             break;*/
         case START_GAME:
             return;
@@ -88,7 +85,6 @@ bool hover_state(Screen_item* button, int Mx, int My)
 // User input for ip address och port number
 int main_menu(App* app)
 {
-
     int Mx, My;
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
@@ -377,9 +373,8 @@ int join_multiplayer(App* app)
 {
 
     int Mx, My;
-
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
-    
+
     Screen_item* background = menu_button_background(app, "./resources/background.png");
     Screen_item* background1 = menu_button_background(app, "./resources/ip_field.png");
     Screen_item* background2 = menu_button_background(app, "./resources/port_field.png");
@@ -388,8 +383,6 @@ int join_multiplayer(App* app)
     Screen_item* text2 = menu_button_text(app, "Enter Port", font, white);
     Screen_item* text3 = menu_button_text(app, "Join", font, white);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
-
-    SDL_StartTextInput();
 
     while (app->running) {
 
@@ -405,10 +398,12 @@ int join_multiplayer(App* app)
 
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(background1, Mx, My)) {
-                    text1 = menu_button_text(app, app->ip, font, white);
+                    //input_text(app, text1);
+                    //text1 = menu_button_text(app, app->ip, font, white);
 
                 } else if (hover_state(background2, Mx, My)) {
-                    text2 = menu_button_text(app, app->port, font, white);
+                    //input_text(app, text1);
+                    //text2 = menu_button_text(app, app->port, font, white);
 
                 } else if (hover_state(button, Mx, My)) {
                     // Makes space on the heap
@@ -436,7 +431,7 @@ int join_multiplayer(App* app)
 
             case SDL_TEXTINPUT:
                 // Add new text onto the end of our text
-                strcat(app->ip, event.text.text);
+                //strcat(app->ip, event.text.text);
                 break;
             }
         }
@@ -485,27 +480,15 @@ int join_multiplayer(App* app)
     return 0;
 }
 /*
-void port_ip_input(App* app, bool ip_not_port)
+Screen_item* input_text(App* app, Screen_item* item)
 {
-
     bool done = false;
-    int Mx, My;
+    SDL_Surface* surface = NULL;
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
-
-    Screen_item* background = menu_button_background(app, "./resources/background.png");
-    Screen_item* enter_ip_background = menu_button_background(app, "./resources/ip_field.png");
-    Screen_item* enter_port_background = menu_button_background(app, "./resources/port_field.png");
-    Screen_item* join_background = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* enter_ip = menu_button_text(app, "Enter IP", font, white);
-    Screen_item* enter_port = menu_button_text(app, "Enter Port", font, white);
-    Screen_item* join_button = menu_button_text(app, "Join", font, green);
-    Screen_item* exit_button = menu_button_text(app, "Back", font, white);
-
-    Screen_item* text = NULL;
-
-    SDL_StartTextInput();
     SDL_Event event;
+    SDL_StartTextInput();
+    
     while (!done) {
 
         if (SDL_PollEvent(&event)) {
@@ -515,82 +498,52 @@ void port_ip_input(App* app, bool ip_not_port)
                 app->running = false;
                 done = true;
                 break;
-            case SDL_TEXTINPUT:
-                // Add new text onto the end of our text
-                strcat(input, event.text.text);
-                text = menu_button_text(app, input, font, white);
-                break;
             case SDL_KEYDOWN:
                 // enter key pressed?
-                switch (event.key.keysym.sym) {
-                case SDLK_RETURN:
-                    done = true;
-                    break;
-                }
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                if (hover_state(exit_button, Mx, My)) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
                     done = true;
                 }
                 break;
-            }
+            case SDL_TEXTINPUT:
+                // Add new text onto the end of our text
+                if (item->rect.y < 420) {
+                    strcat(app->ip, event.text.text);
+                    surface = TTF_RenderText_Blended(font, app->ip, white);
+                    if (surface == NULL) {
+                        SDL_Log("TTF_RenderText_Blended failed: %s", SDL_GetError());
+                        app->running = false;
+                        return item;
+                    }
+                } else {
+                    strcat(app->port, event.text.text);
+                    surface = TTF_RenderText_Blended(font, app->port, white);
+                    if (surface == NULL) {
+                        SDL_Log("TTF_RenderText_Blended failed: %s", SDL_GetError());
+                        app->running = false;
+                        done = true;
+                        return item;
+                    }
+                }
+                item->texture = SDL_CreateTextureFromSurface(app->renderer, surface);
+                if (item->texture == NULL) {
+                    SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
+                    app->running = false;
+                    done = true;
+                    return item;
+                }
+                break;
         }
-        // clear screen before next render
-        SDL_RenderClear(app->renderer);
-        
-        if (app->fullscreen) {
-            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
-        } else {
-            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        }
-
-        render_item(app, &enter_ip_background->rect, enter_ip_background->texture, 230, 250, 500, 180);
-        render_item(app, &enter_port_background->rect, enter_port_background->texture, 300, 390, 360, 150);
-        render_item(app, &join_background->rect, join_background->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H);
-
-        // Makes sure the button pressed is not renderd
-        if (ip_not_port) {
-            render_item(app, &enter_ip->rect, enter_ip->texture, 280, 290, 410, 110);
-        } else if (!ip_not_port) {
-            render_item(app, &enter_port->rect, enter_port->texture, 350, 420, 250, 90);
-        }
-        //printf("Checkpoint 2\n");
-
-        //render_button(app, text); // Renders the user input
-        render_item(app, &join_button->rect, join_button->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
-
-        //If-state for wether the text should switch color on hover or not
-        //printf("Checkpoint 3\n");
-        if (hover_state(exit_button, Mx, My)) {
-            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
-
-        } else {
-            SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
-        }
-        //printf("Checkpoint 4\n");
-        // present on screen
-        SDL_RenderPresent(app->renderer);
-
-        SDL_Delay(1000 / 60);
-        SDL_GetMouseState(&Mx, &My);
     }
-
     SDL_StopTextInput();
 
-    printf("\nthe text input is: %s\n\n", input);
+    if (item->rect.y < 420) {
+        printf("\nThe text input is: %s\n\n", app->ip);
+    } else {
+        printf("\nThe text input is: %s\n\n", app->port);
+    }
+    return item;
+}
 
-    // Makes space on the heap
-    free(enter_ip_background);
-    free(enter_port_background);
-    free(join_background);
-    free(enter_ip);
-    free(enter_port);
-    free(join_button);
-    free(exit_button);
-    return;
-}*/
-/*
 int host_multiplayer(App* app, bool* fullscreen_bool)
 {
 
@@ -754,4 +707,4 @@ int settings(App* app, bool* fullscreen_bool)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
-} */
+}*/
