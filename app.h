@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 //960
-#define WINDOW_WIDTH 1210
+#define WINDOW_WIDTH 1250
 #define WINDOW_HEIGHT 960
 
 #define GAME_WIDTH 960

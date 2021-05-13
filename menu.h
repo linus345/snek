@@ -13,7 +13,8 @@ enum Menu_selection {
     JOIN_MULTIPLAYER = 12,
     HIGH_SCORE = 20,
     SETTINGS = 30,
-    START_GAME = 100
+    START_GAME = 100,
+    TYPE_NAME = 420
 };
 
 enum Color_pallet {
@@ -39,6 +40,7 @@ Button *menu_button_text(App *app, int x, int y, int w, int h, char *text, TTF_F
 void render_button (App *app, Button *button);
 bool hover_state (Button *button, int Mx, int My);
 
+void menu(App* app, char* ip_address, char* port_nr, char* name);
 int main_menu (App *app, SDL_Rect *r, bool *fullscreen);
 int select_game_menu (App *app, SDL_Rect* r, bool *fullscreen);
 int join_multiplayer(App* app, char* ip_address, char* port_nr, SDL_Rect* r, bool* fullscreen);
@@ -48,5 +50,5 @@ void port_ip_input (App *app, char input[], int x, int y, int w, int h, bool ip_
 
 int high_score (App *app, SDL_Rect* r, bool* fullscreen);
 int settings (App *app, SDL_Rect* r, bool* fullscreen);
-
+int type_name(App* app, char name[]);
 #endif

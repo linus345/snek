@@ -13,5 +13,6 @@ typedef struct {
 } Pos;
 
 void load_texture(App *app, SDL_Texture **texture, char *path);
+int game(App* app, char* name);
 
 #endif

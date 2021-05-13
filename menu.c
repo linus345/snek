@@ -10,7 +10,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
-void menu(App* app, char* ip_address, char* port_nr)
+void menu(App* app, char* ip_address, char* port_nr, char* name)
 {
     bool fullscreen_bool = true;
     int menu_state = 0;
@@ -32,7 +32,7 @@ void menu(App* app, char* ip_address, char* port_nr)
             break;
         case JOIN_MULTIPLAYER:
             menu_state = join_multiplayer(app, ip_address, port_nr, &fullscreen, &fullscreen_bool);
-            break; 
+            break;
         case HOST_MULTIPLAYER:
             menu_state = host_multiplayer(app, &fullscreen, &fullscreen_bool);
             break;
@@ -42,12 +42,15 @@ void menu(App* app, char* ip_address, char* port_nr)
         case SETTINGS:
             menu_state = settings(app, &fullscreen, &fullscreen_bool);
             break;
+        case TYPE_NAME:
+            menu_state = type_name( app, name);
+            break;
         case START_GAME:
-            return;
+            menu_state= game(app, name);
+            break;
         }
     }
 }
-
 
 SDL_Color color_select(int selection)
 {
@@ -117,8 +120,6 @@ bool hover_state(Button* button, int Mx, int My)
     }
     return false;
 }
-
-
 
 // User input for ip address och port number
 void port_ip_input(App* app, char input[], int x, int y, int w, int h, bool ip_not_port)
@@ -450,7 +451,7 @@ int select_game_menu(App* app, SDL_Rect* r, bool* fullscreen)
                     free(join_multiplayer_background);
                     free(join_multiplayer_button);
                     free(return_button);
-                    return START_GAME;
+                    return TYPE_NAME;
 
                 } else if (hover_state(join_multiplayer_button, Mx, My)) {
                     // Makes space on the heap
@@ -962,4 +963,92 @@ int settings(App* app, SDL_Rect* r, bool* fullscreen)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
+}
+
+int type_name(App* app, char name[])
+{
+
+    bool done = false;
+    int Mx, My;
+
+    SDL_Texture* background;
+    load_texture(app, &background, "./resources/background.png");
+    SDL_Rect background_view = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
+    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+
+    Button* type_name_background = menu_button_background(app, 450, 400, 360, 150, "./resources/menuButton.png");
+    Button* text = NULL;
+    Button* return_button = menu_button_text(app, 527, 865, 200, 75, "Back", font, color_select(WHITE));
+
+    SDL_StartTextInput();
+    SDL_Event event;
+    while (!done) {
+
+        printf("While loop\n");
+
+        if (SDL_PollEvent(&event)) {
+            printf("If-statement successful\n");
+            switch (event.type) {
+            case SDL_QUIT:
+                app->running = false;
+                done = true;
+                break;
+            case SDL_TEXTINPUT:
+                /* Add new text onto the end of our text */
+                strcat(name, event.text.text);
+                text = menu_button_text(app, 485, 430, 290, 90, name, font, color_select(GREEN));
+                break;
+            case SDL_KEYDOWN:
+                // enter key pressed?
+                switch (event.key.keysym.sym) {
+                case SDLK_RETURN:
+                    done = true;
+                    break;
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(return_button, Mx, My)) {
+                    return SELECT_GAME;
+                }
+                break;
+            }
+        }
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+        printf("Checkpoint\n");
+
+        SDL_RenderCopy(app->renderer, background, NULL, &background_view);
+        render_button(app, type_name_background);
+        if (text != NULL) {
+            render_button(app, text);
+        } // Renders the user input
+        render_button(app, return_button);
+
+        //If-state for wether the text should switch color on hover or not
+
+        if (hover_state(return_button, Mx, My)) {
+            SDL_SetTextureColorMod(return_button->texture, 127, 127, 127);
+
+        } else {
+            SDL_SetTextureColorMod(return_button->texture, 255, 255, 255);
+        }
+        printf("Checkpoint\n");
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
+    }
+
+    SDL_StopTextInput();
+
+    printf("\nthe text input is: %s\n\n", name);
+
+    // Makes space on the heap
+    free(type_name_background);
+    free(text);
+    free(return_button);
+
+    return START_GAME;
 }

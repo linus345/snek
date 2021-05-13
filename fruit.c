@@ -12,7 +12,7 @@ Fruit *new_fruit(Fruit *fruits[], int nr_of_fruits, Snake *snake)
     Fruit *fruit = malloc(sizeof(Fruit));
 
     // generate random position
-    fruit->pos.x = (rand() % ((GAME_WIDTH / CELL_SIZE)) * CELL_SIZE)+250; // Need to fixs this to apply to the new game window
+    fruit->pos.x = (rand() % ((GAME_WIDTH / CELL_SIZE)) * CELL_SIZE)+GAME_START; // Need to fixs this to apply to the new game window
     fruit->pos.y = (rand() % (GAME_HEIGHT / CELL_SIZE)) * CELL_SIZE;
     // generate random fruit type
     fruit->type = rand() % 4;

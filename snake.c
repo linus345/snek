@@ -249,13 +249,12 @@ bool collison_with_wall(Snake* snake, bool fullscreen, SDL_Rect* r)
 {
     // Checks collison with walls
     if (fullscreen) {
-
-        if (snake->head.pos.x < 250 || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
+        if (snake->head.pos.x < 250 || snake->head.pos.y < 0 || snake->head.pos.x > r->w - CELL_SIZE || snake->head.pos.y > r->h - CELL_SIZE) {
             // Collison detected
             return true;
         }
     } else if (!fullscreen) {
-        if (snake->head.pos.x < 250 || snake->head.pos.y < 0 || snake->head.pos.x > r->w - CELL_SIZE || snake->head.pos.y > r->h - CELL_SIZE) {
+        if (snake->head.pos.x < 250 || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
             // Collison detected
             return true;
         }
