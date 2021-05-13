@@ -369,7 +369,10 @@ int join_multiplayer(App* app)
 {
 
     int Mx, My;
+    bool ip = false, port = false;
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    SDL_Surface* tmp_surface = NULL;
+    
 
     Screen_item* background = menu_button_background(app, "./resources/background.png");
     Screen_item* background1 = menu_button_background(app, "./resources/ip_field.png");
@@ -379,12 +382,12 @@ int join_multiplayer(App* app)
     Screen_item* text2 = menu_button_text(app, "Enter Port", font, white);
     Screen_item* text3 = menu_button_text(app, "Join", font, white);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
-
+    
     while (app->running) {
 
         //SDL_MouseButtonEvent mouse_event;
         SDL_Event event;
-        while (SDL_PollEvent(&event)) {
+        if (SDL_PollEvent(&event)) {
 
             switch (event.type) {
                 case SDL_QUIT:
@@ -393,13 +396,11 @@ int join_multiplayer(App* app)
                 break;
                 case SDL_MOUSEBUTTONDOWN:
                     if (hover_state(background1, Mx, My)) {
-                        //input_text(app, text1);
-                        text1 = input_text(app, text1);
-
+                        ip = true;
+                        SDL_StartTextInput();
                     } else if (hover_state(background2, Mx, My)) {
-                        //input_text(app, text1);
-                        text2 = input_text(app, text2);
-
+                        port = true;
+                        SDL_StartTextInput();
                     } else if (hover_state(button, Mx, My)) {
                         // Makes space on the heap
                         free(background);
@@ -410,6 +411,7 @@ int join_multiplayer(App* app)
                         free(text2);
                         free(text3);
                         free(exit_button);
+                        SDL_StopTextInput();
                         return START_GAME;
 
                     } else if (hover_state(exit_button, Mx, My)) {
@@ -422,34 +424,53 @@ int join_multiplayer(App* app)
                         free(text2);
                         free(text3);
                         free(exit_button);
+                        SDL_StopTextInput();
                         return SELECT_GAME;
                     }
                 break;
                 case SDL_TEXTINPUT:
-                    // Add new text onto the end of our text
-                    strcat(app->ip, event.text.text);
-                break;
+                    if (ip && strlen(app->ip) < 15) {
+                        strcat(app->ip, event.text.text);
+                    } else if (port && strlen(app->port) < 4) {
+                        strcat(app->port, event.text.text);
+                    }
+                    break;
                 case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_F11) {
-                        if (app->fullscreen) {
-                            SDL_SetWindowFullscreen(app->window, 0);
-                            app->fullscreen = false;
-                        } else {
-                            SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                            app->fullscreen = true;
-                        }
-                        // Makes space on the heap
-                        free(background);
-                        free(background1);
-                        free(background2);
-                        free(text1);
-                        free(text2);
-                        free(text3);
-                        free(exit_button);
-                        return JOIN_MULTIPLAYER;
-                    } else if (event.key.keysym.sym == SDLK_ESCAPE){
-                        // exit main loop
-                        return SELECT_GAME;
+                    switch (event.key.keysym.sym) {
+                        case SDLK_BACKSPACE:
+                            if (ip && strlen(app->ip) > 0) {
+                                app->ip[strlen(app->ip) - 1] = '\0';
+                            } else if (port && strlen(app->port) > 0) {
+                                app->port[strlen(app->port) - 1] = '\0';
+                            }
+                            break;
+                        case SDLK_RETURN:
+                            SDL_StopTextInput();
+                            ip = false;
+                            port = false;
+                            tmp_surface = NULL;
+                            printf("IP: %s\n", app->ip);
+                            printf("Port: %s\n", app->port);
+                            break;
+                        case SDLK_F11:
+                            if (app->fullscreen) {
+                                SDL_SetWindowFullscreen(app->window, 0);
+                                app->fullscreen = false;
+                            } else {
+                                SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                                app->fullscreen = true;
+                            }
+                            // Makes space on the heap
+                            free(background);
+                            free(background1);
+                            free(background2);
+                            free(text1);
+                            free(text2);
+                            free(text3);
+                            free(exit_button);
+                            return JOIN_MULTIPLAYER;
+                        case SDLK_ESCAPE:
+                            return SELECT_GAME;
                     }
                 break;
             }
@@ -457,10 +478,29 @@ int join_multiplayer(App* app)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
+        if (ip && port) {
+            ip = false;
+            port = false;
+        }
         if (app->fullscreen) {
             render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
         } else {
             render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        }
+
+        if (app->ip[0] == '\0') {
+            tmp_surface = TTF_RenderText_Blended(font, "Enter IP", white);
+        } else if (app->ip[0] != '\0') {
+            tmp_surface = TTF_RenderText_Blended(font, app->ip, white);
+        } else if (app->port[0] == '\0') {
+            tmp_surface = TTF_RenderText_Blended(font, "Enter Port", white);
+        } else if (app->port[0] != '\0') {
+            tmp_surface = TTF_RenderText_Blended(font, app->port, white);
+        }
+        if (ip && tmp_surface != NULL) {
+            text1->texture = SDL_CreateTextureFromSurface(app->renderer, tmp_surface);
+        } else if (port && tmp_surface != NULL) {
+            text2->texture = SDL_CreateTextureFromSurface(app->renderer, tmp_surface);
         }
 
         render_item(app, &background1->rect, background1->texture, 230, 250, 500, 180);
@@ -498,7 +538,8 @@ int join_multiplayer(App* app)
     }
     return 0;
 }
-
+/*
+// Generates a texture from input text in join_multiplayer and adds input to app->ip/port.
 Screen_item* input_text(App* app, Screen_item* item)
 {
     SDL_Surface* surface = NULL;
@@ -515,7 +556,7 @@ Screen_item* input_text(App* app, Screen_item* item)
                     app->running = false;
                 break;
                 case SDL_TEXTINPUT:
-                    // Add new text onto the end of our text
+                    //TODO: Limit number of possible characters inserted.
                     if (item->rect.y < 420) {
                         strcat(app->ip, event.text.text);
                         surface = TTF_RenderText_Blended(font, app->ip, white);
@@ -537,13 +578,19 @@ Screen_item* input_text(App* app, Screen_item* item)
                     item->texture = SDL_CreateTextureFromSurface(app->renderer, surface);
                     }
                     if (item->texture == NULL) {
-                        SDL_Log("3 SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
+                        SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
                         app->running = false;
                         return item;
                     }
                 break;
                 case SDL_KEYDOWN:
-                    // enter key pressed?
+                    if(event.key.keysym.sym == SDLK_BACKSPACE && strlen(app->ip) > 0 ){
+                        char tmp[16];
+                        strncpy(tmp, app->ip, strlen(app->ip)-1);
+                        strcpy(app->ip, tmp);
+                        printf("%s\n", tmp);
+                        printf("%s\n", app->ip);
+                    }
                     if (event.key.keysym.sym == SDLK_RETURN) {
                         SDL_StopTextInput();
 
@@ -556,11 +603,12 @@ Screen_item* input_text(App* app, Screen_item* item)
                     }
                 break;
             }
-        }        
+        }
+        SDL_RenderClear(app->renderer);
+        render_item(app, &item->rect, item->texture, item->rect.x, item->rect.y, item->rect.w, item->rect.h);
     }
     return item;
 }
-/*
 int host_multiplayer(App* app, bool* fullscreen_bool)
 {
 
