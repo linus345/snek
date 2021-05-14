@@ -516,8 +516,10 @@ int join_multiplayer(App* app)
         SDL_RenderClear(app->renderer);
 
         if (ip && port) {
+            SDL_StopTextInput();
             ip = false;
             port = false;
+            tmp_surface = NULL;
         }
         if (app->fullscreen) {
             render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
@@ -525,13 +527,13 @@ int join_multiplayer(App* app)
             render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
 
-        if (app->ip[0] == '\0') {
+        if (app->ip[0] == '\0' && ip) {
             tmp_surface = TTF_RenderText_Blended(font, "Enter IP", white);
-        } else if (app->ip[0] != '\0') {
+        } else if (app->ip[0] != '\0' && ip) {
             tmp_surface = TTF_RenderText_Blended(font, app->ip, white);
-        } else if (app->port[0] == '\0') {
+        } else if (app->port[0] == '\0' && port) {
             tmp_surface = TTF_RenderText_Blended(font, "Enter Port", white);
-        } else if (app->port[0] != '\0') {
+        } else if (app->port[0] != '\0' && port) {
             tmp_surface = TTF_RenderText_Blended(font, app->port, white);
         }
         if (ip && tmp_surface != NULL) {
@@ -574,7 +576,7 @@ int join_multiplayer(App* app)
         SDL_GetMouseState(&Mx, &My);
     }
 }
-
+/*
 int host_multiplayer(App* app, bool* fullscreen_bool)
 {
 
