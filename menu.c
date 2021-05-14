@@ -825,7 +825,7 @@ int settings(App* app, SDL_Rect* r, bool* fullscreen)
         SDL_GetMouseState(&Mx, &My);
     }
 }
-
+*/
 int type_name(App* app, char name[])
 {
 
