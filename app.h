@@ -12,7 +12,7 @@ typedef struct App {
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_DisplayMode display;
-    char ip[16], port[5];
+    char ip[16], port[5], player_name[16];
 } App;
 
 App *init_app();

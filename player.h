@@ -10,6 +10,7 @@ typedef struct {
     int host;
     int port;
     Snake *snake;
+    char name[16];
 } Player;
 
 Player *new_player(int host, int port, int player_nr);
