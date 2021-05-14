@@ -261,7 +261,7 @@ int select_game_menu(App* app)
                     free(button3);
                     free(text3);
                     free(exit_button);
-                    return START_GAME;
+                    return TYPE_NAME;
 
                 } /* else if (hover_state(text2, Mx, My)) {
                     // Makes space on the heap
@@ -715,36 +715,57 @@ int settings(App* app, bool* fullscreen_bool)
 int type_name(App* app)
 {
     int Mx, My;
-    bool done = false;
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
     SDL_Surface* tmp_surface = NULL;
 
     Screen_item* background = menu_button_background(app, "./resources/background.png");
     Screen_item* button = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* text = NULL;
+    Screen_item* text = menu_button_text(app, "Enter name", font, white);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
-    SDL_StartTextInput();
-    SDL_Event event;
-    while (!done) {
-
-        printf("While loop\n");
-
+    while (app->running) {
+        SDL_Event event;
         if (SDL_PollEvent(&event)) {
-            printf("If-statement successful\n");
             switch (event.type) {
             case SDL_QUIT:
+                // exit main loop
                 app->running = false;
-                done = true;
                 break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(button, Mx, My)) {
+                    printf("Pressed\n");
+                    SDL_StartTextInput();
+                } else if (hover_state(exit_button, Mx, My)) {
+                    free(background);
+                    free(button);
+                    free(text);
+                    free(exit_button);
+                    return SELECT_GAME;
+                }
+                break;
+
             case SDL_TEXTINPUT:
-                if (strlen(app->player_name) < 15)
+                if (strlen(app->player_name) < 15) {
                     strcat(app->player_name, event.text.text);
+                }
+                printf("Text Input: %s\n", app->player_name);
                 break;
+
             case SDL_KEYDOWN:
-                // enter key pressed?
                 switch (event.key.keysym.sym) {
+
+                case SDLK_BACKSPACE:
+                    if (strlen(app->player_name) > 0) {
+                        app->player_name[strlen(app->player_name) - 1] = '\0';
+                    }
+                    break;
+                case SDLK_RETURN:
+                    SDL_StopTextInput();
+                    tmp_surface = NULL;
+                    printf("Name: %s\n", app->player_name);
+                    return START_GAME;
+                    break;
                 case SDLK_F11:
                     if (app->fullscreen) {
                         SDL_SetWindowFullscreen(app->window, 0);
@@ -764,56 +785,47 @@ int type_name(App* app)
                     free(button);
                     free(text);
                     free(exit_button);
-                    return SELECT_GAME;
-                    break;
-                case SDL_MOUSEBUTTONDOWN:
-                    if (hover_state(exit_button, Mx, My)) {
-                        return SELECT_GAME;
-                    }
-                    break;
+                    return TYPE_NAME;
                 }
+                break;
             }
-            // clear screen before next render
-            SDL_RenderClear(app->renderer);
+        }
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
 
-            if (app->fullscreen) {
-                render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
-            } else {
-                render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-            }
-
-            if (app->player_name[0] == '\0') {
-                tmp_surface = TTF_RenderText_Blended(font, "Enter name", white);
-            } else if (app->player_name[0] != '\0') {
-                tmp_surface = TTF_RenderText_Blended(font, app->ip, white);
-            }
-
-            render_item(app, &button->rect, button->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
-            render_item(app, &text->rect, text->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
-            render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
-
-            if (hover_state(exit_button, Mx, My)) {
-                SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
-
-            } else {
-                SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
-            }
-
-            // present on screen
-            SDL_RenderPresent(app->renderer);
-
-            SDL_Delay(1000 / 60);
-            SDL_GetMouseState(&Mx, &My);
+        if (app->fullscreen) {
+            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
+        } else {
+            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
 
-        SDL_StopTextInput();
+        if (app->player_name[0] == '\0') {
+            tmp_surface = TTF_RenderText_Blended(font, "Enter name", white);
+        } else if (app->player_name[0] != '\0') {
+            tmp_surface = TTF_RenderText_Blended(font, app->player_name, white);
+        }
 
-        // Makes space on the heap
-        free(background);
-        free(button);
-        free(text);
-        free(exit_button);
+        if (tmp_surface != 0) {
+            text->texture = SDL_CreateTextureFromSurface(app->renderer, tmp_surface);
+        } else if (tmp_surface == NULL) {
+            printf("%s\n", SDL_GetError());
+        }
 
-        return START_GAME;
+        render_item(app, &button->rect, button->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
+        render_item(app, &text->rect, text->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
+        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
+
+        if (hover_state(exit_button, Mx, My)) {
+            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
+
+        } else {
+            SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
+        }
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
     }
 }

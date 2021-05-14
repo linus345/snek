@@ -11,14 +11,6 @@
 #include "player.h"
 #include <SDL2/SDL_image.h>
 
-SDL_Color
-    black
-    = { 0, 0, 0, 255 },
-    gray = { 127, 127, 127, 255 },
-    white = { 255, 255, 255, 255 },
-    green = { 45, 93, 9, 255 },
-    dark_green = { 9, 34, 3, 255 };
-
 void load_texture(App* app, SDL_Texture** texture, char* path)
 {
     printf("Loading texture: %s\n", path);
@@ -115,7 +107,7 @@ int game(App* app)
 
     SDL_Texture* fruit_sprite_tex;
     load_texture(app, &fruit_sprite_tex, "./resources/fruit-sprite.png");
-
+    printf("Checkpoint\n");
     // background texture
     SDL_Texture* background_tex;
     load_texture(app, &background_tex, "./resources/background.png");
@@ -124,27 +116,29 @@ int game(App* app)
     // Scoreboard texture
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
+    SDL_Color white_txt = { 255, 255, 255, 255 };
+
     SDL_Texture* background_sb_tex;
     load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
-    SDL_Rect background_sb_dst = { 0, 0, 250, fullscreen_game.h };
-
-    Screen_item* goal_text = menu_button_text(app, "Goal", font, white);
-    Screen_item* goal_nr = menu_button_text(app, "250", font, white);
-
+    SDL_Rect background_sb_dst = { 0, 0, 250, fullscreen_game.h};
+    printf("Checkpoint\n");
+    Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
+    Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
+    
     Screen_item* scoreboard1 = menu_button_background(app, "./resources/menuButton.png");
     Screen_item* scoreboard2 = menu_button_background(app, "./resources/menuButton.png");
     Screen_item* scoreboard3 = menu_button_background(app, "./resources/menuButton.png");
     Screen_item* scoreboard4 = menu_button_background(app, "./resources/menuButton.png");
 
-    Screen_item* player1_name = menu_button_text(app, app->player_name, font, white);
-    Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white);
-    Screen_item* player3_name = menu_button_text(app, "Victor", font, white);
-    Screen_item* player4_name = menu_button_text(app, "Alma", font, white);
+    Screen_item* player1_name = menu_button_text(app, app->player_name, font, white_txt);
+    Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white_txt);
+    Screen_item* player3_name = menu_button_text(app, "Victor", font, white_txt);
+    Screen_item* player4_name = menu_button_text(app, "Alma", font, white_txt);
 
-    Screen_item* player1_score = menu_button_text(app, "", font, white);
-    Screen_item* player2_score = menu_button_text(app, "", font, white);
-    Screen_item* player3_score = menu_button_text(app, "", font, white);
-    Screen_item* player4_score = menu_button_text(app, "", font, white);
+    Screen_item* player1_score = menu_button_text(app, "", font, white_txt);
+    Screen_item* player2_score = menu_button_text(app, "", font, white_txt);
+    Screen_item* player3_score = menu_button_text(app, "", font, white_txt);
+    Screen_item* player4_score = menu_button_text(app, "", font, white_txt);
 
     char buffer[50];
 
@@ -271,7 +265,7 @@ int game(App* app)
 
             sprintf(buffer, "%d", player1->points);
 
-            player1_score = menu_button_text(app, buffer, font, white);
+            player1_score = menu_button_text(app, buffer, font, white_txt);
 
             printf("speed: %d\n", player1->snake->speed);
         }
