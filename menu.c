@@ -749,7 +749,6 @@ int type_name(App* app)
                 if (strlen(app->player_name) < 15) {
                     strcat(app->player_name, event.text.text);
                 }
-                printf("Text Input: %s\n", app->player_name);
                 break;
 
             case SDL_KEYDOWN:

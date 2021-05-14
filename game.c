@@ -10,6 +10,7 @@
 #include "menu.h"
 #include "player.h"
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 void load_texture(App* app, SDL_Texture** texture, char* path)
 {
@@ -121,7 +122,7 @@ int game(App* app)
     SDL_Texture* background_sb_tex;
     load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
     SDL_Rect background_sb_dst = { 0, 0, 250, fullscreen_game.h};
-    printf("Checkpoint\n");
+
     Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
     

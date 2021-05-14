@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "app.h"
-#include "menu.h"
+
 #define CELL_SIZE 32
 
 #define MAX_PLAYERS 4
