@@ -377,4 +377,23 @@ int game(App* app, char* name)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
-}
+    //Renders an item on the screen.
+    void render_item(App * app, SDL_Rect * rect, SDL_Texture * texture, int x, int y, int w, int h)
+    {
+        rect->x = x;
+        rect->y = y;
+        rect->w = w;
+        rect->h = h;
+        if (app->fullscreen) {
+            optimizeFullscreen(app, rect);
+        }
+        SDL_RenderCopy(app->renderer, texture, NULL, rect);
+    }
+
+    //Converts the size and coordinates of an SDL_Rect to fit fullscreen.
+    void optimizeFullscreen(App * app, SDL_Rect * rect)
+    {
+        rect->x = (app->display.w / 2) - (rect->w / 2);
+        rect->y = rect->y * (app->display.h / WINDOW_HEIGHT);
+        return;
+    }

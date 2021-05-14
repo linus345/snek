@@ -18,7 +18,7 @@
 
 int main(int argc, char* argv[])
 {
-    char ip_adress[16], port[5], name[50];
+    char name[50];
     strcpy(name, " ");
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -32,7 +32,11 @@ int main(int argc, char* argv[])
         return 2;
     }
     printf("successfully initialized SDL_net\n");
-
+    if (TTF_Init() != 0) {
+        SDL_Log("TTF_Init failed: %s", SDL_GetError());
+        return 3;
+    }
+    printf("successfully initialized TTF\n");
     srand(time(NULL));
 
     App* app = init_app();
@@ -44,7 +48,7 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    menu(app, ip_adress, port, name);
+    menu(app, name);
 
     TTF_Quit();
     quit_app(app);

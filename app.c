@@ -4,10 +4,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include "app.h"
+#include "menu.h"
 
-App *init_app()
-{
-    // allocate enough memory on the heap
+App *init_app() {
+
+    // Allocate memory for the core program features
     App *app = malloc(sizeof(App));
 
     // initialize window
@@ -30,8 +31,22 @@ App *init_app()
         exit(EXIT_FAILURE);
     }
 
+    // Collects information about current monitor.
+    if (SDL_GetCurrentDisplayMode(0, &app->display) != 0) {
+        // print error
+        fprintf(stderr, "Error while calling SDL_DisplayMode: %s\n", SDL_GetError());
+        // exit with failure
+        exit(EXIT_FAILURE);
+    }
+    char tmp[1] = "";
+    strcpy(app->ip, tmp);
+    strcpy(app->port, tmp);
+
     // indicate that the app is running, used for main loop
     app->running = true;
+
+    // Indicates wether applicatication is in fullscreen or not
+    app->fullscreen = false;
 
     // return pointer
     return app;
@@ -46,6 +61,7 @@ void quit_app(App *app)
     
     // cleanup subsystems before exiting
     SDLNet_Quit();
+    TTF_Quit();
     SDL_Quit();
 
     // successfully exit
