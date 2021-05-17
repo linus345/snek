@@ -13,7 +13,5 @@ Player *new_player(int host, int port, int player_nr)
     player->port = port;
     player->snake = new_snake(player_nr);
 
-    char player_name[15];
-
     return player;
 }
