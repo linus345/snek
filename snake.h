@@ -6,6 +6,8 @@
 #define MAX_SNAKE_LENGTH 256
 #define SPEED 500      // ms
 
+#define GAME_START_POS 250
+
 typedef struct {
     int angle;
     bool is_turn;

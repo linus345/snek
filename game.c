@@ -1,4 +1,6 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -9,8 +11,7 @@
 #include "game.h"
 #include "menu.h"
 #include "player.h"
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+
 
 void load_texture(App* app, SDL_Texture** texture, char* path)
 {
@@ -121,11 +122,11 @@ int game(App* app)
 
     SDL_Texture* background_sb_tex;
     load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
-    SDL_Rect background_sb_dst = { 0, 0, 250, fullscreen_game.h};
+    SDL_Rect background_sb_dst = { 0, 0, 250, fullscreen_game.h };
 
     Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
-    
+
     Screen_item* scoreboard1 = menu_button_background(app, "./resources/menuButton.png");
     Screen_item* scoreboard2 = menu_button_background(app, "./resources/menuButton.png");
     Screen_item* scoreboard3 = menu_button_background(app, "./resources/menuButton.png");
@@ -136,10 +137,10 @@ int game(App* app)
     Screen_item* player3_name = menu_button_text(app, "Victor", font, white_txt);
     Screen_item* player4_name = menu_button_text(app, "Alma", font, white_txt);
 
-    Screen_item* player1_score = menu_button_text(app, "", font, white_txt);
-    Screen_item* player2_score = menu_button_text(app, "", font, white_txt);
-    Screen_item* player3_score = menu_button_text(app, "", font, white_txt);
-    Screen_item* player4_score = menu_button_text(app, "", font, white_txt);
+    Screen_item* player1_score = menu_button_text(app, " ", font, white_txt);
+    Screen_item* player2_score = menu_button_text(app, " ", font, white_txt);
+    Screen_item* player3_score = menu_button_text(app, " ", font, white_txt);
+    Screen_item* player4_score = menu_button_text(app, " ", font, white_txt);
 
     char buffer[50];
 
@@ -155,7 +156,6 @@ int game(App* app)
     int Mx, My;
     int speed = 100000;
     while (app->running) {
-
         SDL_Event event;
         // check for event
         while (SDL_PollEvent(&event)) {
@@ -360,7 +360,7 @@ int game(App* app)
         render_item(app, &player3_name->rect, player3_name->texture, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
         render_item(app, &player4_name->rect, player4_name->texture, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
 
-        render_item(app, &return_button->rect, return_button->texture, 150, 65, 70, 70);
+        render_item(app, &return_button->rect, return_button->texture, 1213, 10, 35, 35);
 
         // render fruits
         for (int i = 0; i < nr_of_fruits; i++) {

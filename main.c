@@ -17,6 +17,10 @@
 
 int main(int argc, char* argv[])
 {
+    // int game
+    // start game
+    // end game
+
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
         return 1;
