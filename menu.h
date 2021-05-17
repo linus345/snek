@@ -22,7 +22,8 @@ enum Menu_selection {
     JOIN_MULTIPLAYER = 12,
     HIGH_SCORE = 20,
     SETTINGS = 30,
-    START_GAME = 100
+    START_GAME = 100,
+    TYPE_NAME = 420
 };
 
 //Standard dimensions for menu button backgrounds and texts.
@@ -51,5 +52,6 @@ int join_multiplayer (App* app);
 int host_multiplayer (App* app);
 int high_score (App* app);
 int settings (App* app);
+int type_name(App* app);
 
 #endif
