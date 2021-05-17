@@ -26,18 +26,6 @@ enum Menu_selection {
     TYPE_NAME = 420
 };
 
-//Standard dimensions for menu button backgrounds and texts.
-enum Button_dimensions {
-    BUTTON_X = 300,
-    BUTTON_Y = 400,
-    BUTTON_W = 360,
-    BUTTON_H = 150,
-    TEXT_X = 337,
-    TEXT_Y = 430,
-    TEXT_W = 290,
-    TEXT_H = 90,
-};
-
 void menu_init(App* app, SDL_Texture* background, SDL_Texture* newGame, SDL_Texture* exit);
 SDL_Color color_select (int selection);
 Screen_item* menu_button_background (App* app, char resource[]);

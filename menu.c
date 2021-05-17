@@ -1,14 +1,15 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "app.h"
 #include "game.h"
 #include "menu.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+#include "rendering.h"
 
 SDL_Color
     black
@@ -180,19 +181,14 @@ int main_menu(App* app)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        if (app->fullscreen) {
-            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
-        } else {
-            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        }
-
-        render_item(app, &button1->rect, button1->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
-        render_item(app, &text1->rect, text1->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
-        render_item(app, &button2->rect, button2->texture, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H);
-        render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, app->display.w, app->display.h);
+        render_item(app, &button1->rect, button1->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
+        render_item(app, &text1->rect, text1->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
+        render_item(app, &button2->rect, button2->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
+        render_item(app, &text2->rect, text2->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H);
+        render_item(app, &button3->rect, button3->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H);
+        render_item(app, &text3->rect, text3->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
+        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
@@ -328,20 +324,15 @@ int select_game_menu(App* app)
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-
-        if (app->fullscreen) {
-            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
-        } else {
-            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        }
-
-        render_item(app, &button1->rect, button1->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
-        render_item(app, &text1->rect, text1->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
-        render_item(app, &button2->rect, button2->texture, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text2->rect, text2->texture, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H);
-        render_item(app, &button3->rect, button3->texture, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
+        
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, app->display.w, app->display.h);
+        render_item(app, &button1->rect, button1->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
+        render_item(app, &text1->rect, text1->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
+        render_item(app, &button2->rect, button2->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
+        render_item(app, &text2->rect, text2->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H);
+        render_item(app, &button3->rect, button3->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H);
+        render_item(app, &text3->rect, text3->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
+        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
@@ -490,11 +481,6 @@ int join_multiplayer(App* app)
             port = false;
             tmp_surface = NULL;
         }
-        if (app->fullscreen) {
-            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
-        } else {
-            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        }
 
         if (app->ip[0] == '\0' && ip) {
             tmp_surface = TTF_RenderText_Blended(font, "Enter IP", white);
@@ -511,13 +497,14 @@ int join_multiplayer(App* app)
             text2->texture = SDL_CreateTextureFromSurface(app->renderer, tmp_surface);
         }
 
-        render_item(app, &background1->rect, background1->texture, 230, 250, 500, 180);
-        render_item(app, &background2->rect, background2->texture, 300, 390, 360, 150);
-        render_item(app, &button->rect, button->texture, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H);
-        render_item(app, &text1->rect, text1->texture, 280, 290, 410, 110);
-        render_item(app, &text2->rect, text2->texture, 350, 420, 250, 90);
-        render_item(app, &text3->rect, text3->texture, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        render_item(app, &background1->rect, background1->texture, MENU_BUTTON, 230, 250, 500, 180);
+        render_item(app, &background2->rect, background2->texture, MENU_BUTTON, 300, 390, 360, 150);
+        render_item(app, &button->rect, button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H);
+        render_item(app, &text1->rect, text1->texture, MENU_BUTTON, 280, 290, 410, 110);
+        render_item(app, &text2->rect, text2->texture, MENU_BUTTON, 350, 420, 250, 90);
+        render_item(app, &text3->rect, text3->texture, MENU_BUTTON, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H);
+        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text3, Mx, My)) {
@@ -791,12 +778,7 @@ int type_name(App* app)
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-
-        if (app->fullscreen) {
-            render_item(app, &background->rect, background->texture, 0, 0, app->display.w, app->display.h);
-        } else {
-            render_item(app, &background->rect, background->texture, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        }
+        
 
         if (app->player_name[0] == '\0') {
             tmp_surface = TTF_RenderText_Blended(font, "Enter name", white);
@@ -810,9 +792,10 @@ int type_name(App* app)
             printf("%s\n", SDL_GetError());
         }
 
-        render_item(app, &button->rect, button->texture, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
-        render_item(app, &text->rect, text->texture, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
-        render_item(app, &exit_button->rect, exit_button->texture, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        render_item(app, &button->rect, button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
+        render_item(app, &text->rect, text->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
+        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
 
         if (hover_state(exit_button, Mx, My)) {
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);

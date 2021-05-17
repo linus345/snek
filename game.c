@@ -11,6 +11,7 @@
 #include "game.h"
 #include "menu.h"
 #include "player.h"
+#include "rendering.h"
 
 
 void load_texture(App* app, SDL_Texture** texture, char* path)
@@ -28,27 +29,6 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
         fprintf(stderr, "error creating texture\n");
         exit(EXIT_FAILURE);
     }
-}
-
-//Renders an item on the screen.
-void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int x, int y, int w, int h)
-{
-    rect->x = x;
-    rect->y = y;
-    rect->w = w;
-    rect->h = h;
-    if (app->fullscreen) {
-        optimizeFullscreen(app, rect);
-    }
-    SDL_RenderCopy(app->renderer, texture, NULL, rect);
-}
-
-//Converts the size and coordinates of an SDL_Rect to fit fullscreen.
-void optimizeFullscreen(App* app, SDL_Rect* rect)
-{
-    rect->x = (app->display.w / 2) - (rect->w / 2);
-    rect->y = rect->y * (app->display.h / WINDOW_HEIGHT);
-    return;
 }
 
 int game(App* app)
@@ -345,22 +325,22 @@ int game(App* app)
         SDL_RenderCopy(app->renderer, background_sb_tex, NULL, &background_sb_dst);
         SDL_RenderCopy(app->renderer, background_menu_tex, NULL, &background_menu_dst);
 
-        render_item(app, &goal_text->rect, goal_text->texture, 0, 0, 50, 50);
-        render_item(app, &goal_nr->rect, goal_nr->texture, 194, 0, 50, 50);
+        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, 0, 0, 50, 50);
+        render_item(app, &goal_nr->rect, goal_nr->texture, UNSPECIFIED, 194, 0, 50, 50);
 
-        render_item(app, &scoreboard1->rect, scoreboard1->texture, SD_BUTTON_X, SD_BUTTON_Y, SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard2->rect, scoreboard2->texture, SD_BUTTON_X, SD_BUTTON_Y + Y_OFFSET, SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard3->rect, scoreboard3->texture, SD_BUTTON_X, SD_BUTTON_Y + (2 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard4->rect, scoreboard4->texture, SD_BUTTON_X, SD_BUTTON_Y + (3 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y, SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + Y_OFFSET, SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scoreboard3->rect, scoreboard3->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (2 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scoreboard4->rect, scoreboard4->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (3 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
 
-        render_item(app, &player1_name->rect, player1_name->texture, NAME_X, NAME_Y, NAME_W, NAME_H);
-        render_item(app, &player1_score->rect, player1_score->texture, SCORE_X, SCORE_Y, SCORE_W, SCORE_H);
+        render_item(app, &player1_name->rect, player1_name->texture, UNSPECIFIED, NAME_X, NAME_Y, NAME_W, NAME_H);
+        render_item(app, &player1_score->rect, player1_score->texture, UNSPECIFIED, SCORE_X, SCORE_Y, SCORE_W, SCORE_H);
 
-        render_item(app, &player2_name->rect, player2_name->texture, NAME_X, NAME_Y + Y_OFFSET, NAME_W, NAME_H);
-        render_item(app, &player3_name->rect, player3_name->texture, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
-        render_item(app, &player4_name->rect, player4_name->texture, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
+        render_item(app, &player2_name->rect, player2_name->texture, UNSPECIFIED, NAME_X, NAME_Y + Y_OFFSET, NAME_W, NAME_H);
+        render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
+        render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
 
-        render_item(app, &return_button->rect, return_button->texture, 1213, 10, 35, 35);
+        render_item(app, &return_button->rect, return_button->texture, UNSPECIFIED, 1213, 10, 35, 35);
 
         // render fruits
         for (int i = 0; i < nr_of_fruits; i++) {

@@ -46,7 +46,7 @@ App *init_app() {
     app->running = true;
 
     // Indicates wether applicatication is in fullscreen or not
-    app->fullscreen = false;
+    app->fullscreen = true;
 
     // return pointer
     return app;
