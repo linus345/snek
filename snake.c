@@ -125,7 +125,7 @@ void change_snake_velocity(Snake *snake)
     }
 }
 
-void new_snake_pos(Snake *snake)
+void new_snake_pos(Snake *snake, bool should_update_head)
 {
     // update tail position
     snake->tail.pos.x = snake->body[snake->body_length-1].pos.x;
@@ -208,13 +208,7 @@ void new_snake_pos(Snake *snake)
     snake->body[0].angle = snake->head.angle;
 
     // update head position
-    if(snake->head.next_pos.x > -1 && snake->head.next_pos.y > -1) {
-        snake->head.pos.x = snake->head.next_pos.x;
-        snake->head.pos.y = snake->head.next_pos.y;
-
-        snake->head.next_pos.x = -1;
-        snake->head.next_pos.y = -1;
-    } else {
+    if(should_update_head) {
         snake->head.pos.x += snake->vel_x;
         snake->head.pos.y += snake->vel_y;
     }

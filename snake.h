@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "game.h"
 #define MAX_SNAKE_LENGTH 256
-#define SPEED 1000      // ms
+#define SPEED 500      // ms
 
 typedef struct {
     int angle;
@@ -47,7 +47,7 @@ typedef struct {
 
 Snake *new_snake(int id);
 void change_snake_velocity(Snake *snake);
-void new_snake_pos(Snake *snake);
+void new_snake_pos(Snake *snake, bool should_update_head);
 Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_length);
 bool collison_with_wall(Snake *snake);
 bool collison_with_snake(Snake *snake);
