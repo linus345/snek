@@ -59,7 +59,8 @@ void quit_app(App *app) {
     SDL_DestroyWindow(app->window);
     SDL_DestroyRenderer(app->renderer);
     
-    // cleanup subsystems before exiting
+    // cleanup subsystems before exiting'
+    Mix_CloseAudio();
     SDLNet_Quit();
     TTF_Quit();
     SDL_Quit();
