@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -93,6 +94,8 @@ int main_menu(App* app)
 {
     int Mx, My;
 
+    Mix_Chunk *press_effect = Mix_LoadWAV("./resources/adventure.otf");
+
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
     Screen_item* background = menu_button_background(app, "./resources/background.png");
@@ -115,6 +118,7 @@ int main_menu(App* app)
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(text1, Mx, My)) {
+                    load_sound
                     // Makes space on the heap
                     free(background);
                     free(button1);

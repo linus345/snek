@@ -2,6 +2,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -39,8 +41,13 @@ int main(int argc, char* argv[])
     printf("successfully initialized TTF\n");
     srand(time(NULL));
 
-    App* app = init_app();
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        fprintf(stderr, "Error: SDLNet_Init: %s\n", SDLNet_GetError());
+        return 4;
+    }
     
+    App* app = init_app();
+
     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     TTF_Init();
     if (TTF_Init == NULL || SDL_SetWindowFullscreen == NULL) {
