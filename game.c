@@ -13,7 +13,6 @@
 #include "player.h"
 #include "rendering.h"
 
-
 void load_texture(App* app, SDL_Texture** texture, char* path)
 {
     printf("Loading texture: %s\n", path);
@@ -209,6 +208,7 @@ int game(App* app, Sound_effects* sound)
 
         // Checks if any collisons has occured with the walls
         if (collison_with_wall(player1->snake)) {
+            play_sound(sound->wall_collison); // plays wall collison sound effect
             app->running = false;
         }
         // Checks if any collisons has occured with a snake
@@ -247,6 +247,8 @@ int game(App* app, Sound_effects* sound)
             sprintf(buffer, "%d", player1->points);
 
             player1_score = menu_button_text(app, buffer, font, white_txt);
+
+            play_sound(sound->eat); // plays eat sound effect
 
             printf("speed: %d\n", player1->snake->speed);
         }

@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "app.h"
+#include "sound.h"
 
 #define CELL_SIZE 32
 

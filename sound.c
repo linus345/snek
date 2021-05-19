@@ -14,9 +14,8 @@ Sound_effects* int_sounds()
     sound->back = Mix_LoadWAV("./resources/Sound Effects/VALENTINE_whip_one_shot_high.wav");
 
     // Game sound effects
-    sound->eat = Mix_LoadWAV("");
-    sound->wall_collison = Mix_LoadWAV("");
-
+    sound->eat = Mix_LoadWAV("./resources/Sound Effects/Eat_effect.wav");
+    sound->wall_collison = Mix_LoadWAV("./resources/Sound Effects/Slap effect.wav");
 
     return sound;
 }
@@ -26,10 +25,11 @@ void play_sound(Mix_Chunk* sound)
     Mix_PlayChannel(-1, sound, 0);
 }
 
-
 void free_sound_effects(Sound_effects* sound)
 {
     Mix_FreeChunk(sound->press);
     Mix_FreeChunk(sound->hover);
     Mix_FreeChunk(sound->back);
+    Mix_FreeChunk(sound->eat);
+    Mix_FreeChunk(sound->wall_collison);
 }
