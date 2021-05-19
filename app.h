@@ -7,6 +7,11 @@
 #define WINDOW_HEIGHT 960
 
 typedef struct {
+    int x;
+    int y;
+} Pos;
+
+typedef struct {
     bool running;
     SDL_Window *window;
     SDL_Renderer *renderer;

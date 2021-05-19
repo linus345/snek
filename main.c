@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
     load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
 
     // intilaze fruits array
-    Fruit *fruits[MAX_PLAYERS];
-    int nr_of_fruits = 0;
+    //Fruit *fruits[MAX_PLAYERS];
+    //int nr_of_fruits = 0;
     //bool start_up_fruit = true;
 
     Pos fruit_texture[4];
@@ -145,6 +145,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
+    printf("here\n");
 
     //////////////////////////////////
 
@@ -230,15 +231,15 @@ int main(int argc, char *argv[])
             // update snake velocity based on direction state
             change_snake_velocity(players[game_state->client_id]->snake);
             new_snake_pos(players[game_state->client_id]->snake, true);
-            head_adjecent_with_fruit(&players[game_state->client_id]->snake->head, fruits, nr_of_fruits);
+            head_adjecent_with_fruit(&players[game_state->client_id]->snake->head, game_state->fruits, game_state->nr_of_fruits);
             send_snake_position(udp_sock, server_addr, pack_send, players[game_state->client_id]);
             game_state->last_time = game_state->current_time;
         }
 
         // temporarily disable fruit collision TODO
-        /* if(fruit_collision(players[client_id]->snake, fruits, nr_of_fruits)) { */
-        /*     free(fruits[nr_of_fruits-1]); */
-        /*     nr_of_fruits--; */
+        /* if(fruit_collision(players[client_id]->snake, game_state->fruits, game_state->nr_of_fruits)) { */
+        /*     free(game_state->fruits[game_state->nr_of_fruits-1]); */
+        /*     game_state->nr_of_fruits--; */
         /*     new_snake_body_part(&players[client_id]->snake->body[players[client_id]->snake->body_length-1].pos, */ 
         /*         players[client_id]->snake->body[players[client_id]->snake->body_length-1].angle, */
         /*         &players[client_id]->snake->body_length); */
@@ -249,22 +250,25 @@ int main(int argc, char *argv[])
         SDL_Rect fruit_src[MAX_PLAYERS];
         SDL_Rect fruit_dst[MAX_PLAYERS];
 
-        Fruit *temp_fruit = NULL;
+        /*Fruit *temp_fruit = NULL;
         if(nr_of_fruits < game_state->nr_of_players) {
             // spawn new fruit
             while(temp_fruit == NULL) {
-                temp_fruit = new_fruit(fruits, nr_of_fruits, players[game_state->client_id]->snake);
+                //temp_fruit = new_fruit(fruits, nr_of_fruits, players[game_state->client_id]->snake);
             }
             fruits[nr_of_fruits++] = temp_fruit;
-        }
-        for (int i = 0; i < nr_of_fruits; i++) {
-            fruit_src[i].x = fruit_texture[fruits[i]->type].x;
-            fruit_src[i].y = fruit_texture[fruits[i]->type].y;
+        }*/
+        for (int i = 0; i < game_state->nr_of_fruits; i++) {
+            if(game_state->fruits[i] == NULL) {
+                continue;
+            }
+            fruit_src[i].x = fruit_texture[game_state->fruits[i]->type].x;
+            fruit_src[i].y = fruit_texture[game_state->fruits[i]->type].y;
             fruit_src[i].w = CELL_SIZE;
             fruit_src[i].h = CELL_SIZE;
 
-            fruit_dst[i].x = fruits[i]->pos.x;
-            fruit_dst[i].y = fruits[i]->pos.y;
+            fruit_dst[i].x = game_state->fruits[i]->pos.x;
+            fruit_dst[i].y = game_state->fruits[i]->pos.y;
             fruit_dst[i].w = CELL_SIZE;
             fruit_dst[i].h = CELL_SIZE;
         }
@@ -275,7 +279,7 @@ int main(int argc, char *argv[])
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
         // render fruits
-        for (int i = 0; i < nr_of_fruits; i++) {
+        for (int i = 0; i < game_state->nr_of_fruits; i++) {
             SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
         }
         // render all snakes

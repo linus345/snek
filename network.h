@@ -2,6 +2,7 @@
 #define NETWORK_H
 
 #include <SDL2/SDL_net.h>
+#include "game.h"
 #include "snake.h"
 #include "player.h"
 #include "circular_buffer.h"

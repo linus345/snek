@@ -14,6 +14,7 @@ Game_State *init_game_state()
     game_state->nr_of_players = 0;
     game_state->connected = false;
     game_state->last_time = 0;
+    game_state->nr_of_fruits = 0;
 
     return game_state;
 }

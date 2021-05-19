@@ -1,21 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <SDL2/SDL_net.h>
 #include <SDL2/SDL_image.h>
 #include "app.h"
 #include "fruit.h"
 #include "game.h"
 #include "snake.h"
 
-Fruit *new_fruit(Fruit *fruits[], int nr_of_fruits, Snake *snake)
+Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, int nr_of_fruits, Snake *snake)
 {
     Fruit *fruit = malloc(sizeof(Fruit));
 
     // generate random position
-    fruit->pos.x = (rand() % (WINDOW_WIDTH / CELL_SIZE)) * CELL_SIZE;
-    fruit->pos.y = (rand() % (WINDOW_HEIGHT / CELL_SIZE)) * CELL_SIZE;
+    fruit->pos.x = (random_x % (WINDOW_WIDTH / CELL_SIZE)) * CELL_SIZE;
+    fruit->pos.y = (random_y % (WINDOW_HEIGHT / CELL_SIZE)) * CELL_SIZE;
     // generate random fruit type
-    fruit->type = rand() % 4;
+    fruit->type = random_type % 4;//rand() % 4;
     // different points based on fruit type
     switch(fruit->type) {
         case Cherry:
@@ -58,6 +59,20 @@ Fruit *new_fruit(Fruit *fruits[], int nr_of_fruits, Snake *snake)
     }
     
     return fruit;
+}
+
+void get_fruit_pos_and_spawn(UDPpacket *pack_recv, Fruit *fruits[], int *nr_of_fruits, Snake *snake)
+{
+    // get data from packet
+    int type, random_x, random_y, random_type;
+    sscanf(pack_recv->data, "%d %d %d %d", &type, &random_x, &random_y, &random_type);
+
+    // create new fruit
+    do {
+        fruits[*nr_of_fruits] = new_fruit(fruits, random_x, random_y, random_type, *nr_of_fruits, snake);
+    } while(fruits[*nr_of_fruits] == NULL);
+    // increment nr_of_fruits
+    (*nr_of_fruits)++;
 }
 
 bool fruit_collision(Snake *snake, Fruit *fruits[], int nr_of_fruits)

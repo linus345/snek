@@ -2,7 +2,7 @@
 #define SNAKE_H
 
 #include <stdbool.h>
-#include "game.h"
+#include "app.h"
 #define MAX_SNAKE_LENGTH 256
 #define SPEED 500      // ms
 
