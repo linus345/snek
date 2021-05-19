@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Error: SDLNet_Init: %s\n", SDLNet_GetError());
         return 4;
     }
-    
+
     App* app = init_app();
 
     SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);

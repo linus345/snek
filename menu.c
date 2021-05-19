@@ -98,6 +98,8 @@ int main_menu(App* app)
     Mix_Chunk* press_effect = Mix_LoadWAV("./resources/Button_press_effect.wav");
     Mix_Chunk* hover_effect = Mix_LoadWAV("./resources/Hover_effect.wav");
 
+    bool playsound = true;
+
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
     Screen_item* background = menu_button_background(app, "./resources/background.png");
@@ -202,19 +204,36 @@ int main_menu(App* app)
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
-            //Mix_PlayChannel(-1, hover_effect, 0);
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
 
         } else if (hover_state(text2, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
 
         } else if (hover_state(text3, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
 
         } else if (hover_state(exit_button, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
 
         } else {
+            if (!playsound) // Makes sure the sound effect only plays once
+                playsound = true;
             SDL_SetTextureColorMod(text1->texture, 45, 93, 9);
             SDL_SetTextureColorMod(text2->texture, 45, 93, 9);
             SDL_SetTextureColorMod(text3->texture, 45, 93, 9);
@@ -236,6 +255,9 @@ int select_game_menu(App* app)
     int Mx, My;
 
     Mix_Chunk* press_effect = Mix_LoadWAV("./resources/Button_press_effect.wav");
+    Mix_Chunk* hover_effect = Mix_LoadWAV("./resources/Hover_effect.wav");
+
+    bool playsound = true;
 
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
@@ -353,17 +375,36 @@ int select_game_menu(App* app)
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
 
         } else if (hover_state(text2, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
 
         } else if (hover_state(text3, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
 
         } else if (hover_state(exit_button, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
         } else {
+            if (!playsound) { // Makes sure the sound effect only plays once
+                playsound = true;
+            }
             SDL_SetTextureColorMod(text1->texture, 45, 93, 9);
             SDL_SetTextureColorMod(text2->texture, 45, 93, 9);
             SDL_SetTextureColorMod(text3->texture, 45, 93, 9);
@@ -384,8 +425,11 @@ int join_multiplayer(App* app)
 {
 
     int Mx, My;
-    bool ip = false, port = false;
+    bool ip = false, port = false, playsound = true;
+
     Mix_Chunk* press_effect = Mix_LoadWAV("./resources/Button_press_effect.wav");
+    Mix_Chunk* hover_effect = Mix_LoadWAV("./resources/Hover_effect.wav");
+
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
     SDL_Surface* tmp_surface = NULL;
 
@@ -529,17 +573,36 @@ int join_multiplayer(App* app)
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text3, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
 
         } else if (hover_state(exit_button, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
 
         } else if (hover_state(text1, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text1->texture, 127, 127, 127);
 
         } else if (hover_state(text2, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(text2->texture, 127, 127, 127);
         } else {
+            if (!playsound) { // Makes sure the sound effect only plays once
+                playsound = true;
+            }
             SDL_SetTextureColorMod(text3->texture, 45, 93, 9);
             SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
             SDL_SetTextureColorMod(text1->texture, 255, 255, 255);
@@ -724,8 +787,13 @@ int type_name(App* app)
 {
     int Mx, My;
 
+    bool playsound = true;
+
     Mix_Music* backgroundSound = Mix_LoadMUS("./resources/Test.wav");
+
     Mix_Chunk* press_effect = Mix_LoadWAV("./resources/Button_press_effect.wav");
+    Mix_Chunk* hover_effect = Mix_LoadWAV("./resources/Hover_effect.wav");
+
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
     SDL_Surface* tmp_surface = NULL;
 
@@ -831,9 +899,16 @@ int type_name(App* app)
         render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
 
         if (hover_state(exit_button, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                Mix_PlayChannel(-1, hover_effect, 0);
+                playsound = false;
+            }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
 
         } else {
+            if (!playsound) { // Makes sure the sound effect only plays once
+                playsound = true;
+            }
             SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
         }
 
