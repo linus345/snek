@@ -61,11 +61,15 @@ Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, i
     return fruit;
 }
 
-void get_fruit_pos_and_spawn(UDPpacket *pack_recv, Fruit *fruits[], int *nr_of_fruits, Snake *snake)
+void get_fruit_pos_and_spawn(UDPpacket *pack_recv, Fruit *fruits[], int *nr_of_fruits, int nr_of_players, Snake *snake)
 {
     // get data from packet
     int type, random_x, random_y, random_type;
     sscanf(pack_recv->data, "%d %d %d %d", &type, &random_x, &random_y, &random_type);
+
+    if (*nr_of_fruits >= nr_of_players) {
+        return;
+    }
 
     // create new fruit
     do {

@@ -21,7 +21,7 @@ typedef struct {
 } Fruit;
 
 Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, int nr_of_fruits, Snake *snake);
-void get_fruit_pos_and_spawn(UDPpacket *pack_recv, Fruit *fruits[], int *nr_of_fruits, Snake *snake);
+void get_fruit_pos_and_spawn(UDPpacket *pack_recv, Fruit *fruits[], int *nr_of_fruits, int nr_of_players, Snake *snake);
 bool fruit_collision(Snake *snake, Fruit *fruits[], int nr_of_fruits);
 
 #endif
