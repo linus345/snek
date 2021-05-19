@@ -31,7 +31,7 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
     }
 }
 
-int game(App* app)
+int game(App* app, Sound_effects* sound)
 {
 
     SDL_Rect fullscreen_game;

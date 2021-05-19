@@ -40,6 +40,6 @@ enum Scoreboard_dimensions {
 
 void load_texture(App *app, SDL_Texture **texture, char *path);
 void optimizeFullscreen(App* app, SDL_Rect *rect);
-int game(App* app);
+int game(App* app, Sound_effects* sound);
 
 #endif

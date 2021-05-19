@@ -9,6 +9,7 @@
 #define GAME_WIDTH 960
 #define GAME_HEIGHT 960
 //Core window renderer
+
 typedef struct App {
     bool running, fullscreen;
     SDL_Window* window;

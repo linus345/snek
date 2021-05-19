@@ -1,20 +1,22 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
 #include "app.h"
 #include "menu.h"
+#include "sound.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-App *init_app() {
+App* init_app()
+{
 
     // Allocate memory for the core program features
-    App *app = malloc(sizeof(App));
+    App* app = malloc(sizeof(App));
 
     // initialize window
     app->window = SDL_CreateWindow("Snek", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     // handle for errors
-    if(app->window == NULL) {
+    if (app->window == NULL) {
         // print error
         fprintf(stderr, "Error while initializing window: %s\n", SDL_GetError());
         // exit with failure
@@ -24,7 +26,7 @@ App *init_app() {
     // initialize renderer
     app->renderer = SDL_CreateRenderer(app->window, -1, SDL_RENDERER_ACCELERATED);
     // handle errors
-    if(app->renderer == NULL) {
+    if (app->renderer == NULL) {
         // print error
         fprintf(stderr, "Error while initializing renderer: %s\n", SDL_GetError());
         // exit with failure
@@ -52,13 +54,17 @@ App *init_app() {
     return app;
 }
 
-void quit_app(App *app) {
+void quit_app(App* app)
+{
+
+    // Release sound effects
+    free_sound_effects();
 
     printf("Exiting...\n");
     // destory window and renderer to free memory
     SDL_DestroyWindow(app->window);
     SDL_DestroyRenderer(app->renderer);
-    
+
     // cleanup subsystems before exiting'
     Mix_CloseAudio();
     SDLNet_Quit();

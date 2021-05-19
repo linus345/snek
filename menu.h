@@ -6,6 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "game.h"
 #include "app.h"
+#include "sound.h"
 
 //Menu button creation struct consisting of SDL_Rect, SDL_Texture and SDL_Color.
 typedef struct Screen_item {
@@ -34,12 +35,12 @@ Screen_item* input_text(App* app, Screen_item* item);
 bool hover_state (Screen_item* button, int Mx, int My);
 
 void menu(App* app);
-int main_menu (App*  app);
-int select_game_menu (App* app);
-int join_multiplayer (App* app);
-int host_multiplayer (App* app);
-int high_score (App* app);
-int settings (App* app);
-int type_name(App* app);
+int main_menu (App*  app, Sound_effects* sound);
+int select_game_menu (App* app, Sound_effects* sound);
+int join_multiplayer (App* app, Sound_effects* sound);
+int host_multiplayer (App* app, Sound_effects* sound);
+int high_score (App* app, Sound_effects* sound);
+int settings (App* app, Sound_effects* sound);
+int type_name(App* app, Sound_effects* sound);
 
 #endif
