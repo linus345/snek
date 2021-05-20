@@ -16,6 +16,7 @@ Sound_effects* int_sounds()
     // Game sound effects
     sound->eat = Mix_LoadWAV("./resources/Sound Effects/Eat_effect.wav");
     sound->wall_collison = Mix_LoadWAV("./resources/Sound Effects/Slap effect.wav");
+    sound->scoreboard = Mix_LoadWAV("./resources/Sound Effects/Scoreboard_effect.wav");
 
     return sound;
 }
@@ -32,4 +33,5 @@ void free_sound_effects(Sound_effects* sound)
     Mix_FreeChunk(sound->back);
     Mix_FreeChunk(sound->eat);
     Mix_FreeChunk(sound->wall_collison);
+    Mix_FreeChunk(sound->scoreboard);
 }
