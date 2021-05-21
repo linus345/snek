@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
     }
 
     App* app = init_app();
-
-    SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    
+    //SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     TTF_Init();
     if (TTF_Init == NULL || SDL_SetWindowFullscreen == NULL) {
         fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());

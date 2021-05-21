@@ -33,13 +33,15 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
 int game(App* app, Sound_effects* sound)
 {
     bool show_scoreboard = false;
-
-    SDL_Rect fullscreen_game;
-    // Shall be moved into game.c latter
-    if (SDL_GetDisplayBounds(0, &fullscreen_game) != 0) {
-        SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
-        return 0;
+    /*
+    if (app->fullscreen) {
+        SDL_SetWindowFullscreen(app->window, 0);
+        app->fullscreen = false;
+    } else {
+        SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        app->fullscreen = true;
     }
+    */
 
     int nr_of_players = 0;
     Player* player1 = new_player(1, 1, 1);
@@ -89,21 +91,14 @@ int game(App* app, Sound_effects* sound)
 
     SDL_Texture* fruit_sprite_tex;
     load_texture(app, &fruit_sprite_tex, "./resources/fruit-sprite.png");
-    printf("Checkpoint\n");
-    // background texture
-    SDL_Texture* background_tex;
-    load_texture(app, &background_tex, "./resources/background.png");
-    SDL_Rect background_dst = { 250, 0, fullscreen_game.w, fullscreen_game.h - 40 };
 
     // Scoreboard texture
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
 
     SDL_Color white_txt = { 255, 255, 255, 255 };
 
-    SDL_Texture* background_sb_tex;
-    load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
-    SDL_Rect background_sb_dst = { 0, 0, 250, fullscreen_game.h };
-
+    Screen_item* background = menu_button_background(app, "./resources/background.png");
+    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Forest_green.jpg");
     Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
 
@@ -125,17 +120,11 @@ int game(App* app, Sound_effects* sound)
     int score = 0;
     char buffer[50];
 
-    // Menu texture
-    SDL_Texture* background_menu_tex;
-    load_texture(app, &background_menu_tex, "./resources/Forest_green.jpg");
-    SDL_Rect background_menu_dst = { 1210, 0, 40, fullscreen_game.h };
-
     Screen_item* return_button = menu_button_background(app, "./resources/menuButton.png");
 
     // timer
     unsigned last_time = 0, current_time;
     int Mx, My;
-    int speed = 100000;
     while (app->running) {
         SDL_Event event;
         // check for event
@@ -176,7 +165,6 @@ int game(App* app, Sound_effects* sound)
                         SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                         app->fullscreen = true;
                     }
-                    // Makes space on the heap
                     break;
                 case SDLK_ESCAPE:
                     break;
@@ -227,7 +215,13 @@ int game(App* app, Sound_effects* sound)
             // update snake velocity based on direction state
             // test singleplayer position update
             new_snake_pos(player1->snake);
-            head_adjecent_with_fruit(&player1->snake->head, fruits, nr_of_fruits);
+            for (int i = 0; nr_of_fruits > i; i++) {
+                if (fruits[i]->pos.x == player1->snake->head.pos.x && (fruits[i]->pos.y - CELL_SIZE == player1->snake->head.pos.y || fruits[i]->pos.y + CELL_SIZE == player1->snake->head.pos.y)) {
+                    player1->snake->head.mouth_open = true;
+                } else if (fruits[i]->pos.y == player1->snake->head.pos.y && (fruits[i]->pos.x - CELL_SIZE == player1->snake->head.pos.x || fruits[i]->pos.x + CELL_SIZE == player1->snake->head.pos.x)) {
+                    player1->snake->head.mouth_open = true;
+                }
+            }
 
             last_time = current_time;
         }
@@ -328,9 +322,8 @@ int game(App* app, Sound_effects* sound)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
-        SDL_RenderCopy(app->renderer, background_sb_tex, NULL, &background_sb_dst);
-        SDL_RenderCopy(app->renderer, background_menu_tex, NULL, &background_menu_dst);
+        render_item(app, &background->rect, background->texture, BACKGROUND, 250, 0, WINDOW_WIDTH - 300, WINDOW_HEIGHT);
+        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, 250, WINDOW_HEIGHT);
 
         render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, 0, 0, 50, 50);
         render_item(app, &goal_nr->rect, goal_nr->texture, UNSPECIFIED, 194, 0, 50, 50);
@@ -383,8 +376,10 @@ int game(App* app, Sound_effects* sound)
     }
 
     if (show_scoreboard) {
-        app->running=true;
+        app->running = true;
         return scoreboard(app, sound, score);
+    } else {
+        return MAIN_MENU;
     }
 }
 

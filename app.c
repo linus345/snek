@@ -47,8 +47,8 @@ App* init_app()
     // indicate that the app is running, used for main loop
     app->running = true;
 
-    // Indicates wether applicatication is in fullscreen or not
-    app->fullscreen = true;
+    // Indicates wether the application is in fullscreen or not
+    //app->fullscreen = false;
 
     // return pointer
     return app;
