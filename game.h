@@ -13,12 +13,6 @@ typedef struct {
     int y;
 } Pos;
 
-enum Render_item_type {
-    UNSPECIFIED = 0,
-    BACKGROUND = 1,
-    MENU_BUTTON = 2
-};
-
 enum Scoreboard_dimensions {
     SD_BUTTON_X = 0,
     SD_BUTTON_Y = 50,

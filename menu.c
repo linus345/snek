@@ -153,6 +153,7 @@ int main_menu(App* app)
                 }
                 break;
             case SDL_KEYDOWN:
+                /*
                 if (event.key.keysym.sym == SDLK_F11) {
                     if (app->fullscreen) {
                         SDL_SetWindowFullscreen(app->window, 0);
@@ -171,7 +172,7 @@ int main_menu(App* app)
                     free(text3);
                     free(exit_button);
                     return MAIN_MENU;
-                } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                } else */if (event.key.keysym.sym == SDLK_ESCAPE) {
                     // exit main loop
                     app->running = false;
                 }
@@ -181,7 +182,7 @@ int main_menu(App* app)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, app->display.w, app->display.h);
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         render_item(app, &button1->rect, button1->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
         render_item(app, &text1->rect, text1->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
         render_item(app, &button2->rect, button2->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
@@ -296,6 +297,7 @@ int select_game_menu(App* app)
                 break;
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
+                /*
                 case SDLK_F11:
                     if (app->fullscreen) {
                         SDL_SetWindowFullscreen(app->window, 0);
@@ -314,6 +316,7 @@ int select_game_menu(App* app)
                     free(text3);
                     free(exit_button);
                     return SELECT_GAME;
+                */
                 case SDLK_ESCAPE:
                     // exit main loop
                     return MAIN_MENU;
@@ -325,7 +328,7 @@ int select_game_menu(App* app)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
         
-        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, app->display.w, app->display.h);
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         render_item(app, &button1->rect, button1->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
         render_item(app, &text1->rect, text1->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
         render_item(app, &button2->rect, button2->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
@@ -449,6 +452,7 @@ int join_multiplayer(App* app)
                     printf("IP: %s\n", app->ip);
                     printf("Port: %s\n", app->port);
                     break;
+                /*
                 case SDLK_F11:
                     if (app->fullscreen) {
                         SDL_SetWindowFullscreen(app->window, 0);
@@ -466,6 +470,7 @@ int join_multiplayer(App* app)
                     free(text3);
                     free(exit_button);
                     return JOIN_MULTIPLAYER;
+                */
                 case SDLK_ESCAPE:
                     return SELECT_GAME;
                 }
