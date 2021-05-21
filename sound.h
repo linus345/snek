@@ -11,6 +11,8 @@ typedef struct sound_effects {
     Mix_Chunk* back;
     Mix_Chunk* eat;
     Mix_Chunk* wall_collison;
+    Mix_Chunk* scoreboard;
+
 } Sound_effects;
 
 Sound_effects* int_sounds();

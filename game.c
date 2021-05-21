@@ -32,6 +32,7 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
 
 int game(App* app, Sound_effects* sound)
 {
+    bool show_scoreboard = false;
 
     SDL_Rect fullscreen_game;
     // Shall be moved into game.c latter
@@ -121,6 +122,7 @@ int game(App* app, Sound_effects* sound)
     Screen_item* player3_score = menu_button_text(app, " ", font, white_txt);
     Screen_item* player4_score = menu_button_text(app, " ", font, white_txt);
 
+    int score = 0;
     char buffer[50];
 
     // Menu texture
@@ -210,10 +212,12 @@ int game(App* app, Sound_effects* sound)
         if (collison_with_wall(player1->snake)) {
             play_sound(sound->wall_collison); // plays wall collison sound effect
             app->running = false;
+            show_scoreboard = true; // Remove once multiplayer has been implimented
         }
         // Checks if any collisons has occured with a snake
         if (collison_with_snake(player1->snake)) {
             app->running = false;
+            show_scoreboard = true; // Remove once multiplayer has been implimented
         }
 
         current_time = SDL_GetTicks();
@@ -243,6 +247,7 @@ int game(App* app, Sound_effects* sound)
             }
 
             player1->points += fruits[0]->type;
+            score = player1->points;
 
             sprintf(buffer, "%d", player1->points);
 
@@ -369,6 +374,125 @@ int game(App* app, Sound_effects* sound)
         }
         // render tail
         SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, player1->snake->tail.angle, NULL, SDL_FLIP_NONE);
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
+    }
+
+    if (show_scoreboard) {
+        app->running=true;
+        return scoreboard(app, sound, score);
+    }
+}
+
+int scoreboard(App* app, Sound_effects* sound, int score)
+{
+    //bool playsound = true;
+
+    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    SDL_Color white_txt = { 255, 255, 255, 255 };
+
+    SDL_Texture* background_sb_tex;
+    load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
+    SDL_Rect background_sb_dst = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
+    //Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
+    //Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
+
+    Screen_item* scoreboard1 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* scoreboard2 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* scoreboard3 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* scoreboard4 = menu_button_background(app, "./resources/menuButton.png");
+
+    Screen_item* player1_name = menu_button_text(app, app->player_name, font, white_txt);
+    Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white_txt);
+    Screen_item* player3_name = menu_button_text(app, "Victor", font, white_txt);
+    Screen_item* player4_name = menu_button_text(app, "Alma", font, white_txt);
+
+    char buffer[10];
+    sprintf(buffer, "%d", score);
+
+    Screen_item* player1_score = menu_button_text(app, buffer, font, white_txt);
+    Screen_item* player2_score = menu_button_text(app, " ", font, white_txt);
+    Screen_item* player3_score = menu_button_text(app, " ", font, white_txt);
+    Screen_item* player4_score = menu_button_text(app, " ", font, white_txt);
+
+    Screen_item* continue_button = menu_button_text(app, "Press to continue", font, white_txt);
+
+    // timer
+    unsigned last_time = 0, current_time;
+    int Mx, My;
+    int speed = 100000;
+    while (app->running) {
+        SDL_Event event;
+        // check for event
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                // exit main loop
+                app->running = false;
+                break;
+            case SDL_KEYDOWN:
+                // key pressed?
+                switch (event.key.keysym.sym) {
+                case SDLK_F11:
+                    if (app->fullscreen) {
+                        SDL_SetWindowFullscreen(app->window, 0);
+                        app->fullscreen = false;
+                    } else {
+                        SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                        app->fullscreen = true;
+                    }
+                    // Makes space on the heap
+                    break;
+                }
+                break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(continue_button, Mx, My)) {
+                    play_sound(sound->press);
+                    // Makes space on the heap
+                    //free(goal_text);
+                    //free(goal_nr);
+                    free(scoreboard1);
+                    free(scoreboard2);
+                    free(scoreboard3);
+                    free(scoreboard4);
+                    free(player1_name);
+                    free(player2_name);
+                    free(player3_name);
+                    free(player3_name);
+                    free(player4_name);
+                    free(player1_score);
+                    free(player2_score);
+                    free(player3_score);
+                    free(player4_score);
+                    free(continue_button);
+                    return MAIN_MENU;
+                }
+                break;
+            }
+        }
+
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+
+        render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y, SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + Y_OFFSET, SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scoreboard3->rect, scoreboard3->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (2 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scoreboard4->rect, scoreboard4->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (3 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
+
+        render_item(app, &player1_name->rect, player1_name->texture, UNSPECIFIED, NAME_X, NAME_Y, NAME_W, NAME_H);
+        render_item(app, &player1_score->rect, player1_score->texture, UNSPECIFIED, SCORE_X, SCORE_Y, SCORE_W, SCORE_H);
+
+        render_item(app, &player2_name->rect, player2_name->texture, UNSPECIFIED, NAME_X, NAME_Y + Y_OFFSET, NAME_W, NAME_H);
+        render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
+        render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
+
+        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, 1213, 10, 35, 35);
 
         // present on screen
         SDL_RenderPresent(app->renderer);

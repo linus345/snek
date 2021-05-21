@@ -57,9 +57,6 @@ App* init_app()
 void quit_app(App* app)
 {
 
-    // Release sound effects
-    free_sound_effects();
-
     printf("Exiting...\n");
     // destory window and renderer to free memory
     SDL_DestroyWindow(app->window);
