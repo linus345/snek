@@ -29,7 +29,7 @@ Snake *new_snake(int player_nr)
             snake->vel_y = 0;
             snake->head.angle = 90;
             snake->tail.angle = 90;
-            snake->head.pos.x = CELL_SIZE * 3;
+            snake->head.pos.x = (CELL_SIZE * 3) + GAME_START_POS;
             snake->head.pos.y = CELL_SIZE;
             snake->dir = Right;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
@@ -71,7 +71,7 @@ Snake *new_snake(int player_nr)
             snake->head.angle = 0;
             snake->body[0].angle = 0;
             snake->tail.angle = 0;
-            snake->head.pos.x = CELL_SIZE * 3;
+            snake->head.pos.x = (CELL_SIZE * 3) + GAME_START_POS;
             snake->head.pos.y = WINDOW_HEIGHT - CELL_SIZE * 3;
             snake->dir = Up;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
@@ -248,7 +248,7 @@ Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_leng
 bool collison_with_wall(Snake *snake)
 {
         // Checks collison with walls
-    if (snake->head.pos.x < 0 || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
+    if (snake->head.pos.x < GAME_START_POS || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
         // Collison detected
         return true; 
     }

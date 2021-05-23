@@ -5,21 +5,21 @@ CC := gcc
 CFLAGS := --std=c99 -Wall -Wextra -pedantic
 
 ifeq ($(OS),Windows_NT)
-	CFLAGS += -IC:\libsdl\include -LC:\libsdl\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_net -lSDL2_image -lSDL2_ttf
+	CFLAGS += -IC:\libsdl\include -LC:\libsdl\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_net -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 	EXEC := snek.exe
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
-		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image -lSDL2_ttf -lm
+		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
 		EXEC := snek.out
 	endif
 	ifeq ($(UNAME_S),Darwin)
-		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image -lSDL2_ttf -lm
+		CFLAGS += `sdl2-config --libs --cflags` -lSDL2_net -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
 		EXEC := snek.out
 	endif
 endif
 
-$(EXEC): main.o game.o app.o snake.o player.o fruit.o menu.o
+$(EXEC): main.o game.o app.o snake.o player.o fruit.o menu.o rendering.o sound.o
 	$(CC) *.o $(CFLAGS) -o $(EXEC)
 
 main.o: main.c
@@ -42,6 +42,12 @@ player.o: player.c
 
 menu.o: menu.c
 	$(CC) menu.c -c $(CFLAGS)
+
+rendering.o: rendering.c
+	$(CC) rendering.c -c $(CFLAGS)
+
+sound.o: sound.c
+	$(CC) sound.c -c $(CFLAGS)
 
 clean:
 	rm -f $(EXEC) *.o
