@@ -55,7 +55,7 @@ int game(App* app, Sound_effects* sound)
     snake_texture[1].x = 32;
     snake_texture[1].y = 0;
     // tail
-    snake_texture[2].x = 32;
+    snake_texture[2].x = 32; 
     snake_texture[2].y = 32;
     // turning bodypart
     snake_texture[3].x = 0;
@@ -120,7 +120,7 @@ int game(App* app, Sound_effects* sound)
     int score = 0;
     char buffer[50];
 
-    Screen_item* return_button = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* return_button = menu_button_text(app, "Leave game", font, white_txt);
 
     // timer
     unsigned last_time = 0, current_time;
@@ -317,13 +317,13 @@ int game(App* app, Sound_effects* sound)
         }
 
         SDL_Rect tail_src = { snake_texture[2].x, snake_texture[2].y, CELL_SIZE, CELL_SIZE };
-        SDL_Rect tail_dst = { player1->snake->tail.pos.x, player1->snake->tail.pos.y, CELL_SIZE, CELL_SIZE };
+        SDL_Rect tail_dst = { player1->snake->tail.pos.x, player1->snake->tail.pos.y, CELL_SIZE, CELL_SIZE};
 
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        render_item(app, &background->rect, background->texture, BACKGROUND, 250, 0, WINDOW_WIDTH - 300, WINDOW_HEIGHT);
+        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, 250, WINDOW_HEIGHT);
+        render_item(app, &background->rect, background->texture, BACKGROUND, GAME_START_POS, 0, GAME_WIDTH, WINDOW_HEIGHT);
 
         render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, 0, 0, 50, 50);
         render_item(app, &goal_nr->rect, goal_nr->texture, UNSPECIFIED, 194, 0, 50, 50);
@@ -340,7 +340,7 @@ int game(App* app, Sound_effects* sound)
         render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
         render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
 
-        render_item(app, &return_button->rect, return_button->texture, UNSPECIFIED, 1213, 10, 35, 35);
+        render_item(app, &return_button->rect, return_button->texture, UNSPECIFIED, 15, GAME_HEIGHT-50, 220, 50);
 
         // render fruits
         for (int i = 0; i < nr_of_fruits; i++) {
@@ -476,7 +476,7 @@ int scoreboard(App* app, Sound_effects* sound, int score)
 
         render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, GAME_WIDTH/2-129, 100, 300, 120);
+        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, WINDOW_WIDTH/2-129, 100, 300, 120);
 
         render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y, FSD_BUTTON_W, FSD_BUTTON_H);
         render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + FY_OFFSET, FSD_BUTTON_W, FSD_BUTTON_H);
@@ -490,7 +490,7 @@ int scoreboard(App* app, Sound_effects* sound, int score)
         render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (2 * FY_OFFSET), F_NAME_W, F_NAME_H);
         render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (3 * FY_OFFSET), F_NAME_W, F_NAME_H);
 
-        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, GAME_WIDTH/2-129, GAME_HEIGHT-145, 300, 120);
+        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, WINDOW_WIDTH/2-129, WINDOW_HEIGHT-145, 300, 120);
 
         // present on screen
         SDL_RenderPresent(app->renderer);
