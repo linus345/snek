@@ -322,8 +322,8 @@ int game(App* app, Sound_effects* sound)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
+        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         render_item(app, &background->rect, background->texture, BACKGROUND, 250, 0, WINDOW_WIDTH - 300, WINDOW_HEIGHT);
-        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, 250, WINDOW_HEIGHT);
 
         render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, 0, 0, 50, 50);
         render_item(app, &goal_nr->rect, goal_nr->texture, UNSPECIFIED, 194, 0, 50, 50);
@@ -376,6 +376,7 @@ int game(App* app, Sound_effects* sound)
     }
 
     if (show_scoreboard) {
+        //play_sound(sound->scoreboard);
         app->running = true;
         return scoreboard(app, sound, score);
     } else {
@@ -390,12 +391,10 @@ int scoreboard(App* app, Sound_effects* sound, int score)
     TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
     SDL_Color white_txt = { 255, 255, 255, 255 };
 
-    SDL_Texture* background_sb_tex;
-    load_texture(app, &background_sb_tex, "./resources/Forest_green.jpg");
-    SDL_Rect background_sb_dst = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Forest_green.jpg");
 
-    //Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
-    //Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
+    Screen_item* goal_text = menu_button_text(app, "Goal:", font, white_txt);
+    Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
 
     Screen_item* scoreboard1 = menu_button_background(app, "./resources/menuButton.png");
     Screen_item* scoreboard2 = menu_button_background(app, "./resources/menuButton.png");
@@ -475,19 +474,23 @@ int scoreboard(App* app, Sound_effects* sound, int score)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y, SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + Y_OFFSET, SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard3->rect, scoreboard3->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (2 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard4->rect, scoreboard4->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (3 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
+        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        render_item(app, &player1_name->rect, player1_name->texture, UNSPECIFIED, NAME_X, NAME_Y, NAME_W, NAME_H);
-        render_item(app, &player1_score->rect, player1_score->texture, UNSPECIFIED, SCORE_X, SCORE_Y, SCORE_W, SCORE_H);
+        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, GAME_WIDTH/2-129, 100, 300, 120);
 
-        render_item(app, &player2_name->rect, player2_name->texture, UNSPECIFIED, NAME_X, NAME_Y + Y_OFFSET, NAME_W, NAME_H);
-        render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
-        render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
+        render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y, FSD_BUTTON_W, FSD_BUTTON_H);
+        render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + FY_OFFSET, FSD_BUTTON_W, FSD_BUTTON_H);
+        render_item(app, &scoreboard3->rect, scoreboard3->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (2 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
+        render_item(app, &scoreboard4->rect, scoreboard4->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (3 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
 
-        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, 1213, 10, 35, 35);
+        render_item(app, &player1_name->rect, player1_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y, F_NAME_W, F_NAME_H);
+        render_item(app, &player1_score->rect, player1_score->texture, UNSPECIFIED, F_SCORE_X, F_SCORE_Y, F_SCORE_W, F_SCORE_H);
+
+        render_item(app, &player2_name->rect, player2_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + FY_OFFSET, F_NAME_W, F_NAME_H);
+        render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (2 * FY_OFFSET), F_NAME_W, F_NAME_H);
+        render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (3 * FY_OFFSET), F_NAME_W, F_NAME_H);
+
+        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, GAME_WIDTH/2-129, GAME_HEIGHT-145, 300, 120);
 
         // present on screen
         SDL_RenderPresent(app->renderer);
