@@ -68,7 +68,7 @@ int game(App* app, Sound_effects* sound)
     snake_texture[5].y = 32;
 
     SDL_Texture* snake_sprite_tex;
-    load_texture(app, &snake_sprite_tex, "./resources/snake-sprite.png");
+    load_texture(app, &snake_sprite_tex, "./resources/Textures/snake-sprite.png");
 
     // intilaze fruits array
     Fruit* fruits[MAX_PLAYERS];
@@ -90,22 +90,22 @@ int game(App* app, Sound_effects* sound)
     fruit_texture[3].y = 32;
 
     SDL_Texture* fruit_sprite_tex;
-    load_texture(app, &fruit_sprite_tex, "./resources/fruit-sprite.png");
+    load_texture(app, &fruit_sprite_tex, "./resources/Textures/fruit-sprite.png");
 
     // Scoreboard texture
-    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
 
     SDL_Color white_txt = { 255, 255, 255, 255 };
 
-    Screen_item* background = menu_button_background(app, "./resources/background.png");
-    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Forest_green.jpg");
+    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
+    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Textures/Forest_green.jpg");
     Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
 
-    Screen_item* scoreboard1 = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* scoreboard2 = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* scoreboard3 = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* scoreboard4 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* scoreboard1 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    Screen_item* scoreboard2 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    Screen_item* scoreboard3 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    Screen_item* scoreboard4 = menu_button_background(app, "./resources/Textures/menuButton.png");
 
     Screen_item* player1_name = menu_button_text(app, app->player_name, font, white_txt);
     Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white_txt);
@@ -120,8 +120,8 @@ int game(App* app, Sound_effects* sound)
     int score = 0;
     char buffer[50];
 
-    Screen_item* return_button = menu_button_background(app, "./resources/exit_button.png");
-    Screen_item* mute_button = menu_button_background(app, "./resources/speaker_icon.png"); // Game starts with sound
+    Screen_item* return_button = menu_button_background(app, "./resources/Textures/exit_button.png");
+    Screen_item* mute_button = menu_button_background(app, "./resources/Textures/speaker_icon.png"); // Game starts with sound
 
     // timer
     unsigned last_time = 0, current_time;
@@ -194,10 +194,10 @@ int game(App* app, Sound_effects* sound)
                     return MAIN_MENU;
                 } else if (hover_state(mute_button, Mx, My)) {
                     if (mute) { // Unmutes all the sounds and changes the speaker icon
-                        mute_button = menu_button_background(app, "./resources/speaker_icon.png");
+                        mute_button = menu_button_background(app, "./resources/Textures/speaker_icon.png");
                         mute = false;
                     } else if (!mute) { // Mutes all the sounds and changes the speaker icon
-                        mute_button = menu_button_background(app, "./resources/speaker_icon_mute.png");
+                        mute_button = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
                         mute = true;
                     }
                 }
@@ -405,18 +405,18 @@ int scoreboard(App* app, Sound_effects* sound, int score)
 {
     //bool playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
     SDL_Color white_txt = { 255, 255, 255, 255 };
 
-    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Forest_green.jpg");
+    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Textures/Forest_green.jpg");
 
     Screen_item* goal_text = menu_button_text(app, "Goal:", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
 
-    Screen_item* scoreboard1 = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* scoreboard2 = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* scoreboard3 = menu_button_background(app, "./resources/menuButton.png");
-    Screen_item* scoreboard4 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* scoreboard1 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    Screen_item* scoreboard2 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    Screen_item* scoreboard3 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    Screen_item* scoreboard4 = menu_button_background(app, "./resources/Textures/menuButton.png");
 
     Screen_item* player1_name = menu_button_text(app, app->player_name, font, white_txt);
     Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white_txt);

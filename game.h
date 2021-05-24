@@ -52,8 +52,8 @@ enum Finsh_scoreboard_dimensions {
     FY_OFFSET = 150
 };
 
-void
-load_texture(App* app, SDL_Texture** texture, char* path);
+//void main_loop(App* app);
+void load_texture(App* app, SDL_Texture** texture, char* path);
 void optimizeFullscreen(App* app, SDL_Rect* rect);
 int game(App* app, Sound_effects* sound);
 int scoreboard(App* app, Sound_effects* sound, int score);

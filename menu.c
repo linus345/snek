@@ -100,14 +100,14 @@ int main_menu(App* app, Sound_effects* sound)
 
     bool playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
 
-    Screen_item* background = menu_button_background(app, "./resources/background.png");
-    Screen_item* button1 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
+    Screen_item* button1 = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text1 = menu_button_text(app, "Start Game", font, green);
-    Screen_item* button2 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* button2 = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text2 = menu_button_text(app, "High Score", font, green);
-    Screen_item* button3 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* button3 = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text3 = menu_button_text(app, "Settings", font, green);
     Screen_item* exit_button = menu_button_text(app, "Exit Game", font, white);
 
@@ -257,14 +257,14 @@ int select_game_menu(App* app, Sound_effects* sound)
 
     bool playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
 
-    Screen_item* background = menu_button_background(app, "./resources/background.png");
-    Screen_item* button1 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
+    Screen_item* button1 = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text1 = menu_button_text(app, "Single Player", font, green);
-    Screen_item* button2 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* button2 = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text2 = menu_button_text(app, "Host Multiplayer", font, green);
-    Screen_item* button3 = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* button3 = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text3 = menu_button_text(app, "Join Multiplayer", font, green);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
@@ -434,13 +434,13 @@ int join_multiplayer(App* app, Sound_effects* sound)
     int Mx, My;
     bool ip = false, port = false, playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
     SDL_Surface* tmp_surface = NULL;
 
-    Screen_item* background = menu_button_background(app, "./resources/background.png");
-    Screen_item* background1 = menu_button_background(app, "./resources/ip_field.png");
-    Screen_item* background2 = menu_button_background(app, "./resources/port_field.png");
-    Screen_item* button = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
+    Screen_item* background1 = menu_button_background(app, "./resources/Textures/ip_field.png");
+    Screen_item* background2 = menu_button_background(app, "./resources/Textures/port_field.png");
+    Screen_item* button = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text1 = menu_button_text(app, "Enter IP", font, white);
     Screen_item* text2 = menu_button_text(app, "Enter Port", font, white);
     Screen_item* text3 = menu_button_text(app, "Join", font, white);
@@ -798,11 +798,11 @@ int type_name(App* app, Sound_effects* sound)
 
     bool playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
     SDL_Surface* tmp_surface = NULL;
 
-    Screen_item* background = menu_button_background(app, "./resources/background.png");
-    Screen_item* button = menu_button_background(app, "./resources/menuButton.png");
+    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
+    Screen_item* button = menu_button_background(app, "./resources/Textures/menuButton.png");
     Screen_item* text = menu_button_text(app, "Enter name", font, white);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
