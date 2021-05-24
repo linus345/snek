@@ -9,7 +9,7 @@
 #include "snake.h"
 #include "network.h"
 
-Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, int nr_of_fruits, Snake *snake)
+Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, Snake *snake)
 {
     Fruit *fruit = malloc(sizeof(Fruit));
 
@@ -71,7 +71,7 @@ void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, in
     // get data from packet
     int type, random_x, random_y, random_type, fruit_index;
     // format: type rand_x rand_y fruit_type fruit_index
-    sscanf(data, "%d %d %d %d %d", &type, &random_x, &random_y, &random_type, &fruit_index);
+    sscanf((char *) data, "%d %d %d %d %d", &type, &random_x, &random_y, &random_type, &fruit_index);
     printf("received new fruit: \n");
     printf("x: %d, y: %d, type: %d, index: %d\n", random_x, random_y, random_type, fruit_index);
 
@@ -81,7 +81,7 @@ void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, in
     }
 
     // create new fruit TODO
-    fruits[fruit_index] = new_fruit(fruits, random_x, random_y, random_type, *nr_of_fruits, snake);
+    fruits[fruit_index] = new_fruit(fruits, random_x, random_y, random_type, snake);
     printf("created new fruit\n");
     printf("x: %d, y: %d, type: %d\n", fruits[fruit_index]->pos.x, fruits[fruit_index]->pos.y, fruits[fruit_index]->type);
 

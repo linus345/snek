@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <malloc.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -41,7 +40,6 @@ UDPpacket *allocate_packet(int size) {
         fprintf(stderr, "Error: SDLNet_AllocPacket %s\n", SDLNet_GetError());
         exit(EXIT_FAILURE);
     }
-    printf("size of pack->data: %d\n", malloc_usable_size(pack->data));
     // initialize memory to 0
     memset(pack->data, 0, size);
     return pack;
@@ -91,7 +89,7 @@ void handle_received_packet(Uint8 *data, Game_State *game_state, Player *players
     /* printf("--------received packet in thread--------\n"); */
     /* log_packet(pack_recv); */
     // get request type from packet
-    sscanf(data, "%d", &request_type);
+    sscanf((char *) data, "%d", &request_type);
     switch(request_type) {
         case NEW_CLIENT_JOINED:
             new_client_joined(data, game_state, players);
@@ -117,19 +115,19 @@ void handle_received_packet(Uint8 *data, Game_State *game_state, Player *players
 void get_client_id(UDPpacket *pack_recv, int *client_id)
 {
     int temp;
-    sscanf(pack_recv->data, "%d %d", &temp, client_id);
+    sscanf((char *) pack_recv->data, "%d %d", &temp, client_id);
 }
 
 void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[])
 {
     int type, id;
     // get data from received packet
-    sscanf(data, "%d", &type);
+    sscanf((char *) data, "%d", &type);
     // could be both SUCCESSFUL_CONNECTION and NEW_CLIENT_JOINED
     if(type == SUCCESSFUL_CONNECTION) {
         // gets the number of clients that already connected to the server before this client joined
         // format: type id nr_of_clients
-        sscanf(data, "%d %d %d %u", &type, &game_state->client_id, &game_state->nr_of_players, &game_state->current_time);
+        sscanf((char *) data, "%d %d %d %u", &type, &game_state->client_id, &game_state->nr_of_players, &game_state->current_time);
         // initialize players on this client that was already connected to the server
         for(int i = 0; i < game_state->nr_of_players; i++) {
             players[i] = new_player(i);
@@ -142,7 +140,7 @@ void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[])
     } else {
         // NEW_CLIENT_JOINED
         // format: type id
-        sscanf(data, "%d %d", &type, &id);
+        sscanf((char *) data, "%d %d", &type, &id);
 
         // client already connected, return from function
         if(players[id] != NULL) {
@@ -165,7 +163,7 @@ void update_snake_pos_from_req(Uint8 *data, Player *players[])
 {
     int type, id, packet_nr, x, y, dir, angle;
     // format: type id last_received_packet_nr x y direction angle
-    sscanf(data, "%d %d %d %d %d %d %d", &type, &id, &packet_nr, &x, &y, &dir, &angle);
+    sscanf((char *) data, "%d %d %d %d %d %d %d", &type, &id, &packet_nr, &x, &y, &dir, &angle);
     printf("snake pos: id: %d, pack_nr: %d, x: %d, y: %d, dir: %d, angle: %d\n", id, packet_nr, x, y, dir, angle);
     if(players[id]->last_received_packet_nr > packet_nr) {
         // return early because we've already received a newer packet
@@ -187,14 +185,14 @@ void handle_received_ticks(Uint8 *data, unsigned *current_time)
 {
     int type;
     // format: type ticks
-    sscanf(data, "%d %u", &type, current_time);
+    sscanf((char *) data, "%d %u", &type, current_time);
 }
 
 void handle_collision(Uint8 *data, Player *players[])
 {
     int type, id;
     // format: type id
-    sscanf(data, "%d %d", &type, &id);
+    sscanf((char *) data, "%d %d", &type, &id);
     // update player alive state to dead
     players[id]->alive = false;
 }
@@ -203,7 +201,7 @@ void handle_ate_fruit(Uint8 *data, Player *players[], Game_State *game_state)
 {
     int type, id, fruit_index;
     // format: type id fruit_index
-    sscanf(data, "%d %d %d", &type, &id, &fruit_index);
+    sscanf((char *) data, "%d %d %d", &type, &id, &fruit_index);
     printf("--------------\n");
     printf("type: %d, id: %d, fruit_index: %d\n", type, id, fruit_index);
     printf("--------------\n");

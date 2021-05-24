@@ -116,12 +116,11 @@ int main(int argc, char *argv[])
     unsigned time_when_req_sent = SDL_GetTicks();
     // used when client connecting and in main loop
     int request_type;
-    bool recv_this_tick = true;
 
     while(!game_state->connected) {
         if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
             // get request type from packet
-            sscanf(pack_recv->data, "%d", &request_type);
+            sscanf((char *) pack_recv->data, "%d", &request_type);
             switch(request_type) {
                 // these are the only expected types
                 case SUCCESSFUL_CONNECTION:

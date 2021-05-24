@@ -20,7 +20,7 @@ typedef struct {
     int points;
 } Fruit;
 
-Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, int nr_of_fruits, Snake *snake);
+Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, Snake *snake);
 void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, int nr_of_players, Snake *snake);
 // return < 0 if no collision happened, otherwise it returns the index of the fruit that was collided with
 void fruit_collision(UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, Snake *snake, Fruit *fruits[], int *nr_of_fruits, int client_id);
