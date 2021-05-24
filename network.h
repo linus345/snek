@@ -7,6 +7,8 @@
 #include "player.h"
 #include "circular_buffer.h"
 
+#define PACKET_DATA_SIZE 128
+
 typedef struct {
     UDPsocket udp_sock;
     UDPpacket *pack_recv;
@@ -22,7 +24,8 @@ enum Request_Type {
     UPDATE_SNAKE_POS = 4,
     RANDOM_POS = 5,
     RECEIVE_TICKS = 6,
-    COLLISION = 7
+    COLLISION = 7,
+    ATE_FRUIT = 8
 };
 
 void free_net(UDPsocket udp_sock, UDPpacket *pack_recv, UDPpacket *pack_send);
@@ -31,15 +34,17 @@ UDPpacket *allocate_packet(int size);
 IPaddress resolve_host(char *host, int port);
 void log_packet(UDPpacket *pack_recv);
 int receive_packets_in_new_thread(void *void_args);
-void handle_received_packet(UDPpacket *pack_recv, Game_State *game_state, Player *players[]);
+void handle_received_packet(Uint8 *data, Game_State *game_state, Player *players[]);
 void get_client_id(UDPpacket *pack_recv, int *client_id);
-void new_client_joined(UDPpacket *pack_recv, Game_State *game_state, Player *players[]);
-void update_snake_pos_from_req(UDPpacket *pack_recv, Player *players[]);
-void handle_received_ticks(UDPpacket *pack_recv, unsigned *current_time);
-void handle_collision(UDPpacket *pack_recv, Player *players[]);
+void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[]);
+void update_snake_pos_from_req(Uint8 *data, Player *players[]);
+void handle_received_ticks(Uint8 *data, unsigned *current_time);
+void handle_collision(Uint8 *data, Player *players[]);
+void handle_ate_fruit(Uint8 *data, Player *players[], Game_State *game_state);
 void send_packet(UDPsocket udp_sock, UDPpacket *pack_send);
 void join_game_request(UDPsocket udp_sock, IPaddress server_addr, UDPpacket *pack_send);
 void send_snake_position(UDPsocket socket, IPaddress server_addr, UDPpacket *packet, Player *player);
 void send_collision(UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, int client_id);
+void send_ate_fruit(UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, int client_id, int fruit_index);
 
 #endif 

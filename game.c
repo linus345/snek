@@ -15,6 +15,9 @@ Game_State *init_game_state()
     game_state->connected = false;
     game_state->last_time = 0;
     game_state->nr_of_fruits = 0;
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        game_state->fruits[i] = NULL;
+    }
 
     return game_state;
 }

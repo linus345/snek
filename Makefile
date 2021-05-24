@@ -2,7 +2,7 @@
 CC := gcc
 
 # general compiler flags
-CFLAGS := --std=c99 -Wall -Wextra -pedantic -g
+CFLAGS := --std=c99 -Wall -Wextra -pedantic -gdwarf-3
 
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -IC:\libsdl\include -LC:\libsdl\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_net -lSDL2_image

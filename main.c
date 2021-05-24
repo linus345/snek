@@ -13,6 +13,9 @@
 #include "network.h"
 #include "circular_buffer.h"
 
+// used to indicate if receive thread should exit
+bool thread_done;
+
 int main(int argc, char *argv[])
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -91,14 +94,14 @@ int main(int argc, char *argv[])
     UDPsocket udp_sock = open_client_socket();
 
     /* // allocate memory for sent packet */
-    UDPpacket *pack_send = allocate_packet(128);
+    UDPpacket *pack_send = allocate_packet(PACKET_DATA_SIZE);
 
     /* // allocate memory for received packet */
-    UDPpacket *pack_recv = allocate_packet(128);
+    UDPpacket *pack_recv = allocate_packet(PACKET_DATA_SIZE);
 
     // resolve server address TODO: bind address?
     int server_port = 1234;
-    IPaddress server_addr = resolve_host("127.0.0.1", server_port);
+    IPaddress server_addr = resolve_host(argv[1], server_port);
 
     // array to store info about connected players
     Player *players[MAX_PLAYERS] = {NULL, NULL, NULL, NULL};
@@ -123,7 +126,7 @@ int main(int argc, char *argv[])
                 // these are the only expected types
                 case SUCCESSFUL_CONNECTION:
                     // adds new player and increments nr_of_players
-                    new_client_joined(pack_recv, game_state, players);
+                    new_client_joined(pack_recv->data, game_state, players);
                     break;
                 case FAILED_CONNECTION:
                     // TODO: handle it differently if it failed because 4 clients
@@ -145,13 +148,14 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    printf("here\n");
 
     //////////////////////////////////
 
-    // initialize thread safe buffer with enough space for 10 128 byte packets
-    Circular_Buffer *buf = init_buffer(10, 128);
+    // initialize thread safe buffer with enough space for 10 PACKET_DATA_SIZE byte packets
+    Circular_Buffer *buf = init_buffer(10, PACKET_DATA_SIZE);
 
+    // set global variable thread_done to false before creating thread
+    thread_done = false;
     // arguments that thread needs to access
     Thread_Args args = {udp_sock, pack_recv, pack_send, buf};
     // create thread that listens for udp packets
@@ -161,7 +165,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: SDL_CreateThread: %s\n", SDL_GetError());
         exit(EXIT_FAILURE);
     }
-    printf("created thread\n");
 
     while (app->running) {
         SDL_Event event;
@@ -208,10 +211,8 @@ int main(int argc, char *argv[])
         // handle every new packet before rendering this frame
         while(!buf_is_empty(buf)) {
             // handle packets
-            void *data = malloc(128);
-            printf("------------------reading from buffer------------------\n");
+            void *data = malloc(PACKET_DATA_SIZE);
             read_from_buffer(buf, data);
-            printf("------------------------read done----------------------\n");
             handle_received_packet(data, game_state, players);
             free(data);
         }
@@ -236,30 +237,16 @@ int main(int argc, char *argv[])
             game_state->last_time = game_state->current_time;
         }
 
-        // temporarily disable fruit collision TODO
-        /* if(fruit_collision(players[client_id]->snake, game_state->fruits, game_state->nr_of_fruits)) { */
-        /*     free(game_state->fruits[game_state->nr_of_fruits-1]); */
-        /*     game_state->nr_of_fruits--; */
-        /*     new_snake_body_part(&players[client_id]->snake->body[players[client_id]->snake->body_length-1].pos, */ 
-        /*         players[client_id]->snake->body[players[client_id]->snake->body_length-1].angle, */
-        /*         &players[client_id]->snake->body_length); */
-        /*     players[client_id]->snake->speed -= 50; */
-        /* } */
+        /* update_state_if_fruit_collision(players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits); */
+        fruit_collision(udp_sock, server_addr, pack_send, players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
         // fruit rendering
-        SDL_Rect fruit_src[MAX_PLAYERS];
-        SDL_Rect fruit_dst[MAX_PLAYERS];
+        SDL_Rect fruit_src[MAX_PLAYERS] = {0};
+        SDL_Rect fruit_dst[MAX_PLAYERS] = {0};
 
-        /*Fruit *temp_fruit = NULL;
-        if(nr_of_fruits < game_state->nr_of_players) {
-            // spawn new fruit
-            while(temp_fruit == NULL) {
-                //temp_fruit = new_fruit(fruits, nr_of_fruits, players[game_state->client_id]->snake);
-            }
-            fruits[nr_of_fruits++] = temp_fruit;
-        }*/
-        for (int i = 0; i < game_state->nr_of_fruits; i++) {
+        for (int i = 0; i < MAX_PLAYERS; i++) {
             if(game_state->fruits[i] == NULL) {
+                // don't try to render a fruit that doesn't exist
                 continue;
             }
             fruit_src[i].x = fruit_texture[game_state->fruits[i]->type].x;
@@ -279,7 +266,11 @@ int main(int argc, char *argv[])
         SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
         // render fruits
-        for (int i = 0; i < game_state->nr_of_fruits; i++) {
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            if(fruit_src[i].w != CELL_SIZE || fruit_dst[i].w != CELL_SIZE) {
+                // skip rendering if there is no fruit
+                continue;
+            }
             SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
         }
         // render all snakes
@@ -378,8 +369,10 @@ int main(int argc, char *argv[])
         SDL_Delay(1000 / 60);
     }
 
-    // cleanup thread
-    SDL_DetachThread(recv_thread);
+    // indicate that receive thread should stop running
+    thread_done = true;
+    // wait for thread to cleanup and exit
+    SDL_WaitThread(recv_thread, NULL);
 
     // free receive buffer from memory
     free_buffer(buf);

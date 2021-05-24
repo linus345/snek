@@ -10,7 +10,8 @@ Circular_Buffer *init_buffer(int capacity, int size)
     // allocate memory for entire struct
     Circular_Buffer *buf = malloc(sizeof(Circular_Buffer));
     // allocate memory for actual buffer data
-    void *data_start = malloc(size * capacity);
+    /* void *data_start = malloc(size * capacity); */
+    void *data_start = calloc(capacity+1, size);
 
     // initialize struct
     buf->data_start = data_start;
@@ -41,7 +42,7 @@ int write_to_buffer(Circular_Buffer *buf, void *data)
 {
     SDL_LockMutex(buf->mutex);
     void *next = ((char *) buf->write_ptr) + buf->size;
-    if(next == buf->data_end) {
+    if(next >= buf->data_end) {
         next = buf->data_start;
     }
     // check if buffer is full
@@ -51,9 +52,14 @@ int write_to_buffer(Circular_Buffer *buf, void *data)
         return -1;
     }
     // store data in buffer
+    /* printf("data_start: %p\n", buf->data_start); */
+    /* printf("data_end: %p\n", buf->data_end); */
+    /* printf("write_ptr: %p\n", buf->write_ptr); */
+    /* printf("data ptr: %p\n", data); */
     memcpy(buf->write_ptr, data, buf->size);
     // increment write pointer
     buf->write_ptr = next;
+    buf->count++;
     SDL_UnlockMutex(buf->mutex);
     // return code to indicate that write was a success
     return 0;
@@ -61,29 +67,26 @@ int write_to_buffer(Circular_Buffer *buf, void *data)
 
 int read_from_buffer(Circular_Buffer *buf, void *data)
 {
-    printf("1\n");
+    printf("buffer count: %d\n", buf->count);
     SDL_LockMutex(buf->mutex);
-    printf("2\n");
     // check if buffer is empty
     if(buf_is_empty(buf)) {
         SDL_UnlockMutex(buf->mutex);
         // return code to indicate that buffer is empty
         return -1;
     }
-    printf("3\n");
     void *next = ((char *) buf->read_ptr) + buf->size;
     if(next == buf->data_end) {
         next = buf->data_start;
     }
-    printf("4\n");
     // get data from buffer
-    printf("read_ptr: %p\n", buf->read_ptr);
-    printf("write_ptr: %p\n", buf->write_ptr);
-    printf("data ptr: %p\n", data);
+    /* printf("read_ptr: %p\n", buf->read_ptr); */
+    /* printf("write_ptr: %p\n", buf->write_ptr); */
+    /* printf("data ptr: %p\n", data); */
     memcpy(data, buf->read_ptr, buf->size);
-    printf("5\n");
     // increment read pointer
     buf->read_ptr = next;
+    buf->count--;
     SDL_UnlockMutex(buf->mutex);
     // return code to indicate that read was successful
     return 0;
