@@ -22,7 +22,8 @@ enum Menu_selection {
     JOIN_MULTIPLAYER = 12,
     HIGH_SCORE = 20,
     SETTINGS = 30,
-    START_GAME = 100
+    START_GAME = 100,
+    TYPE_NAME = 420
 };
 
 //Standard dimensions for menu button backgrounds and texts.
@@ -44,7 +45,7 @@ Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color co
 Screen_item* input_text(App* app, Screen_item* item);
 bool hover_state (Screen_item* button, int Mx, int My);
 
-void menu(App* app);
+void menu(App* app, char* name);
 int main_menu (App*  app);
 int select_game_menu (App* app);
 int join_multiplayer (App* app);
@@ -52,4 +53,7 @@ int host_multiplayer (App* app);
 int high_score (App* app);
 int settings (App* app);
 
+//int high_score (App *app, SDL_Rect* r, bool* fullscreen);
+//int settings (App *app, SDL_Rect* r, bool* fullscreen);
+int type_name(App* app, char name[]);
 #endif

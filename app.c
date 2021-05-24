@@ -52,8 +52,8 @@ App *init_app() {
     return app;
 }
 
-void quit_app(App *app) {
-
+void quit_app(App *app)
+{
     printf("Exiting...\n");
     // destory window and renderer to free memory
     SDL_DestroyWindow(app->window);

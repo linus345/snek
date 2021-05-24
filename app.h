@@ -1,10 +1,16 @@
 #ifndef APP_H
 #define APP_H
 
-#include <stdbool.h>
 #include <SDL2/SDL.h>
-#define WINDOW_WIDTH 960
+#include <stdbool.h>
+//960
+#define WINDOW_WIDTH 1250
 #define WINDOW_HEIGHT 960
+
+#define GAME_WIDTH 960
+#define GAME_HEIGHT 960
+
+#define GAME_START 250
 
 //Core window renderer
 typedef struct App {
@@ -15,7 +21,7 @@ typedef struct App {
     char ip[16], port[5];
 } App;
 
-App *init_app();
-void quit_app(App *app);
+App* init_app();
+void quit_app(App* app);
 
 #endif
