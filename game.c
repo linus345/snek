@@ -32,7 +32,7 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
 
 int game(App* app, Sound_effects* sound)
 {
-    bool show_scoreboard = false;
+    bool show_scoreboard = false, mute = false;
     /*
     if (app->fullscreen) {
         SDL_SetWindowFullscreen(app->window, 0);
@@ -55,7 +55,7 @@ int game(App* app, Sound_effects* sound)
     snake_texture[1].x = 32;
     snake_texture[1].y = 0;
     // tail
-    snake_texture[2].x = 32; 
+    snake_texture[2].x = 32;
     snake_texture[2].y = 32;
     // turning bodypart
     snake_texture[3].x = 0;
@@ -120,7 +120,8 @@ int game(App* app, Sound_effects* sound)
     int score = 0;
     char buffer[50];
 
-    Screen_item* return_button = menu_button_text(app, "Leave game", font, white_txt);
+    Screen_item* return_button = menu_button_background(app, "./resources/exit_button.png");
+    Screen_item* mute_button = menu_button_background(app, "./resources/speaker_icon.png"); // Game starts with sound
 
     // timer
     unsigned last_time = 0, current_time;
@@ -191,6 +192,14 @@ int game(App* app, Sound_effects* sound)
                     free(player4_score);
                     free(return_button);
                     return MAIN_MENU;
+                } else if (hover_state(mute_button, Mx, My)) {
+                    if (mute) { // Unmutes all the sounds and changes the speaker icon
+                        mute_button = menu_button_background(app, "./resources/speaker_icon.png");
+                        mute = false;
+                    } else if (!mute) { // Mutes all the sounds and changes the speaker icon
+                        mute_button = menu_button_background(app, "./resources/speaker_icon_mute.png");
+                        mute = true;
+                    }
                 }
                 break;
             }
@@ -198,12 +207,17 @@ int game(App* app, Sound_effects* sound)
 
         // Checks if any collisons has occured with the walls
         if (collison_with_wall(player1->snake)) {
-            play_sound(sound->wall_collison); // plays wall collison sound effect
+            if (!mute) {
+                play_sound(sound->wall_collison); // plays wall collison sound effect
+            }
             app->running = false;
             show_scoreboard = true; // Remove once multiplayer has been implimented
         }
         // Checks if any collisons has occured with a snake
         if (collison_with_snake(player1->snake)) {
+            if (!mute) {
+                play_sound(sound->wall_collison); // plays wall collison sound effect
+            }
             app->running = false;
             show_scoreboard = true; // Remove once multiplayer has been implimented
         }
@@ -247,7 +261,9 @@ int game(App* app, Sound_effects* sound)
 
             player1_score = menu_button_text(app, buffer, font, white_txt);
 
-            play_sound(sound->eat); // plays eat sound effect
+            if (!mute) {
+                play_sound(sound->eat); // plays eat sound effect
+            }
 
             printf("speed: %d\n", player1->snake->speed);
         }
@@ -317,7 +333,7 @@ int game(App* app, Sound_effects* sound)
         }
 
         SDL_Rect tail_src = { snake_texture[2].x, snake_texture[2].y, CELL_SIZE, CELL_SIZE };
-        SDL_Rect tail_dst = { player1->snake->tail.pos.x, player1->snake->tail.pos.y, CELL_SIZE, CELL_SIZE};
+        SDL_Rect tail_dst = { player1->snake->tail.pos.x, player1->snake->tail.pos.y, CELL_SIZE, CELL_SIZE };
 
         // clear screen before next render
         SDL_RenderClear(app->renderer);
@@ -340,7 +356,8 @@ int game(App* app, Sound_effects* sound)
         render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
         render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
 
-        render_item(app, &return_button->rect, return_button->texture, UNSPECIFIED, 15, GAME_HEIGHT-50, 220, 50);
+        render_item(app, &return_button->rect, return_button->texture, UNSPECIFIED, 55, GAME_HEIGHT - 50, 50, 50);
+        render_item(app, &mute_button->rect, mute_button->texture, UNSPECIFIED, 160, GAME_HEIGHT - 50, 50, 50);
 
         // render fruits
         for (int i = 0; i < nr_of_fruits; i++) {
@@ -476,7 +493,7 @@ int scoreboard(App* app, Sound_effects* sound, int score)
 
         render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, WINDOW_WIDTH/2-129, 100, 300, 120);
+        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, WINDOW_WIDTH / 2 - 129, 100, 300, 120);
 
         render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y, FSD_BUTTON_W, FSD_BUTTON_H);
         render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + FY_OFFSET, FSD_BUTTON_W, FSD_BUTTON_H);
@@ -490,7 +507,7 @@ int scoreboard(App* app, Sound_effects* sound, int score)
         render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (2 * FY_OFFSET), F_NAME_W, F_NAME_H);
         render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (3 * FY_OFFSET), F_NAME_W, F_NAME_H);
 
-        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, WINDOW_WIDTH/2-129, WINDOW_HEIGHT-145, 300, 120);
+        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, WINDOW_WIDTH / 2 - 129, WINDOW_HEIGHT - 145, 300, 120);
 
         // present on screen
         SDL_RenderPresent(app->renderer);
