@@ -51,6 +51,8 @@ void menu(App* app)
         case START_GAME:
             menu_state = game(app, sound);
             break;
+        case LOBBY:
+            menu_state = lobby(app, sound);
         }
     }
     free_sound_effects(sound);
@@ -91,6 +93,104 @@ bool hover_state(Screen_item* button, int Mx, int My)
         return true;
     }
     return false;
+}
+
+int lobby(App* app, Sound_effects* sound)
+{
+    int Mx, My;
+    bool playsound = true;
+
+    TTF_Font* font = TTF_OpenFont("./resources/adventure.otf", 250);
+
+    Screen_item* background = menu_button_background(app, "./resources/background.png");
+    //Screen_item* button1 = menu_button_background(app, "./resources/menuButton.png");
+    //Screen_item* text1 = menu_button_text(app, "hej", font, green);
+    Screen_item* start_button = menu_button_text(app, "Start", font, white);
+    Screen_item* exit_button = menu_button_text(app, "Exit", font, white);
+
+    // screen item för varje spelare
+    // + orm val
+
+    while (app->running) {
+
+        //SDL_MouseButtonEvent mouse_event;
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    // exit main loop
+                    app->running = false;
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    if (hover_state(start_button, Mx, My)) {            /* START */
+                        // Plays button press effect
+                        play_sound(sound->press);
+                        // Makes space on the heap
+                        //free(button1);
+                        //free(text1);
+                        free(background);
+                        free(start_button);
+                        free(exit_button);
+                        return START_GAME;
+                    } else if (hover_state(exit_button, Mx, My)) {      /* EXIT */
+                        // Plays button press effect
+                        play_sound(sound->back);
+                        // Makes space on the heap
+                        //free(button1);
+                        //free(text1);
+                        free(background);
+                        free(start_button);
+                        free(exit_button);
+                        return MAIN_MENU;
+                    }
+                    break;
+                case SDL_KEYDOWN:
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE:
+                            // exit main loop
+                            return MAIN_MENU;
+                            break;
+                    }
+                    break;
+            }
+        }
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+        
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
+        render_item(app, &start_button->rect, start_button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
+
+        //If-state for wether the text should switch color on hover or not
+        if (hover_state(start_button, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                play_sound(sound->hover); // Plays hover effect
+                playsound = false;
+            } 127, 127, 127);
+
+        } else if (hover_state(exit_button, Mx, My)) {
+            if (playsound) { // Makes sure the sound effect only plays once
+                play_sound(sound->hover); // Plays hover effect
+                playsound = false;
+            }
+            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
+        } else {
+            if (!playsound) { // Makes sure the sound effect only plays once
+                playsound = true;
+            }
+            SDL_SetTextureColorMod(start_button->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(start_button->texture,
+        }
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
+    }
+    SDL_StopTextInput();
+    return 0;  
 }
 
 // User input for ip address och port number

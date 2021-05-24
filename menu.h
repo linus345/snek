@@ -24,7 +24,8 @@ enum Menu_selection {
     HIGH_SCORE = 20,
     SETTINGS = 30,
     START_GAME = 100,
-    TYPE_NAME = 420
+    TYPE_NAME = 420,
+    LOBBY = 80085
 };
 
 void menu_init(App* app, SDL_Texture* background, SDL_Texture* newGame, SDL_Texture* exit);
@@ -42,5 +43,7 @@ int host_multiplayer (App* app, Sound_effects* sound);
 int high_score (App* app, Sound_effects* sound);
 int settings (App* app, Sound_effects* sound);
 int type_name(App* app, Sound_effects* sound);
+
+int lobby(App* app, Sound_effects* sound);
 
 #endif
