@@ -2,22 +2,25 @@
 #include <SDL2/SDL_mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "sound.h"
 
-Sound_effects* int_sounds()
+Sound_effects* init_sounds()
 {
     Sound_effects* sound = malloc(sizeof(Sound_effects));
 
     // Menu sound effects
-    sound->press = Mix_LoadWAV("./resources/Sound Effects/Button_press_effect.wav");
-    sound->hover = Mix_LoadWAV("./resources/Sound Effects/Hover_effect.wav");
-    sound->back = Mix_LoadWAV("./resources/Sound Effects/VALENTINE_whip_one_shot_high.wav");
+    sound->press = Mix_LoadWAV("./resources/Sound_Effects/Button_press_effect.wav");
+    sound->hover = Mix_LoadWAV("./resources/Sound_Effects/Hover_effect.wav");
+    sound->back = Mix_LoadWAV("./resources/Sound_Effects/VALENTINE_whip_one_shot_high.wav");
 
     // Game sound effects
-    sound->eat = Mix_LoadWAV("./resources/Sound Effects/Eat_effect.wav");
-    sound->wall_collison = Mix_LoadWAV("./resources/Sound Effects/Slap effect.wav");
-    sound->scoreboard = Mix_LoadWAV("./resources/Sound Effects/Scoreboard_effect.wav");
+    sound->eat = Mix_LoadWAV("./resources/Sound_Effects/Eat_effect.wav");
+    sound->wall_collison = Mix_LoadWAV("./resources/Sound_Effects/Slap effect.wav");
+    sound->scoreboard = Mix_LoadWAV("./resources/Sound_Effects/Scoreboard_effect.wav");
+
+    sound->muted = false;
 
     return sound;
 }

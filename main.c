@@ -1,21 +1,23 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
-
-#include <math.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
 #include "app.h"
 #include "fruit.h"
 #include "game.h"
 #include "menu.h"
 #include "player.h"
 #include "snake.h"
+#include "network.h"
+#include "circular_buffer.h"
+
+// used to indicate if receive thread should exit
+bool thread_done;
 
 int main(int argc, char* argv[])
 {
@@ -35,7 +37,7 @@ int main(int argc, char* argv[])
     }
     printf("successfully initialized SDL_net\n");
     if (TTF_Init() != 0) {
-        SDL_Log("TTF_Init failed: %s", SDL_GetError());
+        SDL_Log("TTF_Init failed: %s", TTF_GetError());
         return 3;
     }
     printf("successfully initialized TTF\n");
@@ -47,16 +49,11 @@ int main(int argc, char* argv[])
     }
 
     App* app = init_app();
-    
-    //SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    TTF_Init();
-    if (TTF_Init == NULL || SDL_SetWindowFullscreen == NULL) {
-        fprintf(stderr, "error: font not found\n%s\n", TTF_GetError());
-        return 0;
-    }
-    menu(app);
 
-    TTF_Quit();
+    Game_State *game_state = init_game_state();
+
+    main_loop(app, game_state);
+
     quit_app(app);
 
     return 0;

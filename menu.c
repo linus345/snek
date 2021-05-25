@@ -21,43 +21,6 @@ SDL_Color
     green = { 45, 93, 9, 255 },
     dark_green = { 9, 34, 3, 255 };
 
-void menu(App* app)
-{
-    Sound_effects* sound = int_sounds();
-    int menu_state = MAIN_MENU;
-    while (app->running) {
-        switch (menu_state) {
-        case MAIN_MENU:
-            menu_state = main_menu(app, sound);
-            break;
-        case SELECT_GAME:
-            menu_state = select_game_menu(app, sound);
-            break;
-        case JOIN_MULTIPLAYER:
-            menu_state = join_multiplayer(app, sound);
-            break; /*
-        case HOST_MULTIPLAYER:
-            menu_state = host_multiplayer(app);
-            break;
-        case HIGH_SCORE:
-            menu_state = high_score(app);
-            break;
-        case SETTINGS:
-            menu_state = settings(app);
-            break;*/
-        case TYPE_NAME:
-            menu_state = type_name(app, sound);
-            break;
-        case START_GAME:
-            menu_state = game(app, sound);
-            break;
-        }
-    }
-    free_sound_effects(sound);
-    free(sound);
-    return;
-}
-
 // Button memory allocator and texture loader.
 Screen_item* menu_button_background(App* app, char resource[])
 {
@@ -94,7 +57,7 @@ bool hover_state(Screen_item* button, int Mx, int My)
 }
 
 // User input for ip address och port number
-int main_menu(App* app, Sound_effects* sound)
+int main_menu(App* app)
 {
     int Mx, My;
 
@@ -123,7 +86,7 @@ int main_menu(App* app, Sound_effects* sound)
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(text1, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->press);
+                    play_sound(app->sound->press);
                     // Makes space on the heap
                     free(background);
                     free(button1);
@@ -136,7 +99,7 @@ int main_menu(App* app, Sound_effects* sound)
                     return SELECT_GAME;
                 } /* else if (hover_state(text2, Mx, My)) {
                         // Plays button press effect
-                        play_sound(sound->press);
+                        play_sound(app->sound->press);
                         // Makes space on the heap
                         free(background);
                         free(button1);
@@ -149,7 +112,7 @@ int main_menu(App* app, Sound_effects* sound)
                         return HIGH_SCORE;
                     } else if (hover_state(text3, Mx, My)) {
                         // Plays button press effect
-                        play_sound(sound->press);
+                        play_sound(app->sound->press);
                         free(background);
                         free(button1);
                         free(button2);
@@ -206,28 +169,28 @@ int main_menu(App* app, Sound_effects* sound)
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
 
         } else if (hover_state(text2, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
 
         } else if (hover_state(text3, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
 
         } else if (hover_state(exit_button, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
@@ -250,7 +213,7 @@ int main_menu(App* app, Sound_effects* sound)
     return 0;
 }
 
-int select_game_menu(App* app, Sound_effects* sound)
+int select_game_menu(App* app)
 {
 
     int Mx, My;
@@ -283,7 +246,7 @@ int select_game_menu(App* app, Sound_effects* sound)
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(text1, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->press);
+                    play_sound(app->sound->press);
                     // Makes space on the heap
                     free(button1);
                     free(text1);
@@ -296,7 +259,7 @@ int select_game_menu(App* app, Sound_effects* sound)
 
                 } /* else if (hover_state(text2, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->press);
+                    play_sound(app->sound->press);
                     // Makes space on the heap
                     free(button1);
                     free(text1);
@@ -313,7 +276,7 @@ int select_game_menu(App* app, Sound_effects* sound)
                 } */
                 else if (hover_state(text3, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->press);
+                    play_sound(app->sound->press);
                     // Makes space on the heap
                     free(button1);
                     free(text1);
@@ -326,7 +289,7 @@ int select_game_menu(App* app, Sound_effects* sound)
 
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->back);
+                    play_sound(app->sound->back);
                     // Makes space on the heap
                     free(button1);
                     free(text1);
@@ -383,28 +346,28 @@ int select_game_menu(App* app, Sound_effects* sound)
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text1, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
 
         } else if (hover_state(text2, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
 
         } else if (hover_state(text3, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
 
         } else if (hover_state(exit_button, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
@@ -428,9 +391,9 @@ int select_game_menu(App* app, Sound_effects* sound)
     return 0;
 }
 
-int join_multiplayer(App* app, Sound_effects* sound)
+int join_multiplayer(App* app)
 {
-
+    type_name(app);
     int Mx, My;
     bool ip = false, port = false, playsound = true;
 
@@ -463,12 +426,12 @@ int join_multiplayer(App* app, Sound_effects* sound)
                     SDL_StartTextInput();
                 } else if (hover_state(background2, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->press);
+                    play_sound(app->sound->press);
                     port = true;
                     SDL_StartTextInput();
                 } else if (hover_state(button, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->press);
+                    play_sound(app->sound->press);
                     // Makes space on the heap
                     free(background);
                     free(background1);
@@ -483,7 +446,7 @@ int join_multiplayer(App* app, Sound_effects* sound)
 
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->back);
+                    play_sound(app->sound->back);
                     // Makes space on the heap
                     free(background);
                     free(background1);
@@ -583,28 +546,28 @@ int join_multiplayer(App* app, Sound_effects* sound)
         //If-state for wether the text should switch color on hover or not
         if (hover_state(text3, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
 
         } else if (hover_state(exit_button, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
 
         } else if (hover_state(text1, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text1->texture, 127, 127, 127);
 
         } else if (hover_state(text2, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(text2->texture, 127, 127, 127);
@@ -792,7 +755,7 @@ int settings(App* app, bool* fullscreen_bool)
     }
 }*/
 
-int type_name(App* app, Sound_effects* sound)
+int type_name(App* app)
 {
     int Mx, My;
 
@@ -817,12 +780,12 @@ int type_name(App* app, Sound_effects* sound)
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(button, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->press);
+                    play_sound(app->sound->press);
                     printf("Pressed\n");
                     SDL_StartTextInput();
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Plays button press effect
-                    play_sound(sound->back);
+                    play_sound(app->sound->back);
                     free(background);
                     free(button);
                     free(text);
@@ -847,7 +810,7 @@ int type_name(App* app, Sound_effects* sound)
                     break;
                 case SDLK_RETURN:
                     // Plays button press effect
-                    play_sound(sound->back);
+                    play_sound(app->sound->back);
                     SDL_StopTextInput();
                     tmp_surface = NULL;
                     printf("Name: %s\n", app->player_name);
@@ -899,7 +862,7 @@ int type_name(App* app, Sound_effects* sound)
 
         if (hover_state(exit_button, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
-                play_sound(sound->hover); // Plays hover effect
+                play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
             SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);

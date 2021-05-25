@@ -7,21 +7,27 @@
 #include "snake.h"
 #include "fruit.h"
 
-Snake *new_snake(int player_nr)
+// TODO: BANDAID FIX, MUST FIX!!! FIX MUCH IMPORTANT!!!!!!!!!
+void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits);
+
+Snake *new_snake(int id)
 {
     // allocate memory on heap
     Snake *snake = malloc(sizeof(Snake));
 
+    printf("new_snake id: %d\n", id);
     snake->body_length = 0;
     // initialize start speed
     snake->speed = SPEED;
     snake->next_dir = None;
     snake->head.has_turned = false;
+    snake->head.next_pos.x = -1;
+    snake->head.next_pos.y = -1;
 
     // position snake differently depending on player
-    switch(player_nr) {
+    switch(id) {
         // position snake top left, moving to the right
-        case 1:
+        case 0:
             snake->vel_x = CELL_SIZE;
             snake->vel_y = 0;
             snake->head.angle = 90;
@@ -34,7 +40,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y;
             break;
         // position snake top right, moving to downwards
-        case 2:
+        case 1:
             snake->vel_x = 0;
             snake->vel_y = CELL_SIZE;
             snake->head.angle = 180;
@@ -48,7 +54,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y - CELL_SIZE * 2;
             break;
         // position snake bottom right, moving to the left
-        case 3:
+        case 2:
             snake->vel_x = CELL_SIZE;
             snake->vel_y = 0;
             snake->head.angle = 270;
@@ -62,7 +68,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y;
             break;
         // position snake bottom left, moving upwards
-        case 4:
+        case 3:
             snake->vel_x = 0;
             snake->vel_y = CELL_SIZE;
             snake->head.angle = 0;
@@ -120,7 +126,7 @@ void change_snake_velocity(Snake *snake)
     }
 }
 
-void new_snake_pos(Snake *snake)
+void new_snake_pos(Snake *snake, bool should_update_head)
 {
     // update tail position
     snake->tail.pos.x = snake->body[snake->body_length-1].pos.x;
@@ -201,9 +207,12 @@ void new_snake_pos(Snake *snake)
     snake->body[0].pos.x = snake->head.pos.x;
     snake->body[0].pos.y = snake->head.pos.y;
     snake->body[0].angle = snake->head.angle;
+
     // update head position
-    snake->head.pos.x += snake->vel_x;
-    snake->head.pos.y += snake->vel_y;
+    if(should_update_head) {
+        snake->head.pos.x += snake->vel_x;
+        snake->head.pos.y += snake->vel_y;
+    }
     snake->head.has_turned = false;
     snake->head.mouth_open = false;
     snake->head.mouth_eating = false;
@@ -269,4 +278,15 @@ bool collison_with_snake(Snake *snake)
     }
     // No collison detected
     return false;
+}
+
+void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits)
+{
+    for(int i = 0; i < nr_of_fruits; i++) {
+        if (fruits[i] != NULL && fruits[i]->pos.x == head->pos.x && (fruits[i]->pos.y-CELL_SIZE == head->pos.y || fruits[i]->pos.y+CELL_SIZE == head->pos.y)) {
+            head->mouth_open = true;
+        } else if (fruits[i] != NULL && fruits[i]->pos.y == head->pos.y && (fruits[i]->pos.x-CELL_SIZE == head->pos.x || fruits[i]->pos.x+CELL_SIZE == head->pos.x)) {
+            head->mouth_open = true;
+        }
+    }
 }
