@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#include "network.h"
 #include "sound.h"
 
 #define WINDOW_WIDTH 1210
@@ -24,10 +23,6 @@ typedef struct App {
     SDL_DisplayMode display;
     char ip[16], port[5], player_name[16];
     Sound_effects* sound;
-    UDPsocket udp_sock;
-    UDPpacket *pack_send;
-    UDPpacket *pack_recv;
-    IPaddress server_addr;
 } App;
 
 App *init_app();

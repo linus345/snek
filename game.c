@@ -30,11 +30,6 @@ Game_State *init_game_state()
         game_state->fruits[i] = NULL;
     }
 
-    // array to store info about connected players
-    for(int i = 0; i < MAX_PLAYERS; i++) {
-        game_state->players[i] = NULL;
-    }
-
     return game_state;
 }
 
@@ -85,7 +80,7 @@ void main_loop(App* app, Game_State *game_state)
             menu_state = game(app, game_state);
             break;
         case LOBBY:
-            menu_state = lobby(app, game_state);
+            menu_state = lobby(app);
             break;
         }
     }
@@ -148,62 +143,6 @@ int lobby(App* app)
                             break;
                     }
                     break;
-            }
-
-            // open socket
-            app->udp_sock = open_client_socket();
-
-            // allocate memory for sent packet
-            pack_send = allocate_packet(PACKET_DATA_SIZE);
-
-            // allocate memory for received packet
-            pack_recv = allocate_packet(PACKET_DATA_SIZE);
-
-            // resolve server address TODO: bind address?
-            int server_port = atoi(app->port);
-            app->server_addr = resolve_host(app->ip, server_port);
-
-            /* // keep track of number of joined clients */
-            /* int nr_of_players = 0; */
-            /* // client id for this specific client, needed to select correct player from the players array */
-            /* int client_id; */
-
-            // send join game request
-            join_game_request(udp_sock, server_addr, pack_send);
-            // wait for server to respond to request, only wait for 3 seconds
-            unsigned time_when_req_sent = SDL_GetTicks();
-            // used when client connecting and in main loop
-            int request_type;
-
-            while(!game_state->connected) {
-                if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
-                    // get request type from packet
-                    sscanf((char *) pack_recv->data, "%d", &request_type);
-                    switch(request_type) {
-                        // these are the only expected types
-                        case SUCCESSFUL_CONNECTION:
-                            // adds new player and increments nr_of_players
-                            new_client_joined(pack_recv->data, game_state, game_state->players);
-                            break;
-                        case FAILED_CONNECTION:
-                            // TODO: handle it differently if it failed because 4 clients
-                            // already is connected
-                            printf("Failed to connect, retrying...\n");
-                            // TODO: temporary exit until fixing above todo
-                            exit(EXIT_FAILURE);
-                            // update time for new request
-                            time_when_req_sent = SDL_GetTicks();
-                            break;
-                    }
-                }
-                // 3 second timer to break out of loop if packet not received yet
-                // prevents from getting stuck in while loop
-                if(time_when_req_sent > time_when_req_sent + 3000) {
-                    printf("join: request timed out\n");
-                    // exit for now
-                    exit(EXIT_FAILURE);
-                    break;
-                }
             }
         }
         // clear screen before next render
@@ -320,6 +259,15 @@ int game(App* app, Game_State *game_state)
     Screen_item* mute_button = menu_button_background(app, "./resources/Textures/speaker_icon.png"); // Game starts with sound
 
     //////////// NETWORK ////////////
+
+    // open socket
+    UDPsocket udp_sock = open_client_socket();
+
+    // allocate memory for sent packet
+    UDPpacket *pack_send = allocate_packet(PACKET_DATA_SIZE);
+
+    // allocate memory for received packet
+    UDPpacket *pack_recv = allocate_packet(PACKET_DATA_SIZE);
 
     // resolve server address TODO: bind address?
     int server_port = atoi(app->port);

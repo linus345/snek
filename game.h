@@ -4,7 +4,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include "app.h"
-#include "player.h"
 #include "sound.h"
 #include "fruit.h"
 
@@ -26,7 +25,6 @@ typedef struct {
     bool connected;
     int nr_of_fruits;
     Fruit *fruits[MAX_PLAYERS];
-    Player *players[MAX_PLAYERS];
 } Game_State;
 
 enum Scoreboard_dimensions {
@@ -71,7 +69,7 @@ enum Finsh_scoreboard_dimensions {
 Game_State *init_game_state();
 void load_texture(App* app, SDL_Texture** texture, char* path);
 void main_loop(App* app, Game_State *game_state);
-int lobby(App* app, Game_State *game_state);
+int lobby(App* app);
 void optimizeFullscreen(App* app, SDL_Rect* rect);
 int game(App* app, Game_State *game_state);
 int scoreboard(App* app, int score);
