@@ -16,6 +16,13 @@ typedef struct {
     Circular_Buffer *buf;
 } Thread_Args;
 
+typedef struct {
+    UDPsocket udp_sock;
+    UDPpacket *pack_recv;
+    UDPpacket *pack_send;
+    IPaddress server_addr;
+} Network;
+
 enum Request_Type {
     CLIENT_JOIN = 0,
     NEW_CLIENT_JOINED = 1,
@@ -28,6 +35,7 @@ enum Request_Type {
     ATE_FRUIT = 8
 };
 
+Network *init_net(App *app, int packet_size);
 void free_net(UDPsocket udp_sock, UDPpacket *pack_recv, UDPpacket *pack_send);
 UDPsocket open_client_socket();
 UDPpacket *allocate_packet(int size);

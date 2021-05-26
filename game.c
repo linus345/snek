@@ -28,6 +28,7 @@ Game_State *init_game_state()
     game_state->nr_of_fruits = 0;
     for(int i = 0; i < MAX_PLAYERS; i++) {
         game_state->fruits[i] = NULL;
+        game_state->players[i] = NULL;
     }
 
     return game_state;
@@ -52,6 +53,8 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
 
 void main_loop(App* app, Game_State *game_state)
 {
+    Network *net = init_net(app, PACKET_DATA_SIZE);
+
     int menu_state = MAIN_MENU;
     while (app->running) {
         switch (menu_state) {
@@ -77,16 +80,16 @@ void main_loop(App* app, Game_State *game_state)
             menu_state = type_name(app);
             break;
         case START_GAME:
-            menu_state = game(app, game_state);
+            menu_state = game(app, game_state, net);
             break;
         case LOBBY:
-            menu_state = lobby(app);
+            menu_state = lobby(app, game_state, net);
             break;
         }
     }
 }
 
-int lobby(App* app)
+int lobby(App* app, Game_State* game_state, Network* net)
 {
     int Mx, My;
     bool playsound = true;
@@ -118,7 +121,6 @@ int lobby(App* app)
                         play_sound(app->sound->press);
                         // Makes space on the heap
                         //free(button1);
-                        //free(text1);
                         free(background);
                         free(start_button);
                         free(exit_button);
@@ -128,7 +130,6 @@ int lobby(App* app)
                         play_sound(app->sound->back);
                         // Makes space on the heap
                         //free(button1);
-                        //free(text1);
                         free(background);
                         free(start_button);
                         free(exit_button);
@@ -143,6 +144,44 @@ int lobby(App* app)
                             break;
                     }
                     break;
+            }
+
+            // send join game request
+            join_game_request(net->udp_sock, net->server_addr, net->pack_send);
+            // wait for server to respond to request, only wait for 3 seconds
+            unsigned time_when_req_sent = SDL_GetTicks();
+            // used when client connecting and in main loop
+            int request_type;
+
+            while(!game_state->connected) {
+                if(SDLNet_UDP_Recv(net->udp_sock, net->pack_recv)) {
+                    // get request type from packet
+                    sscanf((char *) net->pack_recv->data, "%d", &request_type);
+                    switch(request_type) {
+                        // these are the only expected types
+                        case SUCCESSFUL_CONNECTION:
+                            // adds new player and increments nr_of_players
+                            new_client_joined(net->pack_recv->data, game_state, game_state->players);
+                            break;
+                        case FAILED_CONNECTION:
+                            // TODO: handle it differently if it failed because 4 clients
+                            // already is connected
+                            printf("Failed to connect, retrying...\n");
+                            // TODO: temporary exit until fixing above todo
+                            exit(EXIT_FAILURE);
+                            // update time for new request
+                            time_when_req_sent = SDL_GetTicks();
+                            break;
+                    }
+                }
+                // 3 second timer to break out of loop if packet not received yet
+                // prevents from getting stuck in while loop
+                if(time_when_req_sent > time_when_req_sent + 3000) {
+                    printf("join: request timed out\n");
+                    // exit for now
+                    exit(EXIT_FAILURE);
+                    break;
+                }
             }
         }
         // clear screen before next render
@@ -179,7 +218,7 @@ int lobby(App* app)
     return START_GAME;  
 }
 
-int game(App* app, Game_State *game_state)
+int game(App* app, Game_State *game_state, Network* net)
 {
     int Mx, My;
 
@@ -260,7 +299,7 @@ int game(App* app, Game_State *game_state)
 
     //////////// NETWORK ////////////
 
-    // open socket
+   /*  // open socket
     UDPsocket udp_sock = open_client_socket();
 
     // allocate memory for sent packet
@@ -272,30 +311,32 @@ int game(App* app, Game_State *game_state)
     // resolve server address TODO: bind address?
     int server_port = atoi(app->port);
     IPaddress server_addr = resolve_host(app->ip, server_port);
+ */
+/*     Network *net = init_net(app, PACKET_DATA_SIZE);
 
     // array to store info about connected players
-    Player *players[MAX_PLAYERS] = {NULL, NULL, NULL, NULL};
-    /* // keep track of number of joined clients */
-    /* int nr_of_players = 0; */
-    /* // client id for this specific client, needed to select correct player from the players array */
-    /* int client_id; */
+    //Player *players[MAX_PLAYERS] = {NULL, NULL, NULL, NULL};
+    // keep track of number of joined clients 
+    int nr_of_players = 0; 
+    // client id for this specific client, needed to select correct player from the players array 
+    int client_id; 
 
     // send join game request
-    join_game_request(udp_sock, server_addr, pack_send);
+    join_game_request(net->udp_sock, net->server_addr, net->pack_send);
     // wait for server to respond to request, only wait for 3 seconds
     unsigned time_when_req_sent = SDL_GetTicks();
     // used when client connecting and in main loop
     int request_type;
 
     while(!game_state->connected) {
-        if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
+        if(SDLNet_UDP_Recv(net->udp_sock, net->pack_recv)) {
             // get request type from packet
-            sscanf((char *) pack_recv->data, "%d", &request_type);
+            sscanf((char *) net->pack_recv->data, "%d", &request_type);
             switch(request_type) {
                 // these are the only expected types
                 case SUCCESSFUL_CONNECTION:
                     // adds new player and increments nr_of_players
-                    new_client_joined(pack_recv->data, game_state, players);
+                    new_client_joined(net->pack_recv->data, game_state, game_state->players);
                     break;
                 case FAILED_CONNECTION:
                     // TODO: handle it differently if it failed because 4 clients
@@ -316,7 +357,7 @@ int game(App* app, Game_State *game_state)
             exit(EXIT_FAILURE);
             break;
         }
-    }
+    } */
 
     //////////////////////////////////
 
@@ -326,7 +367,7 @@ int game(App* app, Game_State *game_state)
     // set global variable thread_done to false before creating thread
     thread_done = false;
     // arguments that thread needs to access
-    Thread_Args args = {udp_sock, pack_recv, pack_send, buf};
+    Thread_Args args = {net->udp_sock, net->pack_recv, net->pack_send, buf};
     // create thread that listens for udp packets
     SDL_Thread *recv_thread = SDL_CreateThread(receive_packets_in_new_thread, "recv_thread", (void *) &args);
     // check if thread creation was successful or not
@@ -349,23 +390,23 @@ int game(App* app, Game_State *game_state)
                     switch (event.key.keysym.sym) {
                         case SDLK_UP:
                         case SDLK_w:
-                            if (players[game_state->client_id]->snake->dir != Down)
-                                players[game_state->client_id]->snake->dir = Up;
+                            if (game_state->players[game_state->client_id]->snake->dir != Down)
+                                game_state->players[game_state->client_id]->snake->dir = Up;
                             break;
                         case SDLK_DOWN:
                         case SDLK_s:
-                            if (players[game_state->client_id]->snake->dir != Up)
-                                players[game_state->client_id]->snake->dir = Down;
+                            if (game_state->players[game_state->client_id]->snake->dir != Up)
+                                game_state->players[game_state->client_id]->snake->dir = Down;
                             break;
                         case SDLK_RIGHT:
                         case SDLK_d:
-                            if (players[game_state->client_id]->snake->dir != Left)
-                                players[game_state->client_id]->snake->dir = Right;
+                            if (game_state->players[game_state->client_id]->snake->dir != Left)
+                                game_state->players[game_state->client_id]->snake->dir = Right;
                             break;
                         case SDLK_LEFT:
                         case SDLK_a:
-                            if (players[game_state->client_id]->snake->dir != Right)
-                                players[game_state->client_id]->snake->dir = Left;
+                            if (game_state->players[game_state->client_id]->snake->dir != Right)
+                                game_state->players[game_state->client_id]->snake->dir = Left;
                             break;
                         default:
                             break;
@@ -411,40 +452,40 @@ int game(App* app, Game_State *game_state)
             // handle packets
             void *data = malloc(PACKET_DATA_SIZE);
             read_from_buffer(buf, data);
-            handle_received_packet(app, data, game_state, players);
+            handle_received_packet(app, data, game_state, game_state->players);
             free(data);
         }
 
         // Checks if any collisons has occured with the walls
-        if (collison_with_wall(players[game_state->client_id]->snake)) {
-            players[game_state->client_id]->alive = false;
-            send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
+        if (collison_with_wall(game_state->players[game_state->client_id]->snake)) {
+            game_state->players[game_state->client_id]->alive = false;
+            send_collision(net->udp_sock, net->server_addr, net->pack_send, game_state->client_id);
             if (!app->sound->muted) {
                 play_sound(app->sound->wall_collison); // plays wall collison sound effect
             }
             //show_scoreboard = true; // Remove once multiplayer has been implimented
         }
         // Checks if any collisons has occured with a snake
-        if (collison_with_snake(players[game_state->client_id]->snake)) {
-            players[game_state->client_id]->alive = false;
-            send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
+        if (collison_with_snake(game_state->players[game_state->client_id]->snake)) {
+            game_state->players[game_state->client_id]->alive = false;
+            send_collision(net->udp_sock, net->server_addr, net->pack_send, game_state->client_id);
             if (!app->sound->muted) {
                 play_sound(app->sound->wall_collison); // plays wall collison sound effect
             }
             //show_scoreboard = true; // Remove once multiplayer has been implimented
         }
 
-        if (players[game_state->client_id]->alive && game_state->current_time > game_state->last_time + players[game_state->client_id]->snake->speed) {
+        if (game_state->players[game_state->client_id]->alive && game_state->current_time > game_state->last_time + game_state->players[game_state->client_id]->snake->speed) {
             // update snake velocity based on direction state
-            change_snake_velocity(players[game_state->client_id]->snake);
-            new_snake_pos(players[game_state->client_id]->snake, true);
-            head_adjecent_with_fruit(&players[game_state->client_id]->snake->head, game_state->fruits, game_state->nr_of_fruits);
-            send_snake_position(udp_sock, server_addr, pack_send, players[game_state->client_id]);
+            change_snake_velocity(game_state->players[game_state->client_id]->snake);
+            new_snake_pos(game_state->players[game_state->client_id]->snake, true);
+            head_adjecent_with_fruit(&game_state->players[game_state->client_id]->snake->head, game_state->fruits, game_state->nr_of_fruits);
+            send_snake_position(net->udp_sock, net->server_addr, net->pack_send, game_state->players[game_state->client_id]);
             game_state->last_time = game_state->current_time;
         }
 
         /* update_state_if_fruit_collision(players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits); */
-        fruit_collision(app, udp_sock, server_addr, pack_send, players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
+        fruit_collision(app, net->udp_sock, net->server_addr, net->pack_send, game_state->players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
         // fruit rendering
         SDL_Rect fruit_src[MAX_PLAYERS] = {0};
@@ -510,24 +551,24 @@ int game(App* app, Game_State *game_state)
         SDL_RendererFlip flip;
         int rotation;
         for(int i = 0; i < game_state->nr_of_players; i++) {
-            if(players[i] == NULL) {
+            if(game_state->players[i] == NULL) {
                 // skip current player if player doesn't exist
                 continue;
-            } else if(!players[i]->alive) {
+            } else if(!game_state->players[i]->alive) {
                 // skip current player if player is dead
                 continue;
             }
             // snake head rendering
-            head_dst.x = players[i]->snake->head.pos.x;
-            head_dst.y = players[i]->snake->head.pos.y;
+            head_dst.x = game_state->players[i]->snake->head.pos.x;
+            head_dst.y = game_state->players[i]->snake->head.pos.y;
             head_dst.w = CELL_SIZE;
             head_dst.h = CELL_SIZE;
 
-            if (players[i]->snake->head.mouth_open) {
+            if (game_state->players[i]->snake->head.mouth_open) {
                 // Snake open mouth next to fruit
                 head_src.x = snake_texture[4].x;
                 head_src.y = snake_texture[4].y;
-            } else if (players[i]->snake->head.mouth_eating) {
+            } else if (game_state->players[i]->snake->head.mouth_eating) {
                 // Snake eating after open mouth
                 head_src.x = snake_texture[5].x;
                 head_src.y = snake_texture[5].y;
@@ -540,8 +581,8 @@ int game(App* app, Game_State *game_state)
             head_src.h = CELL_SIZE;
 
             // snake body rendering
-            for (int j = 0; j < players[i]->snake->body_length; j++) {
-                if (players[i]->snake->body[j].is_turn) {
+            for (int j = 0; j < game_state->players[i]->snake->body_length; j++) {
+                if (game_state->players[i]->snake->body[j].is_turn) {
                     body_src[j].x = snake_texture[3].x;
                     body_src[j].y = snake_texture[3].y;
                 }
@@ -552,8 +593,8 @@ int game(App* app, Game_State *game_state)
                 body_src[j].w = CELL_SIZE;
                 body_src[j].h = CELL_SIZE;
 
-                body_dst[j].x = players[i]->snake->body[j].pos.x;
-                body_dst[j].y = players[i]->snake->body[j].pos.y;
+                body_dst[j].x = game_state->players[i]->snake->body[j].pos.x;
+                body_dst[j].y = game_state->players[i]->snake->body[j].pos.y;
                 body_dst[j].w = CELL_SIZE;
                 body_dst[j].h = CELL_SIZE;
             }
@@ -563,31 +604,31 @@ int game(App* app, Game_State *game_state)
             tail_src.y = snake_texture[2].y;
             tail_src.w = CELL_SIZE;
             tail_src.h = CELL_SIZE;
-            tail_dst.x = players[i]->snake->tail.pos.x;
-            tail_dst.y = players[i]->snake->tail.pos.y;
+            tail_dst.x = game_state->players[i]->snake->tail.pos.x;
+            tail_dst.y = game_state->players[i]->snake->tail.pos.y;
             tail_dst.w = CELL_SIZE;
             tail_dst.h = CELL_SIZE;
 
             // render head
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, game_state->players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
             // render body
             flip = SDL_FLIP_NONE;
-            for (int j = 0; j < players[i]->snake->body_length; j++) {
-                rotation = players[i]->snake->body[j].angle;
+            for (int j = 0; j < game_state->players[i]->snake->body_length; j++) {
+                rotation = game_state->players[i]->snake->body[j].angle;
                 flip = SDL_FLIP_NONE;
-                if (players[i]->snake->body[j].is_turn) {
-                    rotation = players[i]->snake->body[j].turn_rotation;
-                    if (players[i]->snake->body[j].should_flip_vertical) {
+                if (game_state->players[i]->snake->body[j].is_turn) {
+                    rotation = game_state->players[i]->snake->body[j].turn_rotation;
+                    if (game_state->players[i]->snake->body[j].should_flip_vertical) {
                         flip = SDL_FLIP_VERTICAL;
                     }
-                    else if (players[i]->snake->body[j].should_flip_horizontal) {
+                    else if (game_state->players[i]->snake->body[j].should_flip_horizontal) {
                         flip = SDL_FLIP_HORIZONTAL;
                     }
                 }
                 SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[j], &body_dst[j], rotation, NULL, flip);
             }
             // render tail
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, game_state->players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
         }
 
         // present on screen
@@ -614,7 +655,7 @@ int game(App* app, Game_State *game_state)
 
     // cleanup Network structure
     printf("freeing packets...\n");
-    free_net(udp_sock, pack_recv, pack_send);
+    free_net(net->udp_sock, net->pack_recv, net->pack_send);
     printf("packets freed\n");
 
     return MAIN_MENU;
