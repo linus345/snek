@@ -13,40 +13,6 @@
 #include "rendering.h"
 #include "sound.h"
 
-SDL_Color
-    black
-    = { 0, 0, 0, 255 },
-    gray = { 127, 127, 127, 255 },
-    white = { 255, 255, 255, 255 },
-    green = { 45, 93, 9, 255 },
-    dark_green = { 9, 34, 3, 255 };
-
-// Button memory allocator and texture loader.
-Screen_item* menu_button_background(App* app, char resource[])
-{
-    Screen_item* button = malloc(sizeof(Screen_item));
-    load_texture(app, &button->texture, resource);
-    return button;
-}
-
-// Universal text renderer for buttons.
-Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
-{
-    Screen_item* item = malloc(sizeof(Screen_item));
-    SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
-    if (surface == NULL) {
-        SDL_Log("TTF_RenderText_Blended failed: %s", SDL_GetError());
-        app->running = false;
-    }
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(app->renderer, surface);
-    if (texture == NULL) {
-        SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
-        app->running = false;
-    }
-    item->texture = texture;
-    return item;
-}
-
 //Checks if the mouse is hovering on an SDL_Rect.
 bool hover_state(Screen_item* button, int Mx, int My)
 {
@@ -63,16 +29,7 @@ int main_menu(App* app)
 
     bool playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-
-    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
-    Screen_item* button1 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* text1 = menu_button_text(app, "Start Game", font, green);
-    Screen_item* button2 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* text2 = menu_button_text(app, "High Score", font, green);
-    Screen_item* button3 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* text3 = menu_button_text(app, "Settings", font, green);
-    Screen_item* exit_button = menu_button_text(app, "Exit Game", font, white);
+    Menu* menu = init_menu_tex(app, "Start Game", "High Score", "Settings", "Exit Game");
 
     while (app->running) {
         //SDL_MouseButtonEvent mouse_event;
@@ -84,46 +41,26 @@ int main_menu(App* app)
                 app->running = false;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if (hover_state(text1, Mx, My)) {
+                if (hover_state(menu->text1, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free(background);
-                    free(button1);
-                    free(button2);
-                    free(button3);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
+                    free_menu(menu);
                     return SELECT_GAME;
                 } /* else if (hover_state(text2, Mx, My)) {
                         // Plays button press effect
                         play_sound(app->sound->press);
                         // Makes space on the heap
-                        free(background);
-                        free(button1);
-                        free(button2);
-                        free(button3);
-                        free(text1);
-                        free(text2);
-                        free(text3);
-                        free(exit_button);
+                        free_menu(menu);
                         return HIGH_SCORE;
                     } else if (hover_state(text3, Mx, My)) {
                         // Plays button press effect
                         play_sound(app->sound->press);
-                        free(background);
-                        free(button1);
-                        free(button2);
-                        free(button3);
-                        free(text1);
-                        free(text2);
-                        free(text3);
-                        free(exit_button);
+                        // Makes space on the heap
+                        free_menu(menu);
                         return SETTINGS;
                     }*/
-                else if (hover_state(exit_button, Mx, My)) {
+                else if (hover_state(menu->return_button, Mx, My)) {
                     app->running = false;
                 }
                 break;
@@ -138,16 +75,10 @@ int main_menu(App* app)
                         app->fullscreen = true;
                     }
                     // Makes space on the heap
-                    free(background);
-                    free(button1);
-                    free(button2);
-                    free(button3);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
+                    free_menu(menu);
                     return MAIN_MENU;
-                } else */if (event.key.keysym.sym == SDLK_ESCAPE) {
+                } else */
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
                     // exit main loop
                     app->running = false;
                 }
@@ -157,51 +88,44 @@ int main_menu(App* app)
         // clear screen before next render
         SDL_RenderClear(app->renderer);
 
-        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        render_item(app, &button1->rect, button1->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
-        render_item(app, &text1->rect, text1->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
-        render_item(app, &button2->rect, button2->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text2->rect, text2->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H);
-        render_item(app, &button3->rect, button3->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text3->rect, text3->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
-        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
+        render_menu(app, menu);
 
         //If-state for wether the text should switch color on hover or not
-        if (hover_state(text1, Mx, My)) {
+        if (hover_state(menu->text1, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
+            SDL_SetTextureColorMod(menu->text1->texture, 9, 34, 3);
 
-        } else if (hover_state(text2, Mx, My)) {
+        } else if (hover_state(menu->text2, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
+            SDL_SetTextureColorMod(menu->text2->texture, 9, 34, 3);
 
-        } else if (hover_state(text3, Mx, My)) {
+        } else if (hover_state(menu->text3, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
+            SDL_SetTextureColorMod(menu->text3->texture, 9, 34, 3);
 
-        } else if (hover_state(exit_button, Mx, My)) {
+        } else if (hover_state(menu->return_button, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
+            SDL_SetTextureColorMod(menu->return_button->texture, 127, 127, 127);
 
         } else {
             if (!playsound) // Makes sure the sound effect only plays once
                 playsound = true;
-            SDL_SetTextureColorMod(text1->texture, 45, 93, 9);
-            SDL_SetTextureColorMod(text2->texture, 45, 93, 9);
-            SDL_SetTextureColorMod(text3->texture, 45, 93, 9);
-            SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(menu->text1->texture, 45, 93, 9);
+            SDL_SetTextureColorMod(menu->text2->texture, 45, 93, 9);
+            SDL_SetTextureColorMod(menu->text3->texture, 45, 93, 9);
+            SDL_SetTextureColorMod(menu->return_button->texture, 255, 255, 255);
         }
 
         // present on screen
@@ -220,16 +144,7 @@ int select_game_menu(App* app)
 
     bool playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-
-    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
-    Screen_item* button1 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* text1 = menu_button_text(app, "Single Player", font, green);
-    Screen_item* button2 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* text2 = menu_button_text(app, "Host Multiplayer", font, green);
-    Screen_item* button3 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* text3 = menu_button_text(app, "Join Multiplayer", font, green);
-    Screen_item* exit_button = menu_button_text(app, "Back", font, white);
+    Menu* menu = init_menu_tex(app, "Single Player", "Host Multiplayer", "Join Multiplayer", "Back");
 
     while (app->running) {
 
@@ -244,60 +159,33 @@ int select_game_menu(App* app)
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
-                if (hover_state(text1, Mx, My)) {
+                if (hover_state(menu->text1, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free(button1);
-                    free(text1);
-                    free(button2);
-                    free(text2);
-                    free(button3);
-                    free(text3);
-                    free(exit_button);
+                    free_menu(menu);
                     return TYPE_NAME;
 
                 } /* else if (hover_state(text2, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free(button1);
-                    free(text1);
-                    free(button2);
-                    free(text2);
-                    free(button3);
-                    free(text3);
-                    free(exit_button);
-                    Mix_FreeChunk(press_effect);
-                    Mix_FreeChunk(hover_effect);
-                    Mix_FreeChunk(back_effect);
+                    free_menu(menu);
                     return HOST_MULTIPLAYER;
 
                 } */
-                else if (hover_state(text3, Mx, My)) {
+                else if (hover_state(menu->text3, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free(button1);
-                    free(text1);
-                    free(button2);
-                    free(text2);
-                    free(button3);
-                    free(text3);
-                    free(exit_button);
+                    free_menu(menu);
                     return JOIN_MULTIPLAYER;
 
-                } else if (hover_state(exit_button, Mx, My)) {
+                } else if (hover_state(menu->return_button, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->back);
                     // Makes space on the heap
-                    free(button1);
-                    free(text1);
-                    free(button2);
-                    free(text2);
-                    free(button3);
-                    free(text3);
-                    free(exit_button);
+                    free_menu(menu);
                     return MAIN_MENU;
                 }
                 break;
@@ -313,14 +201,7 @@ int select_game_menu(App* app)
                         app->fullscreen = true;
                     }
                     // Makes space on the heap
-                    free(background);
-                    free(button1);
-                    free(button2);
-                    free(button3);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
+                    free_menu(menu);
                     return SELECT_GAME;
                 */
                 case SDLK_ESCAPE:
@@ -333,52 +214,45 @@ int select_game_menu(App* app)
         }
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-        
-        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        render_item(app, &button1->rect, button1->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
-        render_item(app, &text1->rect, text1->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
-        render_item(app, &button2->rect, button2->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text2->rect, text2->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H);
-        render_item(app, &button3->rect, button3->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H);
-        render_item(app, &text3->rect, text3->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
-        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
+
+        render_menu(app, menu);
 
         //If-state for wether the text should switch color on hover or not
-        if (hover_state(text1, Mx, My)) {
+        if (hover_state(menu->text1, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
+            SDL_SetTextureColorMod(menu->text1->texture, 9, 34, 3);
 
-        } else if (hover_state(text2, Mx, My)) {
+        } else if (hover_state(menu->text2, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
+            SDL_SetTextureColorMod(menu->text2->texture, 9, 34, 3);
 
-        } else if (hover_state(text3, Mx, My)) {
+        } else if (hover_state(menu->text3, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
+            SDL_SetTextureColorMod(menu->text3->texture, 9, 34, 3);
 
-        } else if (hover_state(exit_button, Mx, My)) {
+        } else if (hover_state(menu->return_button, Mx, My)) {
             if (playsound) { // Makes sure the sound effect only plays once
                 play_sound(app->sound->hover); // Plays hover effect
                 playsound = false;
             }
-            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
+            SDL_SetTextureColorMod(menu->return_button->texture, 127, 127, 127);
         } else {
             if (!playsound) { // Makes sure the sound effect only plays once
                 playsound = true;
             }
-            SDL_SetTextureColorMod(text1->texture, 45, 93, 9);
-            SDL_SetTextureColorMod(text2->texture, 45, 93, 9);
-            SDL_SetTextureColorMod(text3->texture, 45, 93, 9);
-            SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(menu->text1->texture, 45, 93, 9);
+            SDL_SetTextureColorMod(menu->text2->texture, 45, 93, 9);
+            SDL_SetTextureColorMod(menu->text3->texture, 45, 93, 9);
+            SDL_SetTextureColorMod(menu->return_button->texture, 255, 255, 255);
         }
 
         // present on screen
@@ -398,6 +272,9 @@ int join_multiplayer(App* app)
     bool ip = false, port = false, playsound = true;
 
     TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
+
+    SDL_Color white = { 255, 255, 255, 255 };
+
     SDL_Surface* tmp_surface = NULL;
 
     Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
@@ -429,7 +306,7 @@ int join_multiplayer(App* app)
                     play_sound(app->sound->press);
                     port = true;
                     SDL_StartTextInput();
-                } else if (hover_state(button, Mx, My)) {
+                } else if (hover_state(text3, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
@@ -497,6 +374,7 @@ int join_multiplayer(App* app)
                     free(background);
                     free(background1);
                     free(background2);
+                    free(button);
                     free(text1);
                     free(text2);
                     free(text3);
@@ -753,13 +631,16 @@ int settings(App* app, bool* fullscreen_bool)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
-}*/
+}
+*/
 
 int type_name(App* app)
 {
     int Mx, My;
 
     bool playsound = true;
+
+    SDL_Color white = { 255, 255, 255, 255 };
 
     TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
     SDL_Surface* tmp_surface = NULL;

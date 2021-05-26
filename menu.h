@@ -30,7 +30,7 @@ enum Menu_selection {
 void menu_init(App* app, SDL_Texture* background, SDL_Texture* newGame, SDL_Texture* exit);
 SDL_Color color_select (int selection);
 Screen_item* menu_button_background (App* app, char resource[]);
-Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color);
+//Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color);
 Screen_item* input_text(App* app, Screen_item* item);
 bool hover_state (Screen_item* button, int Mx, int My);
 
