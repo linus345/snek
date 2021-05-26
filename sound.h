@@ -18,6 +18,7 @@ typedef struct sound_effects {
 
 Sound_effects* init_sounds();
 void play_sound(Mix_Chunk* sound);
+void play_hover_sound(Sound_effects* sound, bool *playsound);
 void free_sound_effects(Sound_effects* sound);
 
 #endif

@@ -15,6 +15,7 @@
 #include "network.h"
 
 extern bool thread_done;
+extern SDL_Color black, gray, white, green, dark_green;
 
 Game_State *init_game_state()
 {
@@ -27,6 +28,11 @@ Game_State *init_game_state()
     game_state->nr_of_fruits = 0;
     for(int i = 0; i < MAX_PLAYERS; i++) {
         game_state->fruits[i] = NULL;
+    }
+
+    // array to store info about connected players
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        game_state->players[i] = NULL;
     }
 
     return game_state;
@@ -78,8 +84,160 @@ void main_loop(App* app, Game_State *game_state)
         case START_GAME:
             menu_state = game(app, game_state);
             break;
+        case LOBBY:
+            menu_state = lobby(app, game_state);
+            break;
         }
     }
+}
+
+int lobby(App* app)
+{
+    int Mx, My;
+    bool playsound = true;
+
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
+
+    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
+    //Screen_item* button1 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    //Screen_item* text1 = menu_button_text(app, "hej", font, green);
+    Screen_item* start_button = menu_button_text(app, "Start", font, white);
+    Screen_item* exit_button = menu_button_text(app, "Exit", font, white);
+
+    // screen item för varje spelare
+    // + orm val
+
+    while (app->running) {
+
+        //SDL_MouseButtonEvent mouse_event;
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    // exit main loop
+                    app->running = false;
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    if (hover_state(start_button, Mx, My)) {            /* START */
+                        // Plays button press effect
+                        play_sound(app->sound->press);
+                        // Makes space on the heap
+                        //free(button1);
+                        //free(text1);
+                        free(background);
+                        free(start_button);
+                        free(exit_button);
+                        return START_GAME;
+                    } else if (hover_state(exit_button, Mx, My)) {      /* EXIT */
+                        // Plays button press effect
+                        play_sound(app->sound->back);
+                        // Makes space on the heap
+                        //free(button1);
+                        //free(text1);
+                        free(background);
+                        free(start_button);
+                        free(exit_button);
+                        return MAIN_MENU;
+                    }
+                    break;
+                case SDL_KEYDOWN:
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE:
+                            // exit main loop
+                            return MAIN_MENU;
+                            break;
+                    }
+                    break;
+            }
+
+            // open socket
+            app->udp_sock = open_client_socket();
+
+            // allocate memory for sent packet
+            pack_send = allocate_packet(PACKET_DATA_SIZE);
+
+            // allocate memory for received packet
+            pack_recv = allocate_packet(PACKET_DATA_SIZE);
+
+            // resolve server address TODO: bind address?
+            int server_port = atoi(app->port);
+            app->server_addr = resolve_host(app->ip, server_port);
+
+            /* // keep track of number of joined clients */
+            /* int nr_of_players = 0; */
+            /* // client id for this specific client, needed to select correct player from the players array */
+            /* int client_id; */
+
+            // send join game request
+            join_game_request(udp_sock, server_addr, pack_send);
+            // wait for server to respond to request, only wait for 3 seconds
+            unsigned time_when_req_sent = SDL_GetTicks();
+            // used when client connecting and in main loop
+            int request_type;
+
+            while(!game_state->connected) {
+                if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
+                    // get request type from packet
+                    sscanf((char *) pack_recv->data, "%d", &request_type);
+                    switch(request_type) {
+                        // these are the only expected types
+                        case SUCCESSFUL_CONNECTION:
+                            // adds new player and increments nr_of_players
+                            new_client_joined(pack_recv->data, game_state, game_state->players);
+                            break;
+                        case FAILED_CONNECTION:
+                            // TODO: handle it differently if it failed because 4 clients
+                            // already is connected
+                            printf("Failed to connect, retrying...\n");
+                            // TODO: temporary exit until fixing above todo
+                            exit(EXIT_FAILURE);
+                            // update time for new request
+                            time_when_req_sent = SDL_GetTicks();
+                            break;
+                    }
+                }
+                // 3 second timer to break out of loop if packet not received yet
+                // prevents from getting stuck in while loop
+                if(time_when_req_sent > time_when_req_sent + 3000) {
+                    printf("join: request timed out\n");
+                    // exit for now
+                    exit(EXIT_FAILURE);
+                    break;
+                }
+            }
+        }
+        // clear screen before next render
+        SDL_RenderClear(app->renderer);
+        
+        render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
+        render_item(app, &start_button->rect, start_button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
+
+        //If-state for wether the text should switch color on hover or not
+        if (hover_state(start_button, Mx, My)) {
+            play_hover_sound(app->sound, &playsound);
+
+        } else if (hover_state(exit_button, Mx, My)) {
+            play_hover_sound(app->sound, &playsound);
+            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
+        } else {
+            if (!playsound) { // Makes sure the sound effect only plays once
+                playsound = true;
+            }
+            SDL_SetTextureColorMod(start_button->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(exit_button->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(start_button->texture, 127, 127, 127);
+        }
+
+        // present on screen
+        SDL_RenderPresent(app->renderer);
+
+        SDL_Delay(1000 / 60);
+        SDL_GetMouseState(&Mx, &My);
+    }
+    SDL_StopTextInput();
+
+    return START_GAME;  
 }
 
 int game(App* app, Game_State *game_state)
@@ -162,15 +320,6 @@ int game(App* app, Game_State *game_state)
     Screen_item* mute_button = menu_button_background(app, "./resources/Textures/speaker_icon.png"); // Game starts with sound
 
     //////////// NETWORK ////////////
-
-    /* // open socket */
-    UDPsocket udp_sock = open_client_socket();
-
-    /* // allocate memory for sent packet */
-    UDPpacket *pack_send = allocate_packet(PACKET_DATA_SIZE);
-
-    /* // allocate memory for received packet */
-    UDPpacket *pack_recv = allocate_packet(PACKET_DATA_SIZE);
 
     // resolve server address TODO: bind address?
     int server_port = atoi(app->port);

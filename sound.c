@@ -30,6 +30,14 @@ void play_sound(Mix_Chunk* sound)
     Mix_PlayChannel(-1, sound, 0);
 }
 
+void play_hover_sound(Sound_effects* sound, bool *playsound)
+{
+    if (*playsound) { // Makes sure the sound effect only plays once
+        play_sound(sound->hover); // Plays hover effect
+        *playsound = false;
+    }
+}
+
 void free_sound_effects(Sound_effects* sound)
 {
     Mix_FreeChunk(sound->press);
