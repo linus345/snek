@@ -133,13 +133,28 @@ Scoreboard* create_scoreboard(App* app, Player players[])
     Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
     */
-
     TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
+
+    scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white_txt);
 
     scoreboard->name1 = menu_button_text(app, players[0].name, font, green);
     scoreboard->name2 = menu_button_text(app, players[1].name, font, green);
     scoreboard->name3 = menu_button_text(app, players[2].name, font, green);
     scoreboard->name4 = menu_button_text(app, players[3].name, font, green);
+
+    scoreboard->score1 = menu_button_text(app, "0", font, green);
+    scoreboard->score2 = menu_button_text(app, "0", font, green);
+    scoreboard->score3 = menu_button_text(app, "0", font, green);
+    scoreboard->score4 = menu_button_text(app, "0", font, green);
+
+    scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
+    scoreboard->return_button = menu_button_background(app, "./resources/Textures/exit_button.png");
+
+    return scoreboard;
+}
+
+void update_scoreboard(Player players[], Scoreboard* scoreboard)
+{
     char buffer[50];
 
     sprintf(buffer, "%d", player[0]->points);
@@ -150,16 +165,11 @@ Scoreboard* create_scoreboard(App* app, Player players[])
     scoreboard->score3 = menu_button_text(app, buffer, font, green);
     sprintf(buffer, "%d", player[3]->points);
     scoreboard->score4 = menu_button_text(app, buffer, font, green);
-
-    scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
-    scoreboard->return_button = menu_button_background(app, "./resources/Textures/exit_button.png");
-
-    return scoreboard;
 }
 
 void render_scoreboard(App* app, Scoreboard* scoreboard)
 {
-    // Renders background and button textures
+    // Renders background and scoreboard textures
     render_item(app, &scoreboard->background->rect, scoreboard->background->texture, STRETCH, 0, 0, 250, WINDOW_HEIGHT);
     render_item(app, &scoreboard->scoreboard->rect, scoreboard->scoreboard->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y, SD_BUTTON_W, SD_BUTTON_H);
     render_item(app, &scoreboard->scoreboard->rect, scoreboard->scoreboard->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + Y_OFFSET, SD_BUTTON_W, SD_BUTTON_H);
@@ -180,6 +190,28 @@ void render_scoreboard(App* app, Scoreboard* scoreboard)
     render_item(app, &scoreboard->mute->rect, scoreboard->mute->texture, UNSPECIFIED, 160, GAME_HEIGHT - 50, 50, 50);
 }
 
+void render_end_of_round(App* app, Scoreboard* scoreboard)
+{
+    // Renders background and scoreboard textures
+    render_item(app, &scoreboard->background->rect, scoreboard->background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    render_item(app, &scoreboard->scoreboard->rect, scoreboard->scoreboard->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y, FSD_BUTTON_W, FSD_BUTTON_H);
+    render_item(app, &scoreboard->scoreboard->rect, scoreboard->scoreboard->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + FY_OFFSET, FSD_BUTTON_W, FSD_BUTTON_H);
+    render_item(app, &scoreboard->scoreboard->rect, scoreboard->scoreboard->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (2 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
+    render_item(app, &scoreboard->scoreboard->rect, scoreboard->scoreboard->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (3 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
+    // Renders name textures
+    render_item(app, &scoreboard->name1->rect, scoreboard->name1->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y, F_NAME_W, F_NAME_H);
+    render_item(app, &scoreboard->name2->rect, scoreboard->name2->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + FY_OFFSET, F_NAME_W, F_NAME_H);
+    render_item(app, &scoreboard->name3->rect, scoreboard->name3->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (2 * FY_OFFSET), F_NAME_W, F_NAME_H);
+    render_item(app, &scoreboard->name4->rect, scoreboard->name4->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (3 * FY_OFFSET), F_NAME_W, F_NAME_H);
+    // Renders score textures
+    render_item(app, &scoreboard->score1->rect, scoreboard->score1->texture, UNSPECIFIED, F_SCORE_X, F_SCORE_Y, F_SCORE_W, F_SCORE_H);
+    render_item(app, &scoreboard->score2->rect, scoreboard->score2->texture, UNSPECIFIED, F_SCORE_X, F_SCORE_Y + FY_OFFSET, F_SCORE_W, F_SCORE_H);
+    render_item(app, &scoreboard->score3->rect, scoreboard->score3->texture, UNSPECIFIED, F_SCORE_X, F_SCORE_Y + (2 * FY_OFFSET), F_SCORE_W, F_SCORE_H);
+    render_item(app, &scoreboard->score4->rect, scoreboard->score4->texture, UNSPECIFIED, F_SCORE_X, F_SCORE_Y + (3 * FY_OFFSET), F_SCORE_W, F_SCORE_H);
+    // Renders return button
+    render_item(app, &scoreboard->continue_button->rect, scoreboard->continue_button->texture, UNSPECIFIED, WINDOW_WIDTH / 2 - 129, WINDOW_HEIGHT - 145, 300, 120);
+}
+
 void free_scoreboard(Scoreboard* scoreboard)
 {
     free(scoreboard->background);
@@ -194,5 +226,6 @@ void free_scoreboard(Scoreboard* scoreboard)
     free(scoreboard->score4);
     free(scoreboard->mute);
     free(scoreboard->return_button);
+    free(scoreboard->continue_button);
     free(scoreboard);
 }

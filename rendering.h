@@ -22,6 +22,44 @@ enum Button_dimensions {
     TEXT_H = 90,
 };
 
+enum Scoreboard_dimensions {
+    SD_BUTTON_X = 0,
+    SD_BUTTON_Y = 50,
+    SD_BUTTON_W = 250,
+    SD_BUTTON_H = 100,
+
+    NAME_X = 29,
+    NAME_Y = 65,
+    NAME_W = 100,
+    NAME_H = 70,
+
+    SCORE_X = 150,
+    SCORE_Y = 65,
+    SCORE_W = 70,
+    SCORE_H = 70,
+
+    Y_OFFSET = 100
+};
+
+enum Finsh_scoreboard_dimensions {
+    FSD_BUTTON_X = WINDOW_WIDTH / 2 - 180,
+    FSD_BUTTON_Y = 200,
+    FSD_BUTTON_W = 400,
+    FSD_BUTTON_H = 150,
+
+    F_NAME_X = WINDOW_WIDTH / 2 - 130,
+    F_NAME_Y = 234,
+    F_NAME_W = 130,
+    F_NAME_H = 90,
+
+    F_SCORE_X = WINDOW_WIDTH / 2 + 40,
+    F_SCORE_Y = 234,
+    F_SCORE_W = 90,
+    F_SCORE_H = 90,
+
+    FY_OFFSET = 150
+};
+
 enum Render_item_type {
     UNSPECIFIED = 0,
     BACKGROUND = 1,
@@ -52,19 +90,21 @@ typedef struct scoreboard {
     Screen_item* score4;
     Screen_item* mute;
     Screen_item* return_button;
+    Screen_item* continue_button;
 } Scoreboard;
 
-
+// Genral functions
 Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color);
-Screen_item* menu_button_background (App* app, char resource[]);
-
+Screen_item* menu_button_background(App* app, char resource[]);
 void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int item_type, int x, int y, int w, int h);
-
+// Menu functions
 Menu* init_menu_tex(App* app, char top_button[], char middle_button[], char lower_button[], char return_button[]);
 void render_menu(App* app, Menu* menu);
 void free_menu(Menu* menu);
-
+// Scoreboard functions
 Scoreboard* create_scoreboard(App* app, Player players[]);
-void render_scoreboard(App* app, Scoreboard *scoreboard);
+void update_scoreboard(Player players[], Scoreboard* scoreboard);
+void render_scoreboard(App* app, Scoreboard* scoreboard);
+void render_end_of_round(App* app, Scoreboard* scoreboard);
 void free_scoreboard(Scoreboard* scoreboard);
 #endif

@@ -85,6 +85,7 @@ void main_loop(App* app, Game_State* game_state)
 int game(App* app, Game_State* game_state)
 {
     int Mx, My;
+    bool end_of_round = false;
 
     Pos snake_texture[6];
     // head
@@ -258,7 +259,12 @@ int game(App* app, Game_State* game_state)
                         scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
                         app->sound->muted = true;
                     }
+                } else if (hover_state(scoreboard->continue_button, Mx, My)) {
+                    if (end_of_round) {
+                        end_of_round = false;
+                    }
                 }
+
                 break;
             }
         }
@@ -306,127 +312,136 @@ int game(App* app, Game_State* game_state)
         /* update_state_if_fruit_collision(players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits); */
         fruit_collision(app, udp_sock, server_addr, pack_send, players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
-        // fruit rendering
-        SDL_Rect fruit_src[MAX_PLAYERS] = { 0 };
-        SDL_Rect fruit_dst[MAX_PLAYERS] = { 0 };
+        /////////////////////////////////////////////// Rendering section //////////////////////////////////////////////////////
+        update_scoreboard(players, scoreboard); // updates the scoreboard
 
-        for (int i = 0; i < MAX_PLAYERS; i++) {
-            if (game_state->fruits[i] == NULL) {
-                // don't try to render a fruit that doesn't exist
-                continue;
+        if (end_of_round) {
+            // clear screen before next render
+            SDL_RenderClear(app->renderer);
+            render_end_of_round(app, scoreboard);
+        } else if (!end_of_round) {
+            // fruit rendering
+            SDL_Rect fruit_src[MAX_PLAYERS] = { 0 };
+            SDL_Rect fruit_dst[MAX_PLAYERS] = { 0 };
+
+            for (int i = 0; i < MAX_PLAYERS; i++) {
+                if (game_state->fruits[i] == NULL) {
+                    // don't try to render a fruit that doesn't exist
+                    continue;
+                }
+                fruit_src[i].x = fruit_texture[game_state->fruits[i]->type].x;
+                fruit_src[i].y = fruit_texture[game_state->fruits[i]->type].y;
+                fruit_src[i].w = CELL_SIZE;
+                fruit_src[i].h = CELL_SIZE;
+
+                fruit_dst[i].x = game_state->fruits[i]->pos.x;
+                fruit_dst[i].y = game_state->fruits[i]->pos.y;
+                fruit_dst[i].w = CELL_SIZE;
+                fruit_dst[i].h = CELL_SIZE;
             }
-            fruit_src[i].x = fruit_texture[game_state->fruits[i]->type].x;
-            fruit_src[i].y = fruit_texture[game_state->fruits[i]->type].y;
-            fruit_src[i].w = CELL_SIZE;
-            fruit_src[i].h = CELL_SIZE;
 
-            fruit_dst[i].x = game_state->fruits[i]->pos.x;
-            fruit_dst[i].y = game_state->fruits[i]->pos.y;
-            fruit_dst[i].w = CELL_SIZE;
-            fruit_dst[i].h = CELL_SIZE;
-        }
+            // clear screen before next render
+            SDL_RenderClear(app->renderer);
+            SDL_Rect background_dst = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+            SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
-        // clear screen before next render
-        SDL_RenderClear(app->renderer);
-        SDL_Rect background_dst = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-        SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
+            render_scoreboard(app, scoreboard);
 
-        render_scoreboard(app, scoreboard);
-
-        // render fruits
-        for (int i = 0; i < MAX_PLAYERS; i++) {
-            if (fruit_src[i].w != CELL_SIZE || fruit_dst[i].w != CELL_SIZE) {
-                // skip rendering if there is no fruit
-                continue;
+            // render fruits
+            for (int i = 0; i < MAX_PLAYERS; i++) {
+                if (fruit_src[i].w != CELL_SIZE || fruit_dst[i].w != CELL_SIZE) {
+                    // skip rendering if there is no fruit
+                    continue;
+                }
+                SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
             }
-            SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
-        }
-        // render all snakes
-        SDL_Rect head_src;
-        SDL_Rect head_dst;
-        SDL_Rect body_src[MAX_SNAKE_LENGTH];
-        SDL_Rect body_dst[MAX_SNAKE_LENGTH];
-        SDL_Rect tail_src;
-        SDL_Rect tail_dst;
-        SDL_RendererFlip flip;
-        int rotation;
-        for (int i = 0; i < game_state->nr_of_players; i++) {
-            if (players[i] == NULL) {
-                // skip current player if player doesn't exist
-                continue;
-            } else if (!players[i]->alive) {
-                // skip current player if player is dead
-                continue;
-            }
-            // snake head rendering
-            head_dst.x = players[i]->snake->head.pos.x;
-            head_dst.y = players[i]->snake->head.pos.y;
-            head_dst.w = CELL_SIZE;
-            head_dst.h = CELL_SIZE;
+            // render all snakes
+            SDL_Rect head_src;
+            SDL_Rect head_dst;
+            SDL_Rect body_src[MAX_SNAKE_LENGTH];
+            SDL_Rect body_dst[MAX_SNAKE_LENGTH];
+            SDL_Rect tail_src;
+            SDL_Rect tail_dst;
+            SDL_RendererFlip flip;
+            int rotation;
+            for (int i = 0; i < game_state->nr_of_players; i++) {
+                if (players[i] == NULL) {
+                    // skip current player if player doesn't exist
+                    continue;
+                } else if (!players[i]->alive) {
+                    // skip current player if player is dead
+                    continue;
+                }
+                // snake head rendering
+                head_dst.x = players[i]->snake->head.pos.x;
+                head_dst.y = players[i]->snake->head.pos.y;
+                head_dst.w = CELL_SIZE;
+                head_dst.h = CELL_SIZE;
 
-            if (players[i]->snake->head.mouth_open) {
-                // Snake open mouth next to fruit
-                head_src.x = snake_texture[4].x;
-                head_src.y = snake_texture[4].y;
-            } else if (players[i]->snake->head.mouth_eating) {
-                // Snake eating after open mouth
-                head_src.x = snake_texture[5].x;
-                head_src.y = snake_texture[5].y;
-            } else {
-                // Snake closed mouth, default
-                head_src.x = snake_texture[0].x;
-                head_src.y = snake_texture[0].y;
-            }
-            head_src.w = CELL_SIZE;
-            head_src.h = CELL_SIZE;
-
-            // snake body rendering
-            for (int j = 0; j < players[i]->snake->body_length; j++) {
-                if (players[i]->snake->body[j].is_turn) {
-                    body_src[j].x = snake_texture[3].x;
-                    body_src[j].y = snake_texture[3].y;
+                if (players[i]->snake->head.mouth_open) {
+                    // Snake open mouth next to fruit
+                    head_src.x = snake_texture[4].x;
+                    head_src.y = snake_texture[4].y;
+                } else if (players[i]->snake->head.mouth_eating) {
+                    // Snake eating after open mouth
+                    head_src.x = snake_texture[5].x;
+                    head_src.y = snake_texture[5].y;
                 } else {
-                    body_src[j].x = snake_texture[1].x;
-                    body_src[j].y = snake_texture[1].y;
+                    // Snake closed mouth, default
+                    head_src.x = snake_texture[0].x;
+                    head_src.y = snake_texture[0].y;
                 }
-                body_src[j].w = CELL_SIZE;
-                body_src[j].h = CELL_SIZE;
+                head_src.w = CELL_SIZE;
+                head_src.h = CELL_SIZE;
 
-                body_dst[j].x = players[i]->snake->body[j].pos.x;
-                body_dst[j].y = players[i]->snake->body[j].pos.y;
-                body_dst[j].w = CELL_SIZE;
-                body_dst[j].h = CELL_SIZE;
-            }
-
-            // snake tail rendering
-            tail_src.x = snake_texture[2].x;
-            tail_src.y = snake_texture[2].y;
-            tail_src.w = CELL_SIZE;
-            tail_src.h = CELL_SIZE;
-            tail_dst.x = players[i]->snake->tail.pos.x;
-            tail_dst.y = players[i]->snake->tail.pos.y;
-            tail_dst.w = CELL_SIZE;
-            tail_dst.h = CELL_SIZE;
-
-            // render head
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
-            // render body
-            flip = SDL_FLIP_NONE;
-            for (int j = 0; j < players[i]->snake->body_length; j++) {
-                rotation = players[i]->snake->body[j].angle;
-                flip = SDL_FLIP_NONE;
-                if (players[i]->snake->body[j].is_turn) {
-                    rotation = players[i]->snake->body[j].turn_rotation;
-                    if (players[i]->snake->body[j].should_flip_vertical) {
-                        flip = SDL_FLIP_VERTICAL;
-                    } else if (players[i]->snake->body[j].should_flip_horizontal) {
-                        flip = SDL_FLIP_HORIZONTAL;
+                // snake body rendering
+                for (int j = 0; j < players[i]->snake->body_length; j++) {
+                    if (players[i]->snake->body[j].is_turn) {
+                        body_src[j].x = snake_texture[3].x;
+                        body_src[j].y = snake_texture[3].y;
+                    } else {
+                        body_src[j].x = snake_texture[1].x;
+                        body_src[j].y = snake_texture[1].y;
                     }
+                    body_src[j].w = CELL_SIZE;
+                    body_src[j].h = CELL_SIZE;
+
+                    body_dst[j].x = players[i]->snake->body[j].pos.x;
+                    body_dst[j].y = players[i]->snake->body[j].pos.y;
+                    body_dst[j].w = CELL_SIZE;
+                    body_dst[j].h = CELL_SIZE;
                 }
-                SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[j], &body_dst[j], rotation, NULL, flip);
+
+                // snake tail rendering
+                tail_src.x = snake_texture[2].x;
+                tail_src.y = snake_texture[2].y;
+                tail_src.w = CELL_SIZE;
+                tail_src.h = CELL_SIZE;
+                tail_dst.x = players[i]->snake->tail.pos.x;
+                tail_dst.y = players[i]->snake->tail.pos.y;
+                tail_dst.w = CELL_SIZE;
+                tail_dst.h = CELL_SIZE;
+
+                // render head
+                SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
+                // render body
+                flip = SDL_FLIP_NONE;
+                for (int j = 0; j < players[i]->snake->body_length; j++) {
+                    rotation = players[i]->snake->body[j].angle;
+                    flip = SDL_FLIP_NONE;
+                    if (players[i]->snake->body[j].is_turn) {
+                        rotation = players[i]->snake->body[j].turn_rotation;
+                        if (players[i]->snake->body[j].should_flip_vertical) {
+                            flip = SDL_FLIP_VERTICAL;
+                        } else if (players[i]->snake->body[j].should_flip_horizontal) {
+                            flip = SDL_FLIP_HORIZONTAL;
+                        }
+                    }
+                    SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[j], &body_dst[j], rotation, NULL, flip);
+                }
+                // render tail
+                SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
             }
-            // render tail
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
         }
 
         // present on screen
@@ -435,13 +450,6 @@ int game(App* app, Game_State* game_state)
         SDL_GetMouseState(&Mx, &My);
         SDL_Delay(1000 / 60);
     }
-    //if (show_scoreboard) {
-    //    //play_sound(app->sound->scoreboard);
-    //    app->running = true;
-    //    return scoreboard(app, score);
-    //} else {
-    //    return MAIN_MENU;
-    //}
 
     // indicate that receive thread should stop running
     thread_done = true;
@@ -458,107 +466,3 @@ int game(App* app, Game_State* game_state)
 
     return MAIN_MENU;
 }
-/*
-int scoreboard(App* app, int score)
-{
-    //bool playsound = true;
-
-    
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-    SDL_Color white_txt = { 255, 255, 255, 255 };
-
-    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Textures/Forest_green.jpg");
-
-    Screen_item* goal_text = menu_button_text(app, "Goal:", font, white_txt);
-    Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
-
-    Screen_item* scoreboard1 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard2 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard3 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard4 = menu_button_background(app, "./resources/Textures/menuButton.png");
-
-    Screen_item* player1_name = menu_button_text(app, app->player_name, font, white_txt);
-    Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white_txt);
-    Screen_item* player3_name = menu_button_text(app, "Victor", font, white_txt);
-    Screen_item* player4_name = menu_button_text(app, "Alma", font, white_txt);
-    
-    char buffer[10];
-    sprintf(buffer, "%d", score);
-
-    Screen_item* player1_score = menu_button_text(app, buffer, font, white_txt);
-    Screen_item* player2_score = menu_button_text(app, " ", font, white_txt);
-    Screen_item* player3_score = menu_button_text(app, " ", font, white_txt);
-    Screen_item* player4_score = menu_button_text(app, " ", font, white_txt);
-    
-    Screen_item* continue_button = menu_button_text(app, "Press to continue", font, white_txt);
-
-    int Mx, My;
-    while (app->running) {
-        SDL_Event event;
-        // check for event
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                // exit main loop
-                app->running = false;
-                break;
-            case SDL_KEYDOWN:
-                // key pressed?
-                switch (event.key.keysym.sym) {
-                case SDLK_F11:
-                    if (app->fullscreen) {
-                        SDL_SetWindowFullscreen(app->window, 0);
-                        app->fullscreen = false;
-                    } else {
-                        SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                        app->fullscreen = true;
-                    }
-                    // Makes space on the heap
-                    break;
-                }
-                break;
-
-            case SDL_MOUSEBUTTONDOWN:
-                if (hover_state(continue_button, Mx, My)) {
-                    play_sound(app->sound->press);
-                    // Makes space on the heap
-                    //free(goal_text);
-                    //free(goal_nr);
-                    free(continue_button);
-                    return MAIN_MENU;
-                }
-                break;
-            }
-        }
-
-        // clear screen before next render
-        SDL_RenderClear(app->renderer);
-
-        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, WINDOW_WIDTH / 2 - 129, 100, 300, 120);
-
-        render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y, FSD_BUTTON_W, FSD_BUTTON_H);
-        render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + FY_OFFSET, FSD_BUTTON_W, FSD_BUTTON_H);
-        render_item(app, &scoreboard3->rect, scoreboard3->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (2 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
-        render_item(app, &scoreboard4->rect, scoreboard4->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (3 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
-
-        render_item(app, &player1_name->rect, player1_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y, F_NAME_W, F_NAME_H);
-        render_item(app, &player1_score->rect, player1_score->texture, UNSPECIFIED, F_SCORE_X, F_SCORE_Y, F_SCORE_W, F_SCORE_H);
-
-        render_item(app, &player2_name->rect, player2_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + FY_OFFSET, F_NAME_W, F_NAME_H);
-        render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (2 * FY_OFFSET), F_NAME_W, F_NAME_H);
-        render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (3 * FY_OFFSET), F_NAME_W, F_NAME_H);
-
-        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, WINDOW_WIDTH / 2 - 129, WINDOW_HEIGHT - 145, 300, 120);
-
-        // present on screen
-        SDL_RenderPresent(app->renderer);
-
-        SDL_Delay(1000 / 60);
-        SDL_GetMouseState(&Mx, &My);
-    }
-
-    return MAIN_MENU;
-}
-*/
