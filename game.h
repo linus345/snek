@@ -12,12 +12,22 @@
 #define CELL_SIZE 32
 #define MAX_PLAYERS 4
 
-/*
-typedef struct {
-    int x;
-    int y;
-} Pos;
-*/
+//Menu button creation struct consisting of SDL_Rect, SDL_Texture and SDL_Color.
+typedef struct Screen_item {
+    SDL_Rect rect;
+    SDL_Texture *texture;
+    SDL_Color color;
+} Screen_item;
+
+typedef struct scoreboard {
+    Screen_item* background;
+    Screen_item* scoreboard;
+    Screen_item* name[MAX_PLAYERS];
+    Screen_item* score[MAX_PLAYERS];
+    Screen_item* mute;
+    Screen_item* return_button;
+    Screen_item* continue_button;
+} Scoreboard;
 
 typedef struct {
     int nr_of_players;
@@ -28,45 +38,8 @@ typedef struct {
     int nr_of_fruits;
     Fruit *fruits[MAX_PLAYERS];
     Player *players[MAX_PLAYERS];
+    Scoreboard *scoreboard;
 } Game_State;
-
-enum Scoreboard_dimensions {
-    SD_BUTTON_X = 0,
-    SD_BUTTON_Y = 50,
-    SD_BUTTON_W = 250,
-    SD_BUTTON_H = 100,
-
-    NAME_X = 29,
-    NAME_Y = 65,
-    NAME_W = 100,
-    NAME_H = 70,
-
-    SCORE_X = 150,
-    SCORE_Y = 65,
-    SCORE_W = 70,
-    SCORE_H = 70,
-
-    Y_OFFSET = 100
-};
-
-enum Finsh_scoreboard_dimensions {
-    FSD_BUTTON_X = WINDOW_WIDTH/2-180,
-    FSD_BUTTON_Y = 200,
-    FSD_BUTTON_W = 400,
-    FSD_BUTTON_H = 150,
-
-    F_NAME_X = WINDOW_WIDTH/2-130,
-    F_NAME_Y = 234,
-    F_NAME_W = 130,
-    F_NAME_H = 90,
-
-    F_SCORE_X = WINDOW_WIDTH/2+40,
-    F_SCORE_Y = 234,
-    F_SCORE_W = 90,
-    F_SCORE_H = 90,
-
-    FY_OFFSET = 150
-};
 
 //void main_loop(App* app);
 Game_State *init_game_state();
@@ -75,6 +48,8 @@ void main_loop(App* app, Game_State *game_state);
 int lobby(App* app, Game_State* game_state, Network* net);
 void optimizeFullscreen(App* app, SDL_Rect* rect);
 int game(App* app, Game_State *game_state, Network *net);
-int scoreboard(App* app, int score);
+Scoreboard* create_scoreboard(App* app, Player* players[]);
+void free_scoreboard(Scoreboard* scoreboard);
+void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard);
 
 #endif

@@ -227,7 +227,7 @@ void handle_ate_fruit(App *app, Uint8 *data, Player *players[], Game_State *game
     printf("type: %d, id: %d, fruit_index: %d\n", type, id, fruit_index);
     printf("--------------\n");
     // update snake that ate fruit and remove the fruit that was ate
-    update_state_if_fruit_collision(app, players[id]->snake, game_state->fruits, &game_state->nr_of_fruits, fruit_index);
+    update_state_if_fruit_collision(app, players[id], game_state->fruits, &game_state->nr_of_fruits, fruit_index);
 }
 
 void send_packet(UDPsocket udp_sock, UDPpacket *pack_send) {

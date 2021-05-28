@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "app.h": "c",
-        "fruit.h": "c"
+        "fruit.h": "c",
+        "typeinfo": "c"
     }
 }

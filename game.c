@@ -10,23 +10,23 @@
 #include "fruit.h"
 #include "game.h"
 #include "menu.h"
+#include "network.h"
 #include "player.h"
 #include "rendering.h"
-#include "network.h"
 
 extern bool thread_done;
 extern SDL_Color black, gray, white, green, dark_green;
 
-Game_State *init_game_state()
+Game_State* init_game_state()
 {
-    Game_State *game_state = malloc(sizeof(Game_State));
+    Game_State* game_state = malloc(sizeof(Game_State));
 
     // client_id and current_time doesn't need to be initialized
     game_state->nr_of_players = 0;
     game_state->connected = false;
     game_state->last_time = 0;
     game_state->nr_of_fruits = 0;
-    for(int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         game_state->fruits[i] = NULL;
         game_state->players[i] = NULL;
     }
@@ -51,7 +51,7 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
     }
 }
 
-void main_loop(App* app, Game_State *game_state)
+void main_loop(App* app, Game_State* game_state)
 {
     Network *net = init_net(app, PACKET_DATA_SIZE);
 
@@ -221,6 +221,7 @@ int lobby(App* app, Game_State* game_state, Network* net)
 int game(App* app, Game_State *game_state, Network* net)
 {
     int Mx, My;
+    bool end_of_round = false;
 
     Pos snake_texture[6];
     // head
@@ -242,7 +243,7 @@ int game(App* app, Game_State *game_state, Network* net)
     snake_texture[5].x = 64;
     snake_texture[5].y = 32;
 
-    SDL_Texture *snake_sprite_tex;
+    SDL_Texture* snake_sprite_tex;
     load_texture(app, &snake_sprite_tex, "./resources/Textures/snake-sprite.png");
 
     Pos fruit_texture[4];
@@ -259,43 +260,12 @@ int game(App* app, Game_State *game_state, Network* net)
     fruit_texture[3].x = 32;
     fruit_texture[3].y = 32;
 
-    SDL_Texture *fruit_sprite_tex;
+    SDL_Texture* fruit_sprite_tex;
     load_texture(app, &fruit_sprite_tex, "./resources/Textures/fruit-sprite.png");
 
     // background texture
-    SDL_Texture *background_tex;
+    SDL_Texture* background_tex;
     load_texture(app, &background_tex, "./resources/Textures/background.png");
-
-    // Scoreboard texture
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-
-    SDL_Color white_txt = { 255, 255, 255, 255 };
-
-    Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
-    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Textures/Forest_green.jpg");
-    Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
-    Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
-
-    Screen_item* scoreboard1 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard2 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard3 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard4 = menu_button_background(app, "./resources/Textures/menuButton.png");
-
-    Screen_item* player1_name = menu_button_text(app, app->player_name, font, white_txt);
-    Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white_txt);
-    Screen_item* player3_name = menu_button_text(app, "Victor", font, white_txt);
-    Screen_item* player4_name = menu_button_text(app, "Alma", font, white_txt);
-
-    Screen_item* player1_score = menu_button_text(app, " ", font, white_txt);
-    Screen_item* player2_score = menu_button_text(app, " ", font, white_txt);
-    Screen_item* player3_score = menu_button_text(app, " ", font, white_txt);
-    Screen_item* player4_score = menu_button_text(app, " ", font, white_txt);
-
-    int score = 0;
-    char buffer[50];
-
-    Screen_item* return_button = menu_button_background(app, "./resources/Textures/exit_button.png");
-    Screen_item* mute_button = menu_button_background(app, "./resources/Textures/speaker_icon.png"); // Game starts with sound
 
     //////////// NETWORK ////////////
 
@@ -312,14 +282,14 @@ int game(App* app, Game_State *game_state, Network* net)
     int server_port = atoi(app->port);
     IPaddress server_addr = resolve_host(app->ip, server_port);
  */
-/*     Network *net = init_net(app, PACKET_DATA_SIZE);
+    /* Network *net = init_net(app, PACKET_DATA_SIZE);
 
     // array to store info about connected players
-    //Player *players[MAX_PLAYERS] = {NULL, NULL, NULL, NULL};
-    // keep track of number of joined clients 
-    int nr_of_players = 0; 
-    // client id for this specific client, needed to select correct player from the players array 
-    int client_id; 
+    Player* players[MAX_PLAYERS] = { NULL, NULL, NULL, NULL };
+    // keep track of number of joined clients
+    // int nr_of_players = 0;
+    // client id for this specific client, needed to select correct player from the players array
+    // int client_id;
 
     // send join game request
     join_game_request(net->udp_sock, net->server_addr, net->pack_send);
@@ -328,50 +298,52 @@ int game(App* app, Game_State *game_state, Network* net)
     // used when client connecting and in main loop
     int request_type;
 
-    while(!game_state->connected) {
-        if(SDLNet_UDP_Recv(net->udp_sock, net->pack_recv)) {
+    while (!game_state->connected) {
+        if (SDLNet_UDP_Recv(udp_sock, pack_recv)) {
             // get request type from packet
-            sscanf((char *) net->pack_recv->data, "%d", &request_type);
-            switch(request_type) {
-                // these are the only expected types
-                case SUCCESSFUL_CONNECTION:
-                    // adds new player and increments nr_of_players
-                    new_client_joined(net->pack_recv->data, game_state, game_state->players);
-                    break;
-                case FAILED_CONNECTION:
-                    // TODO: handle it differently if it failed because 4 clients
-                    // already is connected
-                    printf("Failed to connect, retrying...\n");
-                    // TODO: temporary exit until fixing above todo
-                    exit(EXIT_FAILURE);
-                    // update time for new request
-                    time_when_req_sent = SDL_GetTicks();
-                    break;
+            sscanf((char*)pack_recv->data, "%d", &request_type);
+            switch (request_type) {
+            // these are the only expected types
+            case SUCCESSFUL_CONNECTION:
+                // adds new player and increments nr_of_players
+                new_client_joined(pack_recv->data, game_state, players);
+                break;
+            case FAILED_CONNECTION:
+                // TODO: handle it differently if it failed because 4 clients
+                // already is connected
+                printf("Failed to connect, retrying...\n");
+                // TODO: temporary exit until fixing above todo
+                exit(EXIT_FAILURE);
+                // update time for new request
+                time_when_req_sent = SDL_GetTicks();
+                break;
             }
         }
         // 3 second timer to break out of loop if packet not received yet
         // prevents from getting stuck in while loop
-        if(time_when_req_sent > time_when_req_sent + 3000) {
+        if (time_when_req_sent > time_when_req_sent + 3000) {
             printf("join: request timed out\n");
             // exit for now
             exit(EXIT_FAILURE);
             break;
         }
-    } */
+    }*/
 
     //////////////////////////////////
 
+    game_state->scoreboard = create_scoreboard(app, players);
+
     // initialize thread safe buffer with enough space for 10 PACKET_DATA_SIZE byte packets
-    Circular_Buffer *buf = init_buffer(10, PACKET_DATA_SIZE);
+    Circular_Buffer* buf = init_buffer(10, PACKET_DATA_SIZE);
 
     // set global variable thread_done to false before creating thread
     thread_done = false;
     // arguments that thread needs to access
     Thread_Args args = {net->udp_sock, net->pack_recv, net->pack_send, buf};
     // create thread that listens for udp packets
-    SDL_Thread *recv_thread = SDL_CreateThread(receive_packets_in_new_thread, "recv_thread", (void *) &args);
+    SDL_Thread* recv_thread = SDL_CreateThread(receive_packets_in_new_thread, "recv_thread", (void*)&args);
     // check if thread creation was successful or not
-    if(recv_thread == NULL) {
+    if (recv_thread == NULL) {
         fprintf(stderr, "Error: SDL_CreateThread: %s\n", SDL_GetError());
         exit(EXIT_FAILURE);
     }
@@ -381,66 +353,63 @@ int game(App* app, Game_State *game_state, Network* net)
         // check for event
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_QUIT:
-                    // exit main loop
-                    app->running = false;
+            case SDL_QUIT:
+                // exit main loop
+                app->running = false;
+                break;
+            case SDL_KEYDOWN:
+                // key pressed?
+                switch (event.key.keysym.sym) {
+                case SDLK_UP:
+                case SDLK_w:
+                    if (players[game_state->client_id]->snake->vel_y == 0)
+                        players[game_state->client_id]->snake->dir = Up;
                     break;
-                case SDL_KEYDOWN:
-                    // key pressed?
-                    switch (event.key.keysym.sym) {
-                        case SDLK_UP:
-                        case SDLK_w:
-                            if (game_state->players[game_state->client_id]->snake->dir != Down)
-                                game_state->players[game_state->client_id]->snake->dir = Up;
-                            break;
-                        case SDLK_DOWN:
-                        case SDLK_s:
-                            if (game_state->players[game_state->client_id]->snake->dir != Up)
-                                game_state->players[game_state->client_id]->snake->dir = Down;
-                            break;
-                        case SDLK_RIGHT:
-                        case SDLK_d:
-                            if (game_state->players[game_state->client_id]->snake->dir != Left)
-                                game_state->players[game_state->client_id]->snake->dir = Right;
-                            break;
-                        case SDLK_LEFT:
-                        case SDLK_a:
-                            if (game_state->players[game_state->client_id]->snake->dir != Right)
-                                game_state->players[game_state->client_id]->snake->dir = Left;
-                            break;
-                        default:
-                            break;
+                case SDLK_DOWN:
+                case SDLK_s:
+                    if (players[game_state->client_id]->snake->vel_y == 0)
+                        players[game_state->client_id]->snake->dir = Down;
+                    break;
+                case SDLK_RIGHT:
+                case SDLK_d:
+                    if (players[game_state->client_id]->snake->vel_x == 0)
+                        players[game_state->client_id]->snake->dir = Right;
+                    break;
+                case SDLK_LEFT:
+                case SDLK_a:
+                    if (players[game_state->client_id]->snake->vel_x == 0)
+                        players[game_state->client_id]->snake->dir = Left;
+                    break;
+                default:
+                    break;
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(game_state->scoreboard->return_button, Mx, My)) {
+                    // Makes space on the heap
+                    free_scoreboard(game_state->scoreboard);
+                    return MAIN_MENU;
+                } else if (hover_state(game_state->scoreboard->mute, Mx, My)) {
+                    if (app->sound->muted) { // Unmutes all the sounds and changes the speaker icon
+                        // free mute before updating it
+                        if(game_state->scoreboard->mute != NULL)
+                            free(game_state->scoreboard->mute);
+                        game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
+                        app->sound->muted = false;
+                    } else if (!app->sound->muted) { // Mutes all the sounds and changes the speaker icon
+                        // free mute before updating it
+                        if(game_state->scoreboard->mute != NULL)
+                            free(game_state->scoreboard->mute);
+                        game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
+                        app->sound->muted = true;
                     }
-                    break;
-                case SDL_MOUSEBUTTONDOWN:
-                    if (hover_state(return_button, Mx, My)) {
-                        // Makes space on the heap
-                        free(goal_text);
-                        free(goal_nr);
-                        free(scoreboard1);
-                        free(scoreboard2);
-                        free(scoreboard3);
-                        free(scoreboard4);
-                        free(player1_name);
-                        free(player2_name);
-                        free(player3_name);
-                        free(player4_name);
-                        free(player1_score);
-                        free(player2_score);
-                        free(player3_score);
-                        free(player4_score);
-                        free(return_button);
-                        return MAIN_MENU;
-                    } else if (hover_state(mute_button, Mx, My)) {
-                        if (app->sound->muted) { // Unmutes all the sounds and changes the speaker icon
-                            mute_button = menu_button_background(app, "./resources/Textures/speaker_icon.png");
-                            app->sound->muted = false;
-                        } else if (!app->sound->muted) { // Mutes all the sounds and changes the speaker icon
-                            mute_button = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
-                            app->sound->muted = true;
-                        }
+                } else if (hover_state(game_state->scoreboard->continue_button, Mx, My)) {
+                    if (end_of_round) {
+                        end_of_round = false;
                     }
-                    break;
+                }
+
+                break;
             }
         }
 
@@ -448,9 +417,9 @@ int game(App* app, Game_State *game_state, Network* net)
         /* handle_received_packets(net, game_state, players); */
 
         // handle every new packet before rendering this frame
-        while(!buf_is_empty(buf)) {
+        while (!buf_is_empty(buf)) {
             // handle packets
-            void *data = malloc(PACKET_DATA_SIZE);
+            void* data = malloc(PACKET_DATA_SIZE);
             read_from_buffer(buf, data);
             handle_received_packet(app, data, game_state, game_state->players);
             free(data);
@@ -485,150 +454,28 @@ int game(App* app, Game_State *game_state, Network* net)
         }
 
         /* update_state_if_fruit_collision(players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits); */
-        fruit_collision(app, net->udp_sock, net->server_addr, net->pack_send, game_state->players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
+        fruit_collision(app, udp_sock, server_addr, pack_send, players, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
-        // fruit rendering
-        SDL_Rect fruit_src[MAX_PLAYERS] = {0};
-        SDL_Rect fruit_dst[MAX_PLAYERS] = {0};
+        /////////////////////////////////////////////// Rendering section //////////////////////////////////////////////////////
+        
+        // TODO: maybe only call when fruit is eaten
+        update_scoreboard(app, players, game_state->scoreboard); // updates the scoreboard
 
-        for (int i = 0; i < MAX_PLAYERS; i++) {
-            if(game_state->fruits[i] == NULL) {
-                // don't try to render a fruit that doesn't exist
-                continue;
-            }
-            fruit_src[i].x = fruit_texture[game_state->fruits[i]->type].x;
-            fruit_src[i].y = fruit_texture[game_state->fruits[i]->type].y;
-            fruit_src[i].w = CELL_SIZE;
-            fruit_src[i].h = CELL_SIZE;
+        if (end_of_round) {
+            // clear screen before next render
+            SDL_RenderClear(app->renderer);
+            render_end_of_round(app, game_state->scoreboard);
+        } else if (!end_of_round) {
+            // clear screen before next render
+            SDL_RenderClear(app->renderer);
+            SDL_Rect background_dst = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+            SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
-            fruit_dst[i].x = game_state->fruits[i]->pos.x;
-            fruit_dst[i].y = game_state->fruits[i]->pos.y;
-            fruit_dst[i].w = CELL_SIZE;
-            fruit_dst[i].h = CELL_SIZE;
-        }
+            render_scoreboard(app, game_state->scoreboard);
 
-        // clear screen before next render
-        SDL_RenderClear(app->renderer);
-        SDL_Rect background_dst = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-        SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
-
-        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, 250, WINDOW_HEIGHT);
-        render_item(app, &background->rect, background->texture, BACKGROUND, GAME_START_POS, 0, GAME_WIDTH, WINDOW_HEIGHT);
-
-        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, 0, 0, 50, 50);
-        render_item(app, &goal_nr->rect, goal_nr->texture, UNSPECIFIED, 194, 0, 50, 50);
-
-        render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y, SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + Y_OFFSET, SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard3->rect, scoreboard3->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (2 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
-        render_item(app, &scoreboard4->rect, scoreboard4->texture, UNSPECIFIED, SD_BUTTON_X, SD_BUTTON_Y + (3 * Y_OFFSET), SD_BUTTON_W, SD_BUTTON_H);
-
-        render_item(app, &player1_name->rect, player1_name->texture, UNSPECIFIED, NAME_X, NAME_Y, NAME_W, NAME_H);
-        render_item(app, &player1_score->rect, player1_score->texture, UNSPECIFIED, SCORE_X, SCORE_Y, SCORE_W, SCORE_H);
-
-        render_item(app, &player2_name->rect, player2_name->texture, UNSPECIFIED, NAME_X, NAME_Y + Y_OFFSET, NAME_W, NAME_H);
-        render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (2 * Y_OFFSET), NAME_W, NAME_H);
-        render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, NAME_X, NAME_Y + (3 * Y_OFFSET), NAME_W, NAME_H);
-
-        render_item(app, &return_button->rect, return_button->texture, UNSPECIFIED, 55, GAME_HEIGHT - 50, 50, 50);
-        render_item(app, &mute_button->rect, mute_button->texture, UNSPECIFIED, 160, GAME_HEIGHT - 50, 50, 50);
-
-        // render fruits
-        for (int i = 0; i < MAX_PLAYERS; i++) {
-            if(fruit_src[i].w != CELL_SIZE || fruit_dst[i].w != CELL_SIZE) {
-                // skip rendering if there is no fruit
-                continue;
-            }
-            SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
-        }
-        // render all snakes
-        SDL_Rect head_src;
-        SDL_Rect head_dst;
-        SDL_Rect body_src[MAX_SNAKE_LENGTH];
-        SDL_Rect body_dst[MAX_SNAKE_LENGTH];
-        SDL_Rect tail_src;
-        SDL_Rect tail_dst;
-        SDL_RendererFlip flip;
-        int rotation;
-        for(int i = 0; i < game_state->nr_of_players; i++) {
-            if(game_state->players[i] == NULL) {
-                // skip current player if player doesn't exist
-                continue;
-            } else if(!game_state->players[i]->alive) {
-                // skip current player if player is dead
-                continue;
-            }
-            // snake head rendering
-            head_dst.x = game_state->players[i]->snake->head.pos.x;
-            head_dst.y = game_state->players[i]->snake->head.pos.y;
-            head_dst.w = CELL_SIZE;
-            head_dst.h = CELL_SIZE;
-
-            if (game_state->players[i]->snake->head.mouth_open) {
-                // Snake open mouth next to fruit
-                head_src.x = snake_texture[4].x;
-                head_src.y = snake_texture[4].y;
-            } else if (game_state->players[i]->snake->head.mouth_eating) {
-                // Snake eating after open mouth
-                head_src.x = snake_texture[5].x;
-                head_src.y = snake_texture[5].y;
-            } else {
-                // Snake closed mouth, default
-                head_src.x = snake_texture[0].x;
-                head_src.y = snake_texture[0].y;
-            }
-            head_src.w = CELL_SIZE;
-            head_src.h = CELL_SIZE;
-
-            // snake body rendering
-            for (int j = 0; j < game_state->players[i]->snake->body_length; j++) {
-                if (game_state->players[i]->snake->body[j].is_turn) {
-                    body_src[j].x = snake_texture[3].x;
-                    body_src[j].y = snake_texture[3].y;
-                }
-                else {
-                    body_src[j].x = snake_texture[1].x;
-                    body_src[j].y = snake_texture[1].y;
-                }
-                body_src[j].w = CELL_SIZE;
-                body_src[j].h = CELL_SIZE;
-
-                body_dst[j].x = game_state->players[i]->snake->body[j].pos.x;
-                body_dst[j].y = game_state->players[i]->snake->body[j].pos.y;
-                body_dst[j].w = CELL_SIZE;
-                body_dst[j].h = CELL_SIZE;
-            }
-
-            // snake tail rendering
-            tail_src.x = snake_texture[2].x;
-            tail_src.y = snake_texture[2].y;
-            tail_src.w = CELL_SIZE;
-            tail_src.h = CELL_SIZE;
-            tail_dst.x = game_state->players[i]->snake->tail.pos.x;
-            tail_dst.y = game_state->players[i]->snake->tail.pos.y;
-            tail_dst.w = CELL_SIZE;
-            tail_dst.h = CELL_SIZE;
-
-            // render head
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, game_state->players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
-            // render body
-            flip = SDL_FLIP_NONE;
-            for (int j = 0; j < game_state->players[i]->snake->body_length; j++) {
-                rotation = game_state->players[i]->snake->body[j].angle;
-                flip = SDL_FLIP_NONE;
-                if (game_state->players[i]->snake->body[j].is_turn) {
-                    rotation = game_state->players[i]->snake->body[j].turn_rotation;
-                    if (game_state->players[i]->snake->body[j].should_flip_vertical) {
-                        flip = SDL_FLIP_VERTICAL;
-                    }
-                    else if (game_state->players[i]->snake->body[j].should_flip_horizontal) {
-                        flip = SDL_FLIP_HORIZONTAL;
-                    }
-                }
-                SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[j], &body_dst[j], rotation, NULL, flip);
-            }
-            // render tail
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, game_state->players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
+            render_fruits(app, game_state->fruits, fruit_sprite_tex, fruit_texture);
+            // render all snakes
+            render_snakes(app, players, game_state->nr_of_players, snake_sprite_tex, snake_texture);
         }
 
         // present on screen
@@ -637,13 +484,6 @@ int game(App* app, Game_State *game_state, Network* net)
         SDL_GetMouseState(&Mx, &My);
         SDL_Delay(1000 / 60);
     }
-    //if (show_scoreboard) {
-    //    //play_sound(app->sound->scoreboard);
-    //    app->running = true;
-    //    return scoreboard(app, score);
-    //} else {
-    //    return MAIN_MENU;
-    //}
 
     // indicate that receive thread should stop running
     thread_done = true;
@@ -661,117 +501,74 @@ int game(App* app, Game_State *game_state, Network* net)
     return MAIN_MENU;
 }
 
-int scoreboard(App* app, int score)
+Scoreboard* create_scoreboard(App* app, Player* players[])
 {
-    //bool playsound = true;
+    Scoreboard* scoreboard = malloc(sizeof(Scoreboard));
 
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-    SDL_Color white_txt = { 255, 255, 255, 255 };
-
-    Screen_item* scorescreen_background = menu_button_background(app, "./resources/Textures/Forest_green.jpg");
-
-    Screen_item* goal_text = menu_button_text(app, "Goal:", font, white_txt);
+    scoreboard->background = menu_button_background(app, "./resources/Textures/Forest_green.jpg");
+    scoreboard->scoreboard = menu_button_background(app, "./resources/Textures/menuButton.png");
+    /*
+    Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
+    */
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
 
-    Screen_item* scoreboard1 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard2 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard3 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    Screen_item* scoreboard4 = menu_button_background(app, "./resources/Textures/menuButton.png");
+    scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white);
 
-    Screen_item* player1_name = menu_button_text(app, app->player_name, font, white_txt);
-    Screen_item* player2_name = menu_button_text(app, "Stoffe", font, white_txt);
-    Screen_item* player3_name = menu_button_text(app, "Victor", font, white_txt);
-    Screen_item* player4_name = menu_button_text(app, "Alma", font, white_txt);
-
-    char buffer[10];
-    sprintf(buffer, "%d", score);
-
-    Screen_item* player1_score = menu_button_text(app, buffer, font, white_txt);
-    Screen_item* player2_score = menu_button_text(app, " ", font, white_txt);
-    Screen_item* player3_score = menu_button_text(app, " ", font, white_txt);
-    Screen_item* player4_score = menu_button_text(app, " ", font, white_txt);
-
-    Screen_item* continue_button = menu_button_text(app, "Press to continue", font, white_txt);
-
-    int Mx, My;
-    while (app->running) {
-        SDL_Event event;
-        // check for event
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                // exit main loop
-                app->running = false;
-                break;
-            case SDL_KEYDOWN:
-                // key pressed?
-                switch (event.key.keysym.sym) {
-                case SDLK_F11:
-                    if (app->fullscreen) {
-                        SDL_SetWindowFullscreen(app->window, 0);
-                        app->fullscreen = false;
-                    } else {
-                        SDL_SetWindowFullscreen(app->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                        app->fullscreen = true;
-                    }
-                    // Makes space on the heap
-                    break;
-                }
-                break;
-
-            case SDL_MOUSEBUTTONDOWN:
-                if (hover_state(continue_button, Mx, My)) {
-                    play_sound(app->sound->press);
-                    // Makes space on the heap
-                    //free(goal_text);
-                    //free(goal_nr);
-                    free(scoreboard1);
-                    free(scoreboard2);
-                    free(scoreboard3);
-                    free(scoreboard4);
-                    free(player1_name);
-                    free(player2_name);
-                    free(player3_name);
-                    free(player3_name);
-                    free(player4_name);
-                    free(player1_score);
-                    free(player2_score);
-                    free(player3_score);
-                    free(player4_score);
-                    free(continue_button);
-                    return MAIN_MENU;
-                }
-                break;
-            }
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        // skip if player does not exist
+        if(players[i] == NULL) {
+            scoreboard->name[i] = NULL;
+            scoreboard->score[i] = NULL;
+            continue;
         }
 
-        // clear screen before next render
-        SDL_RenderClear(app->renderer);
-
-        render_item(app, &scorescreen_background->rect, scorescreen_background->texture, STRETCH, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        render_item(app, &goal_text->rect, goal_text->texture, UNSPECIFIED, WINDOW_WIDTH / 2 - 129, 100, 300, 120);
-
-        render_item(app, &scoreboard1->rect, scoreboard1->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y, FSD_BUTTON_W, FSD_BUTTON_H);
-        render_item(app, &scoreboard2->rect, scoreboard2->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + FY_OFFSET, FSD_BUTTON_W, FSD_BUTTON_H);
-        render_item(app, &scoreboard3->rect, scoreboard3->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (2 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
-        render_item(app, &scoreboard4->rect, scoreboard4->texture, UNSPECIFIED, FSD_BUTTON_X, FSD_BUTTON_Y + (3 * FY_OFFSET), FSD_BUTTON_W, FSD_BUTTON_H);
-
-        render_item(app, &player1_name->rect, player1_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y, F_NAME_W, F_NAME_H);
-        render_item(app, &player1_score->rect, player1_score->texture, UNSPECIFIED, F_SCORE_X, F_SCORE_Y, F_SCORE_W, F_SCORE_H);
-
-        render_item(app, &player2_name->rect, player2_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + FY_OFFSET, F_NAME_W, F_NAME_H);
-        render_item(app, &player3_name->rect, player3_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (2 * FY_OFFSET), F_NAME_W, F_NAME_H);
-        render_item(app, &player4_name->rect, player4_name->texture, UNSPECIFIED, F_NAME_X, F_NAME_Y + (3 * FY_OFFSET), F_NAME_W, F_NAME_H);
-
-        render_item(app, &continue_button->rect, continue_button->texture, UNSPECIFIED, WINDOW_WIDTH / 2 - 129, WINDOW_HEIGHT - 145, 300, 120);
-
-        // present on screen
-        SDL_RenderPresent(app->renderer);
-
-        SDL_Delay(1000 / 60);
-        SDL_GetMouseState(&Mx, &My);
+        // TODO: use players[i]->name instead of app->player_name
+        /* scoreboard->name[i] = menu_button_text(app, players[i]->name, font, green); */
+        scoreboard->name[i] = menu_button_text(app, app->player_name, font, green);
+        scoreboard->score[i] = menu_button_text(app, "0", font, green);
     }
 
-    return MAIN_MENU;
+    scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
+    scoreboard->return_button = menu_button_background(app, "./resources/Textures/exit_button.png");
+
+    return scoreboard;
+}
+
+void free_scoreboard(Scoreboard* scoreboard)
+{
+    free(scoreboard->background);
+    free(scoreboard->scoreboard);
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        if(scoreboard->name[i] != NULL)
+            free(scoreboard->name[i]);
+        if(scoreboard->score[i] != NULL)
+        free(scoreboard->score[i]);
+    }
+    free(scoreboard->mute);
+    free(scoreboard->return_button);
+    free(scoreboard->continue_button);
+    free(scoreboard);
+}
+
+void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
+{
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
+    if(font == NULL)
+        return;
+    char buffer[50];
+
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        if(players[i] == NULL)
+            continue;
+
+        sprintf(buffer, "%d", players[i]->points);
+        // free previous score before creating new one
+        free(scoreboard->score[i]);
+        // create new score text
+        scoreboard->score[i] = menu_button_text(app, buffer, font, green);
+    }
+
+    TTF_CloseFont(font);
+    font = NULL;
 }
