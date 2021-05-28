@@ -313,7 +313,8 @@ int game(App* app, Game_State* game_state)
         fruit_collision(app, udp_sock, server_addr, pack_send, players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
         /////////////////////////////////////////////// Rendering section //////////////////////////////////////////////////////
-        update_scoreboard(players, scoreboard); // updates the scoreboard
+        
+        update_scoreboard(app, players, scoreboard); // updates the scoreboard
 
         if (end_of_round) {
             // clear screen before next render

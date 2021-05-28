@@ -135,7 +135,7 @@ Scoreboard* create_scoreboard(App* app, Player players[])
     */
     TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
 
-    scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white_txt);
+    scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white);
 
     scoreboard->name1 = menu_button_text(app, players[0].name, font, green);
     scoreboard->name2 = menu_button_text(app, players[1].name, font, green);
@@ -153,17 +153,18 @@ Scoreboard* create_scoreboard(App* app, Player players[])
     return scoreboard;
 }
 
-void update_scoreboard(Player players[], Scoreboard* scoreboard)
+void update_scoreboard(App* app, Player player[], Scoreboard* scoreboard)
 {
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
     char buffer[50];
 
-    sprintf(buffer, "%d", player[0]->points);
+    sprintf(buffer, "%d", player[0].points);
     scoreboard->score1 = menu_button_text(app, buffer, font, green);
-    sprintf(buffer, "%d", player[1]->points);
+    sprintf(buffer, "%d", player[1].points);
     scoreboard->score2 = menu_button_text(app, buffer, font, green);
-    sprintf(buffer, "%d", player[2]->points);
+    sprintf(buffer, "%d", player[2].points);
     scoreboard->score3 = menu_button_text(app, buffer, font, green);
-    sprintf(buffer, "%d", player[3]->points);
+    sprintf(buffer, "%d", player[3].points);
     scoreboard->score4 = menu_button_text(app, buffer, font, green);
 }
 

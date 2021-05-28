@@ -103,7 +103,7 @@ void render_menu(App* app, Menu* menu);
 void free_menu(Menu* menu);
 // Scoreboard functions
 Scoreboard* create_scoreboard(App* app, Player players[]);
-void update_scoreboard(Player players[], Scoreboard* scoreboard);
+void update_scoreboard(App* app, Player player[], Scoreboard* scoreboard);
 void render_scoreboard(App* app, Scoreboard* scoreboard);
 void render_end_of_round(App* app, Scoreboard* scoreboard);
 void free_scoreboard(Scoreboard* scoreboard);
