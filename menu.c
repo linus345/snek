@@ -413,11 +413,11 @@ int join_multiplayer(App* app)
         }
 
         render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        render_item(app, &background1->rect, background1->texture, MENU_BUTTON, 230, 250, 500, 180);
-        render_item(app, &background2->rect, background2->texture, MENU_BUTTON, 300, 390, 360, 150);
+        render_item(app, &background1->rect, background1->texture, MENU_BUTTON, 380, 250, 500, 180);
+        render_item(app, &background2->rect, background2->texture, MENU_BUTTON, 450, 390, 360, 150);
         render_item(app, &button->rect, button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + 200, BUTTON_W, BUTTON_H);
-        render_item(app, &text1->rect, text1->texture, MENU_BUTTON, 280, 290, 410, 110);
-        render_item(app, &text2->rect, text2->texture, MENU_BUTTON, 350, 420, 250, 90);
+        render_item(app, &text1->rect, text1->texture, MENU_BUTTON, 430, 290, 410, 110);
+        render_item(app, &text2->rect, text2->texture, MENU_BUTTON, 500, 420, 250, 90);
         render_item(app, &text3->rect, text3->texture, MENU_BUTTON, TEXT_X, TEXT_Y + 200, TEXT_W, TEXT_H);
         render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + 350, TEXT_W, TEXT_H);
 
