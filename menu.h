@@ -8,13 +8,6 @@
 #include "app.h"
 #include "sound.h"
 
-//Menu button creation struct consisting of SDL_Rect, SDL_Texture and SDL_Color.
-typedef struct Screen_item {
-    SDL_Rect rect;
-    SDL_Texture *texture;
-    SDL_Color color;
-} Screen_item;
-
 //Numreric values to determine menu outcome.
 enum Menu_selection {
     MAIN_MENU = 0,

@@ -77,22 +77,6 @@ typedef struct menu {
     Screen_item* return_button;
 } Menu;
 
-typedef struct scoreboard {
-    Screen_item* background;
-    Screen_item* scoreboard;
-    Screen_item* name1;
-    Screen_item* name2;
-    Screen_item* name3;
-    Screen_item* name4;
-    Screen_item* score1;
-    Screen_item* score2;
-    Screen_item* score3;
-    Screen_item* score4;
-    Screen_item* mute;
-    Screen_item* return_button;
-    Screen_item* continue_button;
-} Scoreboard;
-
 // Genral functions
 Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color);
 Screen_item* menu_button_background(App* app, char resource[]);
@@ -102,9 +86,8 @@ Menu* init_menu_tex(App* app, char top_button[], char middle_button[], char lowe
 void render_menu(App* app, Menu* menu);
 void free_menu(Menu* menu);
 // Scoreboard functions
-Scoreboard* create_scoreboard(App* app, Player players[]);
-void update_scoreboard(App* app, Player player[], Scoreboard* scoreboard);
 void render_scoreboard(App* app, Scoreboard* scoreboard);
 void render_end_of_round(App* app, Scoreboard* scoreboard);
-void free_scoreboard(Scoreboard* scoreboard);
+void render_fruits(App* app, Fruit* fruits[], SDL_Texture* fruit_sprite_tex, Pos fruit_texture[]);
+void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* snake_sprite_tex, Pos snake_texture[]);
 #endif

@@ -15,6 +15,7 @@
 #include "rendering.h"
 
 extern bool thread_done;
+extern SDL_Color black, gray, white, green, dark_green;
 
 Game_State* init_game_state()
 {
@@ -160,8 +161,6 @@ int game(App* app, Game_State* game_state)
     // used when client connecting and in main loop
     int request_type;
 
-    Scoreboard* scoreboard = create_scoreboard(app, players);
-
     while (!game_state->connected) {
         if (SDLNet_UDP_Recv(udp_sock, pack_recv)) {
             // get request type from packet
@@ -194,6 +193,8 @@ int game(App* app, Game_State* game_state)
     }
 
     //////////////////////////////////
+
+    game_state->scoreboard = create_scoreboard(app, players);
 
     // initialize thread safe buffer with enough space for 10 PACKET_DATA_SIZE byte packets
     Circular_Buffer* buf = init_buffer(10, PACKET_DATA_SIZE);
@@ -247,19 +248,25 @@ int game(App* app, Game_State* game_state)
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if (hover_state(scoreboard->return_button, Mx, My)) {
+                if (hover_state(game_state->scoreboard->return_button, Mx, My)) {
                     // Makes space on the heap
-                    free_scoreboard(scoreboard);
+                    free_scoreboard(game_state->scoreboard);
                     return MAIN_MENU;
-                } else if (hover_state(scoreboard->mute, Mx, My)) {
+                } else if (hover_state(game_state->scoreboard->mute, Mx, My)) {
                     if (app->sound->muted) { // Unmutes all the sounds and changes the speaker icon
-                        scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
+                        // free mute before updating it
+                        if(game_state->scoreboard->mute != NULL)
+                            free(game_state->scoreboard->mute);
+                        game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
                         app->sound->muted = false;
                     } else if (!app->sound->muted) { // Mutes all the sounds and changes the speaker icon
-                        scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
+                        // free mute before updating it
+                        if(game_state->scoreboard->mute != NULL)
+                            free(game_state->scoreboard->mute);
+                        game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
                         app->sound->muted = true;
                     }
-                } else if (hover_state(scoreboard->continue_button, Mx, My)) {
+                } else if (hover_state(game_state->scoreboard->continue_button, Mx, My)) {
                     if (end_of_round) {
                         end_of_round = false;
                     }
@@ -310,139 +317,28 @@ int game(App* app, Game_State* game_state)
         }
 
         /* update_state_if_fruit_collision(players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits); */
-        fruit_collision(app, udp_sock, server_addr, pack_send, players[game_state->client_id]->snake, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
+        fruit_collision(app, udp_sock, server_addr, pack_send, players, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
         /////////////////////////////////////////////// Rendering section //////////////////////////////////////////////////////
         
-        update_scoreboard(app, players, scoreboard); // updates the scoreboard
+        // TODO: maybe only call when fruit is eaten
+        update_scoreboard(app, players, game_state->scoreboard); // updates the scoreboard
 
         if (end_of_round) {
             // clear screen before next render
             SDL_RenderClear(app->renderer);
-            render_end_of_round(app, scoreboard);
+            render_end_of_round(app, game_state->scoreboard);
         } else if (!end_of_round) {
-            // fruit rendering
-            SDL_Rect fruit_src[MAX_PLAYERS] = { 0 };
-            SDL_Rect fruit_dst[MAX_PLAYERS] = { 0 };
-
-            for (int i = 0; i < MAX_PLAYERS; i++) {
-                if (game_state->fruits[i] == NULL) {
-                    // don't try to render a fruit that doesn't exist
-                    continue;
-                }
-                fruit_src[i].x = fruit_texture[game_state->fruits[i]->type].x;
-                fruit_src[i].y = fruit_texture[game_state->fruits[i]->type].y;
-                fruit_src[i].w = CELL_SIZE;
-                fruit_src[i].h = CELL_SIZE;
-
-                fruit_dst[i].x = game_state->fruits[i]->pos.x;
-                fruit_dst[i].y = game_state->fruits[i]->pos.y;
-                fruit_dst[i].w = CELL_SIZE;
-                fruit_dst[i].h = CELL_SIZE;
-            }
-
             // clear screen before next render
             SDL_RenderClear(app->renderer);
             SDL_Rect background_dst = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
             SDL_RenderCopy(app->renderer, background_tex, NULL, &background_dst);
 
-            render_scoreboard(app, scoreboard);
+            render_scoreboard(app, game_state->scoreboard);
 
-            // render fruits
-            for (int i = 0; i < MAX_PLAYERS; i++) {
-                if (fruit_src[i].w != CELL_SIZE || fruit_dst[i].w != CELL_SIZE) {
-                    // skip rendering if there is no fruit
-                    continue;
-                }
-                SDL_RenderCopyEx(app->renderer, fruit_sprite_tex, &fruit_src[i], &fruit_dst[i], 0, NULL, SDL_FLIP_NONE);
-            }
+            render_fruits(app, game_state->fruits, fruit_sprite_tex, fruit_texture);
             // render all snakes
-            SDL_Rect head_src;
-            SDL_Rect head_dst;
-            SDL_Rect body_src[MAX_SNAKE_LENGTH];
-            SDL_Rect body_dst[MAX_SNAKE_LENGTH];
-            SDL_Rect tail_src;
-            SDL_Rect tail_dst;
-            SDL_RendererFlip flip;
-            int rotation;
-            for (int i = 0; i < game_state->nr_of_players; i++) {
-                if (players[i] == NULL) {
-                    // skip current player if player doesn't exist
-                    continue;
-                } else if (!players[i]->alive) {
-                    // skip current player if player is dead
-                    continue;
-                }
-                // snake head rendering
-                head_dst.x = players[i]->snake->head.pos.x;
-                head_dst.y = players[i]->snake->head.pos.y;
-                head_dst.w = CELL_SIZE;
-                head_dst.h = CELL_SIZE;
-
-                if (players[i]->snake->head.mouth_open) {
-                    // Snake open mouth next to fruit
-                    head_src.x = snake_texture[4].x;
-                    head_src.y = snake_texture[4].y;
-                } else if (players[i]->snake->head.mouth_eating) {
-                    // Snake eating after open mouth
-                    head_src.x = snake_texture[5].x;
-                    head_src.y = snake_texture[5].y;
-                } else {
-                    // Snake closed mouth, default
-                    head_src.x = snake_texture[0].x;
-                    head_src.y = snake_texture[0].y;
-                }
-                head_src.w = CELL_SIZE;
-                head_src.h = CELL_SIZE;
-
-                // snake body rendering
-                for (int j = 0; j < players[i]->snake->body_length; j++) {
-                    if (players[i]->snake->body[j].is_turn) {
-                        body_src[j].x = snake_texture[3].x;
-                        body_src[j].y = snake_texture[3].y;
-                    } else {
-                        body_src[j].x = snake_texture[1].x;
-                        body_src[j].y = snake_texture[1].y;
-                    }
-                    body_src[j].w = CELL_SIZE;
-                    body_src[j].h = CELL_SIZE;
-
-                    body_dst[j].x = players[i]->snake->body[j].pos.x;
-                    body_dst[j].y = players[i]->snake->body[j].pos.y;
-                    body_dst[j].w = CELL_SIZE;
-                    body_dst[j].h = CELL_SIZE;
-                }
-
-                // snake tail rendering
-                tail_src.x = snake_texture[2].x;
-                tail_src.y = snake_texture[2].y;
-                tail_src.w = CELL_SIZE;
-                tail_src.h = CELL_SIZE;
-                tail_dst.x = players[i]->snake->tail.pos.x;
-                tail_dst.y = players[i]->snake->tail.pos.y;
-                tail_dst.w = CELL_SIZE;
-                tail_dst.h = CELL_SIZE;
-
-                // render head
-                SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
-                // render body
-                flip = SDL_FLIP_NONE;
-                for (int j = 0; j < players[i]->snake->body_length; j++) {
-                    rotation = players[i]->snake->body[j].angle;
-                    flip = SDL_FLIP_NONE;
-                    if (players[i]->snake->body[j].is_turn) {
-                        rotation = players[i]->snake->body[j].turn_rotation;
-                        if (players[i]->snake->body[j].should_flip_vertical) {
-                            flip = SDL_FLIP_VERTICAL;
-                        } else if (players[i]->snake->body[j].should_flip_horizontal) {
-                            flip = SDL_FLIP_HORIZONTAL;
-                        }
-                    }
-                    SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[j], &body_dst[j], rotation, NULL, flip);
-                }
-                // render tail
-                SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
-            }
+            render_snakes(app, players, game_state->nr_of_players, snake_sprite_tex, snake_texture);
         }
 
         // present on screen
@@ -466,4 +362,76 @@ int game(App* app, Game_State* game_state)
     printf("packets freed\n");
 
     return MAIN_MENU;
+}
+
+Scoreboard* create_scoreboard(App* app, Player* players[])
+{
+    Scoreboard* scoreboard = malloc(sizeof(Scoreboard));
+
+    scoreboard->background = menu_button_background(app, "./resources/Textures/Forest_green.jpg");
+    scoreboard->scoreboard = menu_button_background(app, "./resources/Textures/menuButton.png");
+    /*
+    Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
+    Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
+    */
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
+
+    scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white);
+
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        // skip if player does not exist
+        if(players[i] == NULL) {
+            scoreboard->name[i] = NULL;
+            scoreboard->score[i] = NULL;
+            continue;
+        }
+
+        // TODO: use players[i]->name instead of app->player_name
+        /* scoreboard->name[i] = menu_button_text(app, players[i]->name, font, green); */
+        scoreboard->name[i] = menu_button_text(app, app->player_name, font, green);
+        scoreboard->score[i] = menu_button_text(app, "0", font, green);
+    }
+
+    scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
+    scoreboard->return_button = menu_button_background(app, "./resources/Textures/exit_button.png");
+
+    return scoreboard;
+}
+
+void free_scoreboard(Scoreboard* scoreboard)
+{
+    free(scoreboard->background);
+    free(scoreboard->scoreboard);
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        if(scoreboard->name[i] != NULL)
+            free(scoreboard->name[i]);
+        if(scoreboard->score[i] != NULL)
+        free(scoreboard->score[i]);
+    }
+    free(scoreboard->mute);
+    free(scoreboard->return_button);
+    free(scoreboard->continue_button);
+    free(scoreboard);
+}
+
+void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
+{
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
+    if(font == NULL)
+        return;
+    char buffer[50];
+
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        if(players[i] == NULL)
+            continue;
+
+        sprintf(buffer, "%d", players[i]->points);
+        // free previous score before creating new one
+        free(scoreboard->score[i]);
+        // create new score text
+        scoreboard->score[i] = menu_button_text(app, buffer, font, green);
+    }
+
+    TTF_CloseFont(font);
+    font = NULL;
 }

@@ -267,6 +267,7 @@ int select_game_menu(App* app)
 
 int join_multiplayer(App* app)
 {
+    // TODO: move type_name to lobby
     type_name(app);
     int Mx, My;
     bool ip = false, port = false, playsound = true;
@@ -676,6 +677,7 @@ int type_name(App* app)
                 break;
 
             case SDL_TEXTINPUT:
+                // TODO: insert name into player->name instead
                 if (strlen(app->player_name) < 15) {
                     strcat(app->player_name, event.text.text);
                 }
