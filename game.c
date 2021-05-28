@@ -252,22 +252,22 @@ int game(App* app, Game_State *game_state)
                     switch (event.key.keysym.sym) {
                         case SDLK_UP:
                         case SDLK_w:
-                            if (players[game_state->client_id]->snake->dir != Down)
+                            if (players[game_state->client_id]->snake->vel_y == 0)
                                 players[game_state->client_id]->snake->dir = Up;
                             break;
                         case SDLK_DOWN:
                         case SDLK_s:
-                            if (players[game_state->client_id]->snake->dir != Up)
+                            if (players[game_state->client_id]->snake->vel_y == 0)
                                 players[game_state->client_id]->snake->dir = Down;
                             break;
                         case SDLK_RIGHT:
                         case SDLK_d:
-                            if (players[game_state->client_id]->snake->dir != Left)
+                            if (players[game_state->client_id]->snake->vel_x == 0)
                                 players[game_state->client_id]->snake->dir = Right;
                             break;
                         case SDLK_LEFT:
                         case SDLK_a:
-                            if (players[game_state->client_id]->snake->dir != Right)
+                            if (players[game_state->client_id]->snake->vel_x == 0)
                                 players[game_state->client_id]->snake->dir = Left;
                             break;
                         default:
