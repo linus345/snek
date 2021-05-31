@@ -118,42 +118,43 @@ void get_client_id(UDPpacket *pack_recv, int *client_id)
     sscanf((char *) pack_recv->data, "%d %d", &temp, client_id);
 }
 
-void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[])
+void successfully_connected(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][])
+{
+    int type;
+
+    printf("-----successful connection-----\n");
+    // gets the number of clients that already connected to the server before this client joined
+    // format: type id nr_of_clients
+    sscanf((char *) data, "%d %d %d %u", &type, &game_state->client_id, &game_state->nr_of_players, &game_state->current_time);
+    // initialize players on this client that was already connected to the server
+    for(int i = 0; i < game_state->nr_of_players; i++) {
+        players[i] = new_player(i);
+    }
+
+    // add new player, id is between 0-3
+    players[game_state->client_id] = new_player(game_state->client_id);
+    // indicate that client is connected
+    game_state->connected = true;
+}
+
+void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][])
 {
     int type, id;
-    // get data from received packet
-    sscanf((char *) data, "%d", &type);
-    // could be both SUCCESSFUL_CONNECTION and NEW_CLIENT_JOINED
-    if(type == SUCCESSFUL_CONNECTION) {
-        printf("-----successful connection-----\n");
-        // gets the number of clients that already connected to the server before this client joined
-        // format: type id nr_of_clients
-        sscanf((char *) data, "%d %d %d %u", &type, &game_state->client_id, &game_state->nr_of_players, &game_state->current_time);
-        // initialize players on this client that was already connected to the server
-        for(int i = 0; i < game_state->nr_of_players; i++) {
-            players[i] = new_player(i);
-        }
 
-        // add new player, id is between 0-3
-        players[game_state->client_id] = new_player(game_state->client_id);
-        // indicate that client is connected
-        game_state->connected = true;
-    } else {
-        printf("-----new client joined-----\n");
-        // NEW_CLIENT_JOINED
-        // format: type id
-        sscanf((char *) data, "%d %d", &type, &id);
+    printf("-----new client joined-----\n");
+    // NEW_CLIENT_JOINED
+    // format: type id
+    sscanf((char *) data, "%d %d", &type, &id);
 
-        // client already connected, return from function
-        if(players[id] != NULL) {
-            return;
-        }
-
-        // add new player, id is between 0-3
-        players[id] = new_player(id);
-        // increment number of players if new client joined
-        game_state->nr_of_players++;
+    // client already connected, return from function
+    if(players[id] != NULL) {
+        return;
     }
+
+    // add new player, id is between 0-3
+    players[id] = new_player(id);
+    // increment number of players if new client joined
+    game_state->nr_of_players++;
 
     if(game_state->nr_of_players > 4) {
         // shouldn't happen, if it does something probably went wrong

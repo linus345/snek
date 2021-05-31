@@ -172,6 +172,8 @@ int lobby(App* app, Game_State* game_state, UDPsocket udp_sock)
             switch(request_type) {
                 // these are the only expected types at this point
                 case SUCCESSFUL_CONNECTION:
+                    successfully_connected(pack_recv->data, game_state, game_state->players);
+                    break;
                 case NEW_CLIENT_JOINED:
                     // adds new player and increments nr_of_players
                     new_client_joined(pack_recv->data, game_state, game_state->players);
@@ -201,8 +203,16 @@ int lobby(App* app, Game_State* game_state, UDPsocket udp_sock)
         SDL_RenderClear(app->renderer);
         
         render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        render_item(app, &start_button->rect, start_button->texture, MENU_BUTTON, WINDOW_WIDTH - (WINDOW_WIDTH / 3), WINDOW_HEIGHT / 2 - BUTTON_H / 2, BUTTON_W, BUTTON_H);
-        render_item(app, &exit_button->rect, exit_button->texture, MENU_BUTTON, WINDOW_WIDTH - (WINDOW_WIDTH / 3), (WINDOW_HEIGHT / 2 - TEXT_H / 2) + BUTTON_H, TEXT_W, TEXT_H);
+        render_item(app, &start_button->rect, start_button->texture, NULL, WINDOW_WIDTH - (WINDOW_WIDTH / 3), WINDOW_HEIGHT / 2 - BUTTON_H / 2, BUTTON_W, BUTTON_H);
+        render_item(app, &exit_button->rect, exit_button->texture, NULL, WINDOW_WIDTH - (WINDOW_WIDTH / 3), (WINDOW_HEIGHT / 2 - TEXT_H / 2) + BUTTON_H, TEXT_W, TEXT_H);
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            if (game_state->players[i] == NULL)
+                continue;
+            render_item(app, &players_screen_name[i]->rect, players_screen_name[i]->texture, NULL, 10, 25*i, TEXT_W, TEXT_H);
+            for (int j = 0; j < 5; j++) {
+                render_item(app, &players_screen_snake[j]->rect, players_screen_snake[j]->texture, NULL, 200, 25*j, CELL_SIZE, CELL_SIZE);
+            }
+        }
 
         //If-state for wether the text should switch color on hover or not
         if (hover_state(start_button, Mx, My)) {
