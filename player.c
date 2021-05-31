@@ -15,6 +15,7 @@ Player *new_player(int id)
     player->last_received_packet_nr = 0;
     player->packet_nr = 0;
     player->snake = new_snake(id);
+    player->color = GREEN;
 
     return player;
 }

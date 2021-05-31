@@ -7,7 +7,6 @@
 #include "player.h"
 #include "sound.h"
 #include "fruit.h"
-#include "network.h"
 
 #define CELL_SIZE 32
 #define MAX_PLAYERS 4
@@ -45,9 +44,9 @@ typedef struct {
 Game_State *init_game_state();
 void load_texture(App* app, SDL_Texture** texture, char* path);
 void main_loop(App* app, Game_State *game_state);
-int lobby(App* app, Game_State* game_state, Network* net);
+int lobby(App* app, Game_State* game_state, UDPsocket udp_sock);
 void optimizeFullscreen(App* app, SDL_Rect* rect);
-int game(App* app, Game_State *game_state, Network *net);
+int game(App* app, Game_State *game_state, UDPsocket udp_sock);
 Scoreboard* create_scoreboard(App* app, Player* players[]);
 void free_scoreboard(Scoreboard* scoreboard);
 void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard);

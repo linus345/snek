@@ -89,18 +89,18 @@ int main_menu(App* app)
         render_menu(app, menu);
 
         //If-state for wether the text should switch color on hover or not
-        if (hover_state(text1, Mx, My)) {
+        if (hover_state(menu->text1, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
-        } else if (hover_state(text2, Mx, My)) {
+            SDL_SetTextureColorMod(menu->text1->texture, 9, 34, 3);
+        } else if (hover_state(menu->text2, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
-        } else if (hover_state(text3, Mx, My)) {
+            SDL_SetTextureColorMod(menu->text2->texture, 9, 34, 3);
+        } else if (hover_state(menu->text3, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
-        } else if (hover_state(exit_button, Mx, My)) {
+            SDL_SetTextureColorMod(menu->text3->texture, 9, 34, 3);
+        } else if (hover_state(menu->return_button, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
+            SDL_SetTextureColorMod(menu->return_button->texture, 127, 127, 127);
         } else {
             if (!playsound) // Makes sure the sound effect only plays once
                 playsound = true;
@@ -200,18 +200,18 @@ int select_game_menu(App* app)
         render_menu(app, menu);
 
         //If-state for wether the text should switch color on hover or not
-        if (hover_state(text1, Mx, My)) {
+        if (hover_state(menu->text1, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(text1->texture, 9, 34, 3);
-        } else if (hover_state(text2, Mx, My)) {
+            SDL_SetTextureColorMod(menu->text1->texture, 9, 34, 3);
+        } else if (hover_state(menu->text2, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(text2->texture, 9, 34, 3);
-        } else if (hover_state(text3, Mx, My)) {
+            SDL_SetTextureColorMod(menu->text2->texture, 9, 34, 3);
+        } else if (hover_state(menu->text3, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(text3->texture, 9, 34, 3);
-        } else if (hover_state(exit_button, Mx, My)) {
+            SDL_SetTextureColorMod(menu->text3->texture, 9, 34, 3);
+        } else if (hover_state(menu->return_button, Mx, My)) {
             play_hover_sound(app->sound, &playsound);
-            SDL_SetTextureColorMod(exit_button->texture, 127, 127, 127);
+            SDL_SetTextureColorMod(menu->return_button->texture, 127, 127, 127);
         } else {
             if (!playsound) { // Makes sure the sound effect only plays once
                 playsound = true;
@@ -289,7 +289,6 @@ int join_multiplayer(App* app)
                     SDL_StopTextInput();
                     /* return START_GAME; */
                     return LOBBY;
-
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->back);

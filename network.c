@@ -13,27 +13,6 @@
 // global variable declared in main.c
 extern bool thread_done;
 
-Network *init_net(App *app, int packet_size)
-{
-    Network *net = malloc(sizeof(Network));
-
-    // open socket
-    net->udp_sock = open_client_socket();
-
-    // allocate memory for sent packet
-    net->pack_send = allocate_packet(PACKET_DATA_SIZE);
-
-    // allocate memory for received packet
-    net->pack_recv = allocate_packet(PACKET_DATA_SIZE);
-
-    // resolve server address TODO: bind address?
-    int server_port = atoi(app->port);
-    net->server_addr = resolve_host(app->ip, server_port);
-
-    return net;
-}
-
-
 void free_net(UDPsocket udp_sock, UDPpacket *pack_recv, UDPpacket *pack_send)
 {
     // free packets
@@ -146,6 +125,7 @@ void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[])
     sscanf((char *) data, "%d", &type);
     // could be both SUCCESSFUL_CONNECTION and NEW_CLIENT_JOINED
     if(type == SUCCESSFUL_CONNECTION) {
+        printf("-----successful connection-----\n");
         // gets the number of clients that already connected to the server before this client joined
         // format: type id nr_of_clients
         sscanf((char *) data, "%d %d %d %u", &type, &game_state->client_id, &game_state->nr_of_players, &game_state->current_time);
@@ -159,6 +139,7 @@ void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[])
         // indicate that client is connected
         game_state->connected = true;
     } else {
+        printf("-----new client joined-----\n");
         // NEW_CLIENT_JOINED
         // format: type id
         sscanf((char *) data, "%d %d", &type, &id);
