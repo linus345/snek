@@ -149,6 +149,7 @@ void new_snake_pos(Snake *snake, bool should_update_head)
         snake->body[i-1].should_flip_horizontal = false;
         snake->body[i-1].turn_rotation = 0;
     }
+    
     switch(snake->body[0].angle) {
         case 0: // old direction was up
             if(snake->dir == Left) {
@@ -246,7 +247,6 @@ Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_leng
             body.pos.y = last_body_part_pos->y;
             break;
     }
-
     (*body_length)++;
     return body;
 }

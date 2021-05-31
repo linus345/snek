@@ -17,8 +17,8 @@ void free_net(UDPsocket udp_sock, UDPpacket *pack_recv, UDPpacket *pack_send)
 {
     // free packets
     // TODO: getting munmap_chunk(): invalid pointer when trying to free packets
-    /* SDLNet_FreePacket(pack_recv); */
-    /* SDLNet_FreePacket(pack_send); */
+    // SDLNet_FreePacket(pack_recv);
+    // SDLNet_FreePacket(pack_send);
     // close udp socket
     SDLNet_UDP_Close(udp_sock);
 }
