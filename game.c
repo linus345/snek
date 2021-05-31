@@ -86,7 +86,7 @@ void main_loop(App* app, Game_State* game_state)
 int game(App* app, Game_State* game_state)
 {
     int Mx, My;
-    bool end_of_round = false;
+    bool end_of_round = false, playsound_once = true;
 
     Pos snake_texture[6];
     // head
@@ -249,26 +249,24 @@ int game(App* app, Game_State* game_state)
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (hover_state(game_state->scoreboard->return_button, Mx, My)) {
-                    // Makes space on the heap
-                    free_scoreboard(game_state->scoreboard);
-                    return MAIN_MENU;
+                    app->running = false;
                 } else if (hover_state(game_state->scoreboard->mute, Mx, My)) {
                     if (app->sound->muted) { // Unmutes all the sounds and changes the speaker icon
                         // free mute before updating it
-                        if(game_state->scoreboard->mute != NULL)
+                        if (game_state->scoreboard->mute != NULL)
                             free(game_state->scoreboard->mute);
                         game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
                         app->sound->muted = false;
                     } else if (!app->sound->muted) { // Mutes all the sounds and changes the speaker icon
                         // free mute before updating it
-                        if(game_state->scoreboard->mute != NULL)
+                        if (game_state->scoreboard->mute != NULL)
                             free(game_state->scoreboard->mute);
                         game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
                         app->sound->muted = true;
                     }
                 } else if (hover_state(game_state->scoreboard->continue_button, Mx, My)) {
                     if (end_of_round) {
-                        end_of_round = false;
+                        app->running = false;
                     }
                 }
 
@@ -293,18 +291,24 @@ int game(App* app, Game_State* game_state)
             players[game_state->client_id]->alive = false;
             send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
             if (!app->sound->muted) {
-                play_sound(app->sound->wall_collison); // plays wall collison sound effect
+                if (playsound_once) { // makes sure the sound dosent play more than once
+                    play_sound(app->sound->wall_collison); // plays wall collison sound effect
+                    playsound_once = false;
+                }
             }
             //show_scoreboard = true; // Remove once multiplayer has been implimented
-        }
-        // Checks if any collisons has occured with a snake
-        if (collison_with_snake(players[game_state->client_id]->snake)) {
+        } else if (collison_with_snake(players[game_state->client_id]->snake)) { // Checks if any collisons has occured with a snake
             players[game_state->client_id]->alive = false;
             send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
             if (!app->sound->muted) {
-                play_sound(app->sound->wall_collison); // plays wall collison sound effect
+                if (playsound_once) { // makes sure the sound dosent play more than once
+                    play_sound(app->sound->wall_collison); // plays wall collison sound effect
+                    playsound_once = false;
+                }
             }
             //show_scoreboard = true; // Remove once multiplayer has been implimented
+        } else {
+            playsound_once = true;
         }
 
         if (players[game_state->client_id]->alive && game_state->current_time > game_state->last_time + players[game_state->client_id]->snake->speed) {
@@ -320,9 +324,11 @@ int game(App* app, Game_State* game_state)
         fruit_collision(app, udp_sock, server_addr, pack_send, players, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
         /////////////////////////////////////////////// Rendering section //////////////////////////////////////////////////////
-        
+
         // TODO: maybe only call when fruit is eaten
         update_scoreboard(app, players, game_state->scoreboard); // updates the scoreboard
+
+        end_of_round = signs_of_life(game_state, players); // Checks if everybody is alive or not
 
         if (end_of_round) {
             // clear screen before next render
@@ -347,6 +353,10 @@ int game(App* app, Game_State* game_state)
         SDL_GetMouseState(&Mx, &My);
         SDL_Delay(1000 / 60);
     }
+    // frees scoreboard
+    free_scoreboard(game_state->scoreboard);
+
+    app->running = true;
 
     // indicate that receive thread should stop running
     thread_done = true;
@@ -378,9 +388,9 @@ Scoreboard* create_scoreboard(App* app, Player* players[])
 
     scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white);
 
-    for(int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         // skip if player does not exist
-        if(players[i] == NULL) {
+        if (players[i] == NULL) {
             scoreboard->name[i] = NULL;
             scoreboard->score[i] = NULL;
             continue;
@@ -402,11 +412,11 @@ void free_scoreboard(Scoreboard* scoreboard)
 {
     free(scoreboard->background);
     free(scoreboard->scoreboard);
-    for(int i = 0; i < MAX_PLAYERS; i++) {
-        if(scoreboard->name[i] != NULL)
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (scoreboard->name[i] != NULL)
             free(scoreboard->name[i]);
-        if(scoreboard->score[i] != NULL)
-        free(scoreboard->score[i]);
+        if (scoreboard->score[i] != NULL)
+            free(scoreboard->score[i]);
     }
     free(scoreboard->mute);
     free(scoreboard->return_button);
@@ -417,21 +427,37 @@ void free_scoreboard(Scoreboard* scoreboard)
 void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
 {
     TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-    if(font == NULL)
+    if (font == NULL)
         return;
     char buffer[50];
 
-    for(int i = 0; i < MAX_PLAYERS; i++) {
-        if(players[i] == NULL)
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (players[i] == NULL)
             continue;
 
         sprintf(buffer, "%d", players[i]->points);
         // free previous score before creating new one
         free(scoreboard->score[i]);
+
         // create new score text
-        scoreboard->score[i] = menu_button_text(app, buffer, font, green);
+        scoreboard->score[i]
+            = menu_button_text(app, buffer, font, green);
     }
 
     TTF_CloseFont(font);
     font = NULL;
+}
+
+bool signs_of_life(Game_State* game_state, Player* players[])
+{
+    int tmp = 0;
+    for (int i = 0; i < game_state->nr_of_players; i++) {
+        if (players[i]->alive == false) {
+            tmp++;
+        }
+    }
+    if (tmp == game_state->nr_of_players)
+        return true;
+    else
+        return false;
 }
