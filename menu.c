@@ -21,15 +21,15 @@ bool hover_state(Screen_item* button, int Mx, int My)
 }
 
 // User input for ip address och port number
-int main_menu(App* app)
+int main_menu(App* app, TTF_Font* font)
 {
     int Mx, My;
-
+    enum Menu_selection next_menu_state = MAIN_MENU;
     bool playsound = true;
 
-    Menu* menu = init_menu_tex(app, "Start Game", "High Score", "Settings", "Exit Game");
+    Menu* menu = init_menu_tex(app, font, "Start Game", "High Score", "Settings", "Exit Game");
 
-    while (app->running) {
+    while (app->running && next_menu_state == MAIN_MENU) {
         //SDL_MouseButtonEvent mouse_event;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -43,8 +43,9 @@ int main_menu(App* app)
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free_menu(menu);
-                    return SELECT_GAME;
+                    /* free_menu(menu); */
+                    next_menu_state = SELECT_GAME;
+                    /* return SELECT_GAME; */
                 } /* else if (hover_state(text2, Mx, My)) {
                         // Plays button press effect
                         play_sound(app->sound->press);
@@ -116,26 +117,24 @@ int main_menu(App* app)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
-    return 0;
+    free_menu(menu);
+    return next_menu_state;
 }
 
-int select_game_menu(App* app)
+int select_game_menu(App* app, TTF_Font* font)
 {
-
     int Mx, My;
-
+    enum Menu_selection next_menu_state = SELECT_GAME;
     bool playsound = true;
 
-    Menu* menu = init_menu_tex(app, "Single Player", "Host Multiplayer", "Join Multiplayer", "Back");
+    Menu* menu = init_menu_tex(app, font, "Single Player", "Host Multiplayer", "Join Multiplayer", "Back");
 
-    while (app->running) {
-
+    while (app->running && next_menu_state == SELECT_GAME) {
         //SDL_MouseButtonEvent mouse_event;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_QUIT:
-
                 // exit main loop
                 app->running = false;
                 break;
@@ -145,9 +144,9 @@ int select_game_menu(App* app)
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free_menu(menu);
-                    return TYPE_NAME;
-
+                    /* free_menu(menu); */
+                    /* return TYPE_NAME; */
+                    next_menu_state = TYPE_NAME;
                 } /* else if (hover_state(text2, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->press);
@@ -160,15 +159,16 @@ int select_game_menu(App* app)
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free_menu(menu);
-                    return JOIN_MULTIPLAYER;
-
+                    /* free_menu(menu); */
+                    /* return JOIN_MULTIPLAYER; */
+                    next_menu_state = JOIN_MULTIPLAYER;
                 } else if (hover_state(menu->return_button, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->back);
                     // Makes space on the heap
-                    free_menu(menu);
-                    return MAIN_MENU;
+                    /* free_menu(menu); */
+                    /* return MAIN_MENU; */
+                    next_menu_state = MAIN_MENU;
                 }
                 break;
             case SDL_KEYDOWN:
@@ -188,7 +188,8 @@ int select_game_menu(App* app)
                 */
                 case SDLK_ESCAPE:
                     // exit main loop
-                    return MAIN_MENU;
+                    /* return MAIN_MENU; */
+                    next_menu_state = MAIN_MENU;
                     break;
                 }
                 break;
@@ -229,17 +230,17 @@ int select_game_menu(App* app)
         SDL_GetMouseState(&Mx, &My);
     }
     SDL_StopTextInput();
-    return 0;
+    free_menu(menu);
+    return next_menu_state;
 }
 
-int join_multiplayer(App* app)
+int join_multiplayer(App* app, TTF_Font* font)
 {
     // TODO: move type_name to lobby
-    type_name(app);
+    type_name(app, font);
     int Mx, My;
+    enum Menu_selection next_menu_state = JOIN_MULTIPLAYER;
     bool ip = false, port = false, playsound = true;
-
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
 
     SDL_Color white = { 255, 255, 255, 255 };
 
@@ -254,8 +255,7 @@ int join_multiplayer(App* app)
     Screen_item* text3 = menu_button_text(app, "Join", font, white);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
-    while (app->running) {
-
+    while (app->running && next_menu_state == JOIN_MULTIPLAYER) {
         //SDL_MouseButtonEvent mouse_event;
         SDL_Event event;
         if (SDL_PollEvent(&event)) {
@@ -278,31 +278,33 @@ int join_multiplayer(App* app)
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    free(background);
-                    free(background1);
-                    free(background2);
-                    free(button);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
-                    SDL_StopTextInput();
+                    /* free(background); */
+                    /* free(background1); */
+                    /* free(background2); */
+                    /* free(button); */
+                    /* free(text1); */
+                    /* free(text2); */
+                    /* free(text3); */
+                    /* free(exit_button); */
+                    /* SDL_StopTextInput(); */
                     /* return START_GAME; */
-                    return LOBBY;
+                    /* return LOBBY; */
+                    next_menu_state = LOBBY;
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->back);
                     // Makes space on the heap
-                    free(background);
-                    free(background1);
-                    free(background2);
-                    free(button);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
-                    SDL_StopTextInput();
-                    return SELECT_GAME;
+                    /* free(background); */
+                    /* free(background1); */
+                    /* free(background2); */
+                    /* free(button); */
+                    /* free(text1); */
+                    /* free(text2); */
+                    /* free(text3); */
+                    /* free(exit_button); */
+                    /* SDL_StopTextInput(); */
+                    /* return SELECT_GAME; */
+                    next_menu_state = SELECT_GAME;
                 }
                 break;
             case SDL_TEXTINPUT:
@@ -350,7 +352,9 @@ int join_multiplayer(App* app)
                     return JOIN_MULTIPLAYER;
                 */
                 case SDLK_ESCAPE:
-                    return SELECT_GAME;
+                    /* return SELECT_GAME; */
+                    next_menu_state = SELECT_GAME;
+                    break;
                 }
                 break;
             }
@@ -421,7 +425,25 @@ int join_multiplayer(App* app)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
-    return 0;
+    // free memory on heap
+    free(background->texture);
+    free(background);
+    free(background1->texture);
+    free(background1);
+    free(background2->texture);
+    free(background2);
+    free(button->texture);
+    free(button);
+    free(text1->texture);
+    free(text1);
+    free(text2->texture);
+    free(text2);
+    free(text3->texture);
+    free(text3);
+    free(exit_button->texture);
+    free(exit_button);
+    SDL_StopTextInput();
+    return next_menu_state;
 }
 /*
 int host_multiplayer(App* app, bool* fullscreen_bool)
@@ -590,15 +612,14 @@ int settings(App* app, bool* fullscreen_bool)
 }
 */
 
-int type_name(App* app)
+int type_name(App* app, TTF_Font* font)
 {
     int Mx, My;
-
+    enum Menu_selection next_menu_state = TYPE_NAME;
     bool playsound = true;
 
     SDL_Color white = { 255, 255, 255, 255 };
 
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
     SDL_Surface* tmp_surface = NULL;
 
     Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
@@ -606,7 +627,7 @@ int type_name(App* app)
     Screen_item* text = menu_button_text(app, "Enter name", font, white);
     Screen_item* exit_button = menu_button_text(app, "Back", font, white);
 
-    while (app->running) {
+    while (app->running && next_menu_state == TYPE_NAME) {
         SDL_Event event;
         if (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -623,11 +644,12 @@ int type_name(App* app)
                 } else if (hover_state(exit_button, Mx, My)) {
                     // Plays button press effect
                     play_sound(app->sound->back);
-                    free(background);
-                    free(button);
-                    free(text);
-                    free(exit_button);
-                    return SELECT_GAME;
+                    /* free(background); */
+                    /* free(button); */
+                    /* free(text); */
+                    /* free(exit_button); */
+                    /* return SELECT_GAME; */
+                    next_menu_state = SELECT_GAME;
                 }
                 break;
 
@@ -652,7 +674,8 @@ int type_name(App* app)
                     SDL_StopTextInput();
                     tmp_surface = NULL;
                     printf("Name: %s\n", app->player_name);
-                    return START_GAME;
+                    /* return START_GAME; */
+                    next_menu_state = START_GAME;
                     break;
                 case SDLK_F11:
                     if (app->fullscreen) {
@@ -663,17 +686,21 @@ int type_name(App* app)
                         app->fullscreen = true;
                     }
                     // Makes space on the heap
-                    free(background);
-                    free(button);
-                    free(text);
-                    free(exit_button);
-                    return TYPE_NAME;
+                    /* free(background); */
+                    /* free(button); */
+                    /* free(text); */
+                    /* free(exit_button); */
+                    /* return TYPE_NAME; */
+                    next_menu_state = TYPE_NAME;
+                    break;
                 case SDLK_ESCAPE:
-                    free(background);
-                    free(button);
-                    free(text);
-                    free(exit_button);
-                    return TYPE_NAME;
+                    /* free(background); */
+                    /* free(button); */
+                    /* free(text); */
+                    /* free(exit_button); */
+                    /* return TYPE_NAME; */
+                    next_menu_state = TYPE_NAME;
+                    break;
                 }
                 break;
             }
@@ -715,4 +742,13 @@ int type_name(App* app)
         SDL_Delay(1000 / 60);
         SDL_GetMouseState(&Mx, &My);
     }
+    free(background->texture);
+    free(background);
+    free(button->texture);
+    free(button);
+    free(text->texture);
+    free(text);
+    free(exit_button->texture);
+    free(exit_button);
+    return next_menu_state;
 }

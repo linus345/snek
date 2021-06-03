@@ -82,7 +82,7 @@ Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color co
 Screen_item* menu_button_background(App* app, char resource[]);
 void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int item_type, int x, int y, int w, int h);
 // Menu functions
-Menu* init_menu_tex(App* app, char top_button[], char middle_button[], char lower_button[], char return_button[]);
+Menu* init_menu_tex(App* app, TTF_Font* font, char top_button[], char middle_button[], char lower_button[], char return_button[]);
 void render_menu(App* app, Menu* menu);
 void free_menu(Menu* menu);
 // Scoreboard functions

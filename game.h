@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include "app.h"
 #include "player.h"
@@ -15,7 +16,7 @@
 typedef struct Screen_item {
     SDL_Rect rect;
     SDL_Texture *texture;
-    SDL_Color color;
+    /* SDL_Color color; */
 } Screen_item;
 
 typedef struct scoreboard {
@@ -44,10 +45,10 @@ typedef struct {
 Game_State *init_game_state();
 void load_texture(App* app, SDL_Texture** texture, char* path);
 void main_loop(App* app, Game_State *game_state);
-int lobby(App* app, Game_State* game_state, UDPsocket udp_sock);
+int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock);
 void optimizeFullscreen(App* app, SDL_Rect* rect);
-int game(App* app, Game_State *game_state, UDPsocket udp_sock);
-Scoreboard* create_scoreboard(App* app, Player* players[]);
+int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock);
+Scoreboard* create_scoreboard(App* app, TTF_Font* font, Player* players[]);
 void free_scoreboard(Scoreboard* scoreboard);
 void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard);
 

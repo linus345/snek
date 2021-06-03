@@ -91,9 +91,9 @@ void handle_received_packet(App *app, Uint8 *data, Game_State *game_state, Playe
     // get request type from packet
     sscanf((char *) data, "%d", &request_type);
     switch(request_type) {
-        case NEW_CLIENT_JOINED:
-            new_client_joined(data, game_state, players);
-            break;
+        /* case NEW_CLIENT_JOINED: */
+        /*     new_client_joined(data, game_state, players); */
+        /*     break; */
         case UPDATE_SNAKE_POS:
             update_snake_pos_from_req(data, players);
             break;
@@ -118,7 +118,7 @@ void get_client_id(UDPpacket *pack_recv, int *client_id)
     sscanf((char *) pack_recv->data, "%d %d", &temp, client_id);
 }
 
-void successfully_connected(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][])
+void successfully_connected(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][5])
 {
     int type;
 
@@ -137,7 +137,7 @@ void successfully_connected(Uint8 *data, Game_State *game_state, Player *players
     game_state->connected = true;
 }
 
-void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][])
+void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][5])
 {
     int type, id;
 

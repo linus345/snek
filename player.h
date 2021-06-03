@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "snake.h"
 
+#define MAX_NAME_LENGTH 20
+
 enum Colors {
     GREEN = 0,
     BLUE = 1,
@@ -19,7 +21,7 @@ typedef struct {
     int last_received_packet_nr;
     int packet_nr;
     Snake *snake;
-    char name[16];
+    char name[MAX_NAME_LENGTH];
     enum Colors color;
 } Player;
 

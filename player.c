@@ -16,6 +16,8 @@ Player *new_player(int id)
     player->packet_nr = 0;
     player->snake = new_snake(id);
     player->color = GREEN;
+    // set default name
+    snprintf(player->name, MAX_NAME_LENGTH, "Player %d", id);
 
     return player;
 }

@@ -54,17 +54,19 @@ void load_texture(App* app, SDL_Texture** texture, char* path)
 void main_loop(App* app, Game_State* game_state)
 {
     UDPsocket udp_sock = open_client_socket();
+    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
     int menu_state = MAIN_MENU;
+
     while (app->running) {
         switch (menu_state) {
         case MAIN_MENU:
-            menu_state = main_menu(app);
+            menu_state = main_menu(app, font);
             break;
         case SELECT_GAME:
-            menu_state = select_game_menu(app);
+            menu_state = select_game_menu(app, font);
             break;
         case JOIN_MULTIPLAYER:
-            menu_state = join_multiplayer(app);
+            menu_state = join_multiplayer(app, font);
             break; /*
         case HOST_MULTIPLAYER:
             menu_state = host_multiplayer(app);
@@ -76,35 +78,73 @@ void main_loop(App* app, Game_State* game_state)
             menu_state = settings(app);
             break;*/
         case TYPE_NAME:
-            menu_state = type_name(app);
+            menu_state = type_name(app, font);
             break;
         case START_GAME:
-            menu_state = game(app, game_state, udp_sock);
+            menu_state = game(app, font, game_state, udp_sock);
             break;
         case LOBBY:
-            menu_state = lobby(app, game_state, udp_sock);
+            menu_state = lobby(app, font, game_state, udp_sock);
             break;
         }
     }
+    TTF_CloseFont(font);
 }
 
-int lobby(App* app, Game_State* game_state, UDPsocket udp_sock)
+int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 {
-    int Mx, My;
+    int Mx, My, text_width, text_height;
     bool playsound = true;
 
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
+    TTF_Font* small_font = TTF_OpenFont("./resources/Fonts/adventure.otf", 150);
+
+    Pos snake_texture[3];
+    // tail
+    snake_texture[0].x = 32;
+    snake_texture[0].y = 32;
+    // body
+    snake_texture[1].x = 32;
+    snake_texture[1].y = 0;
+    // head
+    snake_texture[2].x = 0;
+    snake_texture[2].y = 0;
+
+    SDL_Rect snake_src, snake_dst;
+    snake_src.w = CELL_SIZE;
+    snake_src.h = CELL_SIZE;
+    snake_dst.w = CELL_SIZE;
+    snake_dst.h = CELL_SIZE;
+
+    SDL_Texture* snake_sprite_textures[5];
+    // green snake texture
+    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-green.png");
+    // blue snake texture
+    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-blue.png");
+    // purple snake texture
+    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-purple.png");
+    // yellow snake texture
+    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-yellow.png");
+    // orange snake texture
+    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-orange.png");
+
+    // arrow texture
+    SDL_Texture* arrow_tex;
+    load_texture(app, &arrow_tex, "./resources/Textures/menu_arrow.png");
 
     Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
-    //Screen_item* button1 = menu_button_background(app, "./resources/Textures/menuButton.png");
-    //Screen_item* text1 = menu_button_text(app, "hej", font, green);
     Screen_item* start_button = menu_button_text(app, "Start", font, white);
     Screen_item* exit_button = menu_button_text(app, "Exit", font, white);
 
     // player name for each connected player
     Screen_item* players_screen_name[MAX_PLAYERS];
-    // player snake color picker for each connected player
-    Screen_item* players_screen_snake[MAX_PLAYERS][5];
+    // player snake selected color for each connected player
+    SDL_Rect players_screen_snake[MAX_PLAYERS][3];
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        players_screen_name[i] = NULL;
+        /* for(int j = 0; j < 3; j++) { */
+        /*     players_screen_snake[i][j] = NULL; */
+        /* } */
+    }
 
     // allocate memory for sent packet
     UDPpacket *pack_send = allocate_packet(PACKET_DATA_SIZE);
@@ -166,17 +206,16 @@ int lobby(App* app, Game_State* game_state, UDPsocket udp_sock)
 
         // check for successful connection and if other clients have joined
         if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
-            int request_type;
             // get request type from packet
             sscanf((char *) pack_recv->data, "%d", &request_type);
             switch(request_type) {
                 // these are the only expected types at this point
                 case SUCCESSFUL_CONNECTION:
-                    successfully_connected(pack_recv->data, game_state, game_state->players);
+                    successfully_connected(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
                     break;
                 case NEW_CLIENT_JOINED:
                     // adds new player and increments nr_of_players
-                    new_client_joined(pack_recv->data, game_state, game_state->players);
+                    new_client_joined(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
                     break;
                 case FAILED_CONNECTION:
                     // TODO: handle it differently if it failed because 4 clients
@@ -201,16 +240,34 @@ int lobby(App* app, Game_State* game_state, UDPsocket udp_sock)
 
         // clear screen before next render
         SDL_RenderClear(app->renderer);
-        
+
         render_item(app, &background->rect, background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         render_item(app, &start_button->rect, start_button->texture, NULL, WINDOW_WIDTH - (WINDOW_WIDTH / 3), WINDOW_HEIGHT / 2 - BUTTON_H / 2, BUTTON_W, BUTTON_H);
         render_item(app, &exit_button->rect, exit_button->texture, NULL, WINDOW_WIDTH - (WINDOW_WIDTH / 3), (WINDOW_HEIGHT / 2 - TEXT_H / 2) + BUTTON_H, TEXT_W, TEXT_H);
+
         for (int i = 0; i < MAX_PLAYERS; i++) {
             if (game_state->players[i] == NULL)
                 continue;
-            render_item(app, &players_screen_name[i]->rect, players_screen_name[i]->texture, NULL, 10, 25*i, TEXT_W, TEXT_H);
-            for (int j = 0; j < 5; j++) {
-                render_item(app, &players_screen_snake[j]->rect, players_screen_snake[j]->texture, NULL, 200, 25*j, CELL_SIZE, CELL_SIZE);
+
+            // free if not NULL before giving it a new value
+            if(players_screen_name[i] != NULL) {
+                free(players_screen_name[i]->texture);
+                free(players_screen_name[i]);
+            }
+
+            players_screen_name[i] = menu_button_text(app, game_state->players[i]->name, small_font, white);
+
+            render_item(app, &players_screen_name[i]->rect, players_screen_name[i]->texture, NULL, 20, 25*i, TEXT_W, TEXT_H);
+            for (int j = 0; j < 3; j++) {
+                /* if(players_screen_snake[i][j] == NULL) */
+                /*     continue; */
+
+                /* render_item(app, &players_screen_snake[i][j], snake_sprite_textures[game_state->players[i]->color][j], NULL, 100 + CELL_SIZE * j, 25*i, CELL_SIZE, CELL_SIZE); */
+                snake_src.x = snake_texture[j].x;
+                snake_src.y = snake_texture[j].y;
+                snake_dst.x = 100 + CELL_SIZE * j;
+                snake_dst.y = 25 * i;
+                SDL_RenderCopyEx(app->renderer, snake_sprite_textures[game_state->players[i]->color], &snake_src, &snake_dst, 90, NULL, SDL_FLIP_NONE);
             }
         }
 
@@ -238,10 +295,23 @@ int lobby(App* app, Game_State* game_state, UDPsocket udp_sock)
     }
     SDL_StopTextInput();
 
+    // free allocated memory on heap
+    for(int i = 0; i < 5; i++) {
+        free(snake_sprite_textures[i]);
+    }
+    TTF_CloseFont(small_font);
+    free(arrow_tex);
+    free(background->texture);
+    free(background);
+    free(start_button->texture);
+    free(start_button);
+    free(exit_button->texture);
+    free(exit_button);
+
     return START_GAME;  
 }
 
-int game(App* app, Game_State *game_state, UDPsocket udp_sock)
+int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
 {
     int Mx, My;
     bool end_of_round = false;
@@ -267,7 +337,7 @@ int game(App* app, Game_State *game_state, UDPsocket udp_sock)
     snake_texture[5].y = 32;
 
     SDL_Texture* snake_sprite_tex;
-    load_texture(app, &snake_sprite_tex, "./resources/Textures/snake-sprite.png");
+    load_texture(app, &snake_sprite_tex, "./resources/Textures/snake-sprite-green.png");
 
     Pos fruit_texture[4];
     //cherry
@@ -351,7 +421,7 @@ int game(App* app, Game_State *game_state, UDPsocket udp_sock)
 
     //////////////////////////////////
 
-    game_state->scoreboard = create_scoreboard(app, game_state->players);
+    game_state->scoreboard = create_scoreboard(app, font, game_state->players);
 
     // initialize thread safe buffer with enough space for 10 PACKET_DATA_SIZE byte packets
     Circular_Buffer* buf = init_buffer(10, PACKET_DATA_SIZE);
@@ -521,7 +591,7 @@ int game(App* app, Game_State *game_state, UDPsocket udp_sock)
     return MAIN_MENU;
 }
 
-Scoreboard* create_scoreboard(App* app, Player* players[])
+Scoreboard* create_scoreboard(App* app, TTF_Font* font, Player* players[])
 {
     Scoreboard* scoreboard = malloc(sizeof(Scoreboard));
 
@@ -531,7 +601,6 @@ Scoreboard* create_scoreboard(App* app, Player* players[])
     Screen_item* goal_text = menu_button_text(app, "Goal", font, white_txt);
     Screen_item* goal_nr = menu_button_text(app, "250", font, white_txt);
     */
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
 
     scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white);
 
@@ -584,6 +653,7 @@ void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
 
         sprintf(buffer, "%d", players[i]->points);
         // free previous score before creating new one
+        free(scoreboard->score[i]->texture);
         free(scoreboard->score[i]);
         // create new score text
         scoreboard->score[i] = menu_button_text(app, buffer, font, green);

@@ -55,7 +55,6 @@ void render_item(App* app, SDL_Rect* rect, SDL_Texture* texture, int item_type, 
 Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color color)
 {
     Screen_item* item = malloc(sizeof(Screen_item));
-    //Screen_item* item;
     SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
     if (surface == NULL) {
         SDL_Log("TTF_RenderText_Blended failed: %s", SDL_GetError());
@@ -66,6 +65,10 @@ Screen_item* menu_button_text(App* app, char* text, TTF_Font* font, SDL_Color co
         SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
         app->running = false;
     }
+
+    // free surface
+    SDL_FreeSurface(surface);
+
     item->texture = texture;
     return item;
 }
@@ -78,7 +81,7 @@ Screen_item* menu_button_background(App* app, char resource[])
     return button;
 }
 
-Menu* init_menu_tex(App* app, char top_button[], char middle_button[], char lower_button[], char return_button[])
+Menu* init_menu_tex(App* app, TTF_Font* font, char top_button[], char middle_button[], char lower_button[], char return_button[])
 {
     Menu* menu = malloc(sizeof(Menu));
 
@@ -87,8 +90,6 @@ Menu* init_menu_tex(App* app, char top_button[], char middle_button[], char lowe
     menu->button = menu_button_background(app, "./resources/Textures/menuButton.png");
 
     // Creates text textures
-    TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-
     menu->text1 = menu_button_text(app, top_button, font, green);
     menu->text2 = menu_button_text(app, middle_button, font, green);
     menu->text3 = menu_button_text(app, lower_button, font, green);
@@ -113,11 +114,17 @@ void render_menu(App* app, Menu* menu)
 
 void free_menu(Menu* menu)
 {
+    free(menu->background->texture);
     free(menu->background);
+    free(menu->button->texture);
     free(menu->button);
+    free(menu->text1->texture);
     free(menu->text1);
+    free(menu->text2->texture);
     free(menu->text2);
+    free(menu->text3->texture);
     free(menu->text3);
+    free(menu->return_button->texture);
     free(menu->return_button);
 
     free(menu);
