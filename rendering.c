@@ -81,7 +81,7 @@ Screen_item* menu_button_background(App* app, char resource[])
     return button;
 }
 
-Menu* init_menu_tex(App* app, TTF_Font* font, char top_button[], char middle_button[], char lower_button[], char return_button[])
+Menu* init_menu_tex(App* app, TTF_Font* font, char top_button[], char return_button[])
 {
     Menu* menu = malloc(sizeof(Menu));
 
@@ -91,8 +91,6 @@ Menu* init_menu_tex(App* app, TTF_Font* font, char top_button[], char middle_but
 
     // Creates text textures
     menu->text1 = menu_button_text(app, top_button, font, green);
-    menu->text2 = menu_button_text(app, middle_button, font, green);
-    menu->text3 = menu_button_text(app, lower_button, font, green);
     menu->return_button = menu_button_text(app, return_button, font, white);
 
     return menu;
@@ -103,13 +101,9 @@ void render_menu(App* app, Menu* menu)
     // Renders background and button textures
     render_item(app, &menu->background->rect, menu->background->texture, BACKGROUND, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     render_item(app, &menu->button->rect, menu->button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y, BUTTON_W, BUTTON_H);
-    render_item(app, &menu->button->rect, menu->button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (1 * 150), BUTTON_W, BUTTON_H);
-    render_item(app, &menu->button->rect, menu->button->texture, MENU_BUTTON, BUTTON_X, BUTTON_Y + (2 * 150), BUTTON_W, BUTTON_H);
     // Renders text textures
     render_item(app, &menu->text1->rect, menu->text1->texture, MENU_BUTTON, TEXT_X, TEXT_Y, TEXT_W, TEXT_H);
-    render_item(app, &menu->text2->rect, menu->text2->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (1 * 150), TEXT_W, TEXT_H);
-    render_item(app, &menu->text3->rect, menu->text3->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
-    render_item(app, &menu->return_button->rect, menu->return_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (3 * 150), TEXT_W, TEXT_H);
+    render_item(app, &menu->return_button->rect, menu->return_button->texture, MENU_BUTTON, TEXT_X, TEXT_Y + (2 * 150), TEXT_W, TEXT_H);
 }
 
 void free_menu(Menu* menu)
@@ -120,10 +114,6 @@ void free_menu(Menu* menu)
     free(menu->button);
     SDL_DestroyTexture(menu->text1->texture);
     free(menu->text1);
-    SDL_DestroyTexture(menu->text2->texture);
-    free(menu->text2);
-    SDL_DestroyTexture(menu->text3->texture);
-    free(menu->text3);
     SDL_DestroyTexture(menu->return_button->texture);
     free(menu->return_button);
 
