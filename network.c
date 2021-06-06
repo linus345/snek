@@ -118,7 +118,7 @@ void get_client_id(UDPpacket *pack_recv, int *client_id)
     sscanf((char *) pack_recv->data, "%d %d", &temp, client_id);
 }
 
-void successfully_connected(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][5])
+void successfully_connected(Uint8 *data, Game_State *game_state, Player *players[])
 {
     int type;
 
@@ -137,7 +137,7 @@ void successfully_connected(Uint8 *data, Game_State *game_state, Player *players
     game_state->connected = true;
 }
 
-void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][5])
+void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[])
 {
     int type, id;
 

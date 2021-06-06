@@ -287,14 +287,6 @@ int join_multiplayer(App* app, TTF_Font* font)
                     // Plays button press effect
                     play_sound(app->sound->press);
                     // Makes space on the heap
-                    /* free(background); */
-                    /* free(background1); */
-                    /* free(background2); */
-                    /* free(button); */
-                    /* free(text1); */
-                    /* free(text2); */
-                    /* free(text3); */
-                    /* free(exit_button); */
                     /* SDL_StopTextInput(); */
                     /* return START_GAME; */
                     /* return LOBBY; */
@@ -303,14 +295,6 @@ int join_multiplayer(App* app, TTF_Font* font)
                     // Plays button press effect
                     play_sound(app->sound->back);
                     // Makes space on the heap
-                    /* free(background); */
-                    /* free(background1); */
-                    /* free(background2); */
-                    /* free(button); */
-                    /* free(text1); */
-                    /* free(text2); */
-                    /* free(text3); */
-                    /* free(exit_button); */
                     /* SDL_StopTextInput(); */
                     /* return SELECT_GAME; */
                     next_menu_state = SELECT_GAME;
@@ -350,14 +334,6 @@ int join_multiplayer(App* app, TTF_Font* font)
                         app->fullscreen = true;
                     }
                     // Makes space on the heap
-                    free(background);
-                    free(background1);
-                    free(background2);
-                    free(button);
-                    free(text1);
-                    free(text2);
-                    free(text3);
-                    free(exit_button);
                     return JOIN_MULTIPLAYER;
                 */
                 case SDLK_ESCAPE:
@@ -435,21 +411,21 @@ int join_multiplayer(App* app, TTF_Font* font)
         SDL_GetMouseState(&Mx, &My);
     }
     // free memory on heap
-    free(background->texture);
+    SDL_DestroyTexture(background->texture);
     free(background);
-    free(background1->texture);
+    SDL_DestroyTexture(background1->texture);
     free(background1);
-    free(background2->texture);
+    SDL_DestroyTexture(background2->texture);
     free(background2);
-    free(button->texture);
+    SDL_DestroyTexture(button->texture);
     free(button);
-    free(text1->texture);
+    SDL_DestroyTexture(text1->texture);
     free(text1);
-    free(text2->texture);
+    SDL_DestroyTexture(text2->texture);
     free(text2);
-    free(text3->texture);
+    SDL_DestroyTexture(text3->texture);
     free(text3);
-    free(exit_button->texture);
+    SDL_DestroyTexture(exit_button->texture);
     free(exit_button);
     SDL_StopTextInput();
     return next_menu_state;

@@ -210,11 +210,11 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
             switch(request_type) {
                 // these are the only expected types at this point
                 case SUCCESSFUL_CONNECTION:
-                    successfully_connected(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
+                    successfully_connected(pack_recv->data, game_state, game_state->players);
                     break;
                 case NEW_CLIENT_JOINED:
                     // adds new player and increments nr_of_players
-                    new_client_joined(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
+                    new_client_joined(pack_recv->data, game_state, game_state->players);
                     break;
                 case FAILED_CONNECTION:
                     // TODO: handle it differently if it failed because 4 clients
@@ -253,7 +253,7 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 
             // free if not NULL before giving it a new value
             if(players_screen_name[i] != NULL) {
-                free(players_screen_name[i]->texture);
+                SDL_DestroyTexture(players_screen_name[i]->texture);
                 free(players_screen_name[i]);
             }
 
@@ -307,7 +307,7 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
         SDL_DestroyTexture(snake_sprite_textures[i]);
     }
     TTF_CloseFont(small_font);
-    free(arrow_tex);
+    SDL_DestroyTexture(arrow_tex);
     SDL_DestroyTexture(background->texture);
     free(background);
     SDL_DestroyTexture(start_button->texture);
@@ -491,14 +491,18 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
                 } else if (hover_state(game_state->scoreboard->mute, Mx, My)) {
                     if (app->sound->muted) { // Unmutes all the sounds and changes the speaker icon
                         // free mute before updating it
-                        if (game_state->scoreboard->mute != NULL)
+                        if (game_state->scoreboard->mute != NULL) {
+                            SDL_DestroyTexture(game_state->scoreboard->mute->texture);
                             free(game_state->scoreboard->mute);
+                        }
                         game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
                         app->sound->muted = false;
                     } else if (!app->sound->muted) { // Mutes all the sounds and changes the speaker icon
                         // free mute before updating it
-                        if (game_state->scoreboard->mute != NULL)
+                        if (game_state->scoreboard->mute != NULL) {
+                            SDL_DestroyTexture(game_state->scoreboard->mute->texture);
                             free(game_state->scoreboard->mute);
+                        }
                         game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
                         app->sound->muted = true;
                     }
@@ -659,16 +663,25 @@ Scoreboard* create_scoreboard(App* app, TTF_Font* font, Player* players[])
 
 void free_scoreboard(Scoreboard* scoreboard)
 {
+    SDL_DestroyTexture(scoreboard->background->texture);
     free(scoreboard->background);
+    SDL_DestroyTexture(scoreboard->scoreboard->texture);
     free(scoreboard->scoreboard);
     for (int i = 0; i < MAX_PLAYERS; i++) {
-        if (scoreboard->name[i] != NULL)
+        if (scoreboard->name[i] != NULL) {
+            SDL_DestroyTexture(scoreboard->name[i]->texture);
             free(scoreboard->name[i]);
-        if (scoreboard->score[i] != NULL)
+        }
+        if (scoreboard->score[i] != NULL) {
+            SDL_DestroyTexture(scoreboard->score[i]->texture);
             free(scoreboard->score[i]);
+        }
     }
+    SDL_DestroyTexture(scoreboard->mute->texture);
     free(scoreboard->mute);
+    SDL_DestroyTexture(scoreboard->return_button->texture);
     free(scoreboard->return_button);
+    SDL_DestroyTexture(scoreboard->continue_button->texture);
     free(scoreboard->continue_button);
     free(scoreboard);
 }
