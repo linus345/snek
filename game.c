@@ -67,18 +67,6 @@ void main_loop(App* app, Game_State* game_state)
             break;
         case JOIN_MULTIPLAYER:
             menu_state = join_multiplayer(app, font);
-            break; /*
-        case HOST_MULTIPLAYER:
-            menu_state = host_multiplayer(app);
-            break;
-        case HIGH_SCORE:
-            menu_state = high_score(app);
-            break;
-        case SETTINGS:
-            menu_state = settings(app);
-            break;*/
-        case TYPE_NAME:
-            menu_state = type_name(app, font);
             break;
         case START_GAME:
             menu_state = game(app, font, game_state, udp_sock);
@@ -547,6 +535,8 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
                 }
             }
             //show_scoreboard = true; // Remove once multiplayer has been implimented
+        } else {
+            playsound_once = true;
         }
         // Checks if any collisons has occured with a snake
         for(int i = 0; i < MAX_PLAYERS; i++) {
@@ -657,7 +647,7 @@ Scoreboard* create_scoreboard(App* app, TTF_Font* font, Player* players[])
 
         // TODO: use players[i]->name instead of app->player_name
         /* scoreboard->name[i] = menu_button_text(app, players[i]->name, font, green); */
-        scoreboard->name[i] = menu_button_text(app, app->player_name, font, green);
+        scoreboard->name[i] = menu_button_text(app, players[i]->name, font, green);
         scoreboard->score[i] = menu_button_text(app, "0", font, green);
     }
 
@@ -696,12 +686,11 @@ void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
 
         sprintf(buffer, "%d", players[i]->points);
         // free previous score before creating new one
-        free(scoreboard->score[i]->texture);
+        SDL_DestroyTexture(scoreboard->score[i]->texture);
         free(scoreboard->score[i]);
 
         // create new score text
-        scoreboard->score[i]
-            = menu_button_text(app, buffer, font, green);
+        scoreboard->score[i] = menu_button_text(app, buffer, font, green);
     }
 
     TTF_CloseFont(font);

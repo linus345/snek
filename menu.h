@@ -7,6 +7,7 @@
 #include "game.h"
 #include "app.h"
 #include "sound.h"
+#include "player.h"
 
 //Numreric values to determine menu outcome.
 enum Menu_selection {
@@ -32,9 +33,5 @@ bool is_hovering_over(SDL_Rect* rect, int mouse_x, int mouse_y);
 int main_menu(App* app, TTF_Font* font);
 int select_game_menu(App* app, TTF_Font* font);
 int join_multiplayer(App* app, TTF_Font* font);
-int host_multiplayer(App* app);
-int high_score(App* app);
-int settings(App* app);
-int type_name(App* app, TTF_Font* font);
 
 #endif
