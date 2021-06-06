@@ -325,7 +325,7 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
 {
     int Mx, My;
-    bool end_of_round = false, playsound_once = true;
+    bool end_of_round = false, playsound_col_once = true;
 
     Pos snake_texture[6];
     // head
@@ -537,14 +537,12 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
             game_state->players[game_state->client_id]->alive = false;
             send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
             if (!app->sound->muted) {
-                if (playsound_once) { // makes sure the sound dosent play more than once
+                if (!app->sound->muted && playsound_col_once) { // makes sure the sound isnt mute and dosent play more than once
                     play_sound(app->sound->wall_collison); // plays wall collison sound effect
-                    playsound_once = false;
+                    playsound_col_once = false; // Makes sure collison sound doesnt go on repeat in spectator mode
                 }
             }
             //show_scoreboard = true; // Remove once multiplayer has been implimented
-        } else {
-            playsound_once = true;
         }
         // Checks if any collisons has occured with a snake
         for(int i = 0; i < MAX_PLAYERS; i++) {
@@ -558,14 +556,12 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
                 game_state->players[game_state->client_id]->alive = false;
                 send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
                 if (!app->sound->muted) {
-                    if (playsound_once) { // makes sure the sound dosent play more than once
+                    if (!app->sound->muted && playsound_col_once) { // makes sure the sound isnt mute and dosent play more than once
                         play_sound(app->sound->wall_collison); // plays wall collison sound effect
-                        playsound_once = false;
+                        playsound_col_once = false; // Makes sure collison sound doesnt go on repeat in spectator mode
                     }
                 }
                 //show_scoreboard = true; // Remove once multiplayer has been implimented
-            } else {
-                playsound_once = true;
             }
         }
 

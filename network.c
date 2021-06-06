@@ -98,7 +98,7 @@ void handle_received_packet(App *app, Uint8 *data, Game_State *game_state, Playe
             update_snake_pos_from_req(data, players);
             break;
         case RANDOM_POS:
-            get_fruit_pos_and_spawn(data, game_state->fruits, &game_state->nr_of_fruits, game_state->nr_of_players, players[game_state->client_id]->snake);
+            get_fruit_pos_and_spawn(data, game_state->fruits, &game_state->nr_of_fruits, game_state->nr_of_players, players);
             break;
         case RECEIVE_TICKS:
             handle_received_ticks(data, &game_state->current_time);

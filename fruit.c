@@ -11,7 +11,7 @@
 #include "network.h"
 #include "player.h"
 
-Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, Snake *snake)
+Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, Player *players[])
 {
     Fruit* fruit = malloc(sizeof(Fruit));
 
@@ -19,7 +19,7 @@ Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, S
     fruit->pos.x = ((random_x % (GAME_WIDTH / CELL_SIZE)) * CELL_SIZE) + GAME_START_POS;
     fruit->pos.y = (random_y % (GAME_HEIGHT / CELL_SIZE)) * CELL_SIZE;
     // generate random fruit type
-    fruit->type = random_type % 4;//rand() % 4;
+    fruit->type = random_type % 4;
     // different points based on fruit type
     switch (fruit->type) {
     case Cherry:
@@ -36,22 +36,27 @@ Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, S
         break;
     }
     // check if position overlaps with snake position
-    // head
-    if (fruit->pos.x == snake->head.pos.x && fruit->pos.y == snake->head.pos.y) {
-        free(fruit);
-        return NULL;
-    }
-    // body
-    for (int i = 0; i < snake->body_length; i++) {
-        if (fruit->pos.x == snake->body[i].pos.x && fruit->pos.y == snake->body[i].pos.y) {
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        if(players[i] == NULL)
+            continue;
+
+        // head
+        if (fruit->pos.x == players[i]->snake->head.pos.x && fruit->pos.y == players[i]->snake->head.pos.y) {
             free(fruit);
             return NULL;
         }
-    }
-    // tail
-    if (fruit->pos.x == snake->tail.pos.x && fruit->pos.y == snake->tail.pos.y) {
-        free(fruit);
-        return NULL;
+        // body
+        for (int i = 0; i < players[i]->snake->body_length; i++) {
+            if (fruit->pos.x == players[i]->snake->body[i].pos.x && fruit->pos.y == players[i]->snake->body[i].pos.y) {
+                free(fruit);
+                return NULL;
+            }
+        }
+        // tail
+        if (fruit->pos.x == players[i]->snake->tail.pos.x && fruit->pos.y == players[i]->snake->tail.pos.y) {
+            free(fruit);
+            return NULL;
+        }
     }
     // check if position overlaps with other fruit positions
     for(int i = 0; i < MAX_PLAYERS; i++) {
@@ -68,7 +73,7 @@ Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, S
     return fruit;
 }
 
-void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, int nr_of_players, Snake *snake)
+void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, int nr_of_players, Player *players[])
 {
     // get data from packet
     int type, random_x, random_y, random_type, fruit_index;
@@ -82,13 +87,14 @@ void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, in
         return;
     }
 
-    // create new fruit TODO
-    fruits[fruit_index] = new_fruit(fruits, random_x, random_y, random_type, snake);
-    printf("created new fruit\n");
-    printf("x: %d, y: %d, type: %d\n", fruits[fruit_index]->pos.x, fruits[fruit_index]->pos.y, fruits[fruit_index]->type);
-
-    // increment nr_of_fruits
-    (*nr_of_fruits)++;
+    // create new fruit
+    fruits[fruit_index] = new_fruit(fruits, random_x, random_y, random_type, players);
+    if(fruits[fruit_index] == NULL) {
+        printf("created new fruit\n");
+        printf("x: %d, y: %d, type: %d\n", fruits[fruit_index]->pos.x, fruits[fruit_index]->pos.y, fruits[fruit_index]->type);
+        // increment nr_of_fruits
+        (*nr_of_fruits)++;
+    }
 }
 
 void fruit_collision(App *app, UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, Player *players[], Fruit *fruits[], int *nr_of_fruits, int client_id)
