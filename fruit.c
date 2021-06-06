@@ -114,6 +114,9 @@ void fruit_collision(App *app, UDPsocket socket, IPaddress server_addr, UDPpacke
 
 void update_state_if_fruit_collision(App *app, Player *player, Fruit *fruits[], int *nr_of_fruits, int index)
 {
+    if(fruits[index] == NULL)
+        return;
+
     // save points before removing fruit
     int points = fruits[index]->points;
     // deallocate fruit from heap
