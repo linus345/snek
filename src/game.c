@@ -5,14 +5,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "app.h"
-#include "fruit.h"
-#include "game.h"
-#include "menu.h"
-#include "network.h"
-#include "player.h"
-#include "rendering.h"
+#include "../includes/app.h"
+#include "../includes/fruit.h"
+#include "../includes/game.h"
+#include "../includes/menu.h"
+#include "../includes/network.h"
+#include "../includes/player.h"
+#include "../includes/rendering.h"
 
 extern bool thread_done;
 extern SDL_Color black, gray, white, green, dark_green;

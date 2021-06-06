@@ -4,12 +4,12 @@
 #include <math.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_image.h>
-#include "app.h"
-#include "fruit.h"
-#include "game.h"
-#include "snake.h"
-#include "network.h"
-#include "player.h"
+#include "../includes/app.h"
+#include "../includes/fruit.h"
+#include "../includes/game.h"
+#include "../includes/snake.h"
+#include "../includes/network.h"
+#include "../includes/player.h"
 
 Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, Player *players[])
 {

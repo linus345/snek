@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#include "app.h"
-#include "game.h"
-#include "snake.h"
-#include "fruit.h"
+#include "../includes/app.h"
+#include "../includes/game.h"
+#include "../includes/snake.h"
+#include "../includes/fruit.h"
 
 // TODO: BANDAID FIX, MUST FIX!!! FIX MUCH IMPORTANT!!!!!!!!!
 void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits);

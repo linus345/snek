@@ -4,11 +4,11 @@
 #include <string.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
-#include "network.h"
-#include "game.h"
-#include "snake.h"
-#include "player.h"
-#include "circular_buffer.h"
+#include "../includes/network.h"
+#include "../includes/game.h"
+#include "../includes/snake.h"
+#include "../includes/player.h"
+#include "../includes/circular_buffer.h"
 
 // global variable declared in main.c
 extern bool thread_done;

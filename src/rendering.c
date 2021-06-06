@@ -5,13 +5,12 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "app.h"
-#include "fruit.h"
-#include "game.h"
-#include "menu.h"
-#include "player.h"
-#include "rendering.h"
+#include "../includes/app.h"
+#include "../includes/fruit.h"
+#include "../includes/game.h"
+#include "../includes/menu.h"
+#include "../includes/player.h"
+#include "../includes/rendering.h"
 
 SDL_Color
     black

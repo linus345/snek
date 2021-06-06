@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "player.h"
+#include "../includes/player.h"
 
 Player *new_player(int id)
 {

@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
-#include "app.h"
-#include "menu.h"
-#include "sound.h"
+#include "../includes/app.h"
+#include "../includes/menu.h"
+#include "../includes/sound.h"
 
 App* init_app()
 {

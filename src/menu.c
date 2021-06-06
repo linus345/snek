@@ -6,11 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "app.h"
-#include "menu.h"
-#include "rendering.h"
-#include "sound.h"
-#include "player.h"
+#include "../includes/app.h"
+#include "../includes/menu.h"
+#include "../includes/rendering.h"
+#include "../includes/sound.h"
+#include "../includes/player.h"
 
 //Checks if the mouse is hovering on an SDL_Rect.
 bool hover_state(Screen_item* button, int Mx, int My)

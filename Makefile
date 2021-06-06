@@ -22,38 +22,38 @@ endif
 $(EXEC): main.o game.o app.o snake.o player.o fruit.o network.o circular_buffer.o menu.o rendering.o sound.o
 	$(CC) *.o $(CFLAGS) -o $(EXEC)
 
-main.o: main.c
-	$(CC) main.c -c $(CFLAGS)
+main.o: src/main.c
+	$(CC) src/main.c -c $(CFLAGS)
 
-game.o: game.c
-	$(CC) game.c -c $(CFLAGS)
+game.o: src/game.c
+	$(CC) src/game.c -c $(CFLAGS)
 
-app.o: app.c
-	$(CC) app.c -c $(CFLAGS)
+app.o: src/app.c
+	$(CC) src/app.c -c $(CFLAGS)
 	
-fruit.o: fruit.c
-	$(CC) fruit.c -c $(CFLAGS)
+fruit.o: src/fruit.c
+	$(CC) src/fruit.c -c $(CFLAGS)
 
-snake.o: snake.c
-	$(CC) snake.c -c $(CFLAGS)
+snake.o: src/snake.c
+	$(CC) src/snake.c -c $(CFLAGS)
 
-player.o: player.c
-	$(CC) player.c -c $(CFLAGS)
+player.o: src/player.c
+	$(CC) src/player.c -c $(CFLAGS)
 
-network.o: network.c
-	$(CC) network.c -c $(CFLAGS)
+network.o: src/network.c
+	$(CC) src/network.c -c $(CFLAGS)
 
-circular_buffer.o: circular_buffer.c
-	$(CC) circular_buffer.c -c $(CFLAGS)
+circular_buffer.o: src/circular_buffer.c
+	$(CC) src/circular_buffer.c -c $(CFLAGS)
 
-menu.o: menu.c
-	$(CC) menu.c -c $(CFLAGS)
+menu.o: src/menu.c
+	$(CC) src/menu.c -c $(CFLAGS)
 
-rendering.o: rendering.c
-	$(CC) rendering.c -c $(CFLAGS)
+rendering.o: src/rendering.c
+	$(CC) src/rendering.c -c $(CFLAGS)
 
-sound.o: sound.c
-	$(CC) sound.c -c $(CFLAGS)
+sound.o: src/sound.c
+	$(CC) src/sound.c -c $(CFLAGS)
 
 clean:
 	rm -f $(EXEC) *.o

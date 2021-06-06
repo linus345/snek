@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <SDL2/SDL.h>
-#include "circular_buffer.h"
+#include "../includes/circular_buffer.h"
 
 Circular_Buffer *init_buffer(int capacity, int size)
 {
