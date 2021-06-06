@@ -46,8 +46,8 @@ Fruit *new_fruit(Fruit *fruits[], int random_x, int random_y, int random_type, P
             return NULL;
         }
         // body
-        for (int i = 0; i < players[i]->snake->body_length; i++) {
-            if (fruit->pos.x == players[i]->snake->body[i].pos.x && fruit->pos.y == players[i]->snake->body[i].pos.y) {
+        for (int j = 0; j < players[i]->snake->body_length; j++) {
+            if (fruit->pos.x == players[i]->snake->body[j].pos.x && fruit->pos.y == players[i]->snake->body[j].pos.y) {
                 free(fruit);
                 return NULL;
             }
@@ -82,10 +82,10 @@ void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, in
     printf("received new fruit: \n");
     printf("x: %d, y: %d, type: %d, index: %d\n", random_x, random_y, random_type, fruit_index);
 
-    if (*nr_of_fruits >= nr_of_players) {
-        printf("nr_of_fruits >= nr_of_players");
-        return;
-    }
+    /* if (*nr_of_fruits >= nr_of_players) { */
+    /*     printf("nr_of_fruits >= nr_of_players"); */
+    /*     return; */
+    /* } */
 
     // create new fruit
     fruits[fruit_index] = new_fruit(fruits, random_x, random_y, random_type, players);
@@ -133,10 +133,10 @@ void update_state_if_fruit_collision(App *app, Player *player, Fruit *fruits[], 
             &player->snake->body_length);
     // change snake speed
     if (player->snake->speed > 100) {
-        player->snake->speed = (SPEED - (pow(player->snake->body_length, 2) * 2) / 3);
+        player->snake->speed = (SPEED - (pow(player->snake->body_length, 2) * 2) / 4);
     } else if (player->snake->speed < 100) {
         player->snake->speed -= 2;
-    } else if (player->snake->speed >= 0) {
+    } else if (player->snake->speed <= 0) {
         player->snake->speed = 0;
     }
     // update player score TODO
