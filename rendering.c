@@ -202,7 +202,7 @@ void render_fruits(App* app, Fruit* fruits[], SDL_Texture* fruit_sprite_tex, Pos
     }
 }
 
-void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* snake_sprite_tex, Pos snake_texture[])
+void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* snake_sprite_textures[], Pos snake_texture[])
 {
     SDL_Rect head_src;
     SDL_Rect head_dst;
@@ -271,7 +271,7 @@ void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* 
         tail_dst.h = CELL_SIZE;
 
         // render head
-        SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &head_src, &head_dst, players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(app->renderer, snake_sprite_textures[players[i]->color], &head_src, &head_dst, players[i]->snake->head.angle, NULL, SDL_FLIP_NONE);
         // render body
         flip = SDL_FLIP_NONE;
         for (int j = 0; j < players[i]->snake->body_length; j++) {
@@ -285,9 +285,9 @@ void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* 
                     flip = SDL_FLIP_HORIZONTAL;
                 }
             }
-            SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &body_src[j], &body_dst[j], rotation, NULL, flip);
+            SDL_RenderCopyEx(app->renderer, snake_sprite_textures[players[i]->color], &body_src[j], &body_dst[j], rotation, NULL, flip);
         }
         // render tail
-        SDL_RenderCopyEx(app->renderer, snake_sprite_tex, &tail_src, &tail_dst, players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(app->renderer, snake_sprite_textures[players[i]->color], &tail_src, &tail_dst, players[i]->snake->tail.angle, NULL, SDL_FLIP_NONE);
     }
 }

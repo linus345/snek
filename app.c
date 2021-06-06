@@ -59,10 +59,10 @@ App* init_app()
 
 void quit_app(App* app)
 {
-
     printf("Exiting...\n");
-    // destory window and renderer to free memory
+    // destroy window and renderer to free memory
     SDL_DestroyWindow(app->window);
+    SDL_RenderPresent(app->renderer);
     SDL_DestroyRenderer(app->renderer);
 
     // free sounds

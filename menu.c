@@ -20,6 +20,14 @@ bool hover_state(Screen_item* button, int Mx, int My)
     return false;
 }
 
+bool is_hovering_over(SDL_Rect* rect, int mouse_x, int mouse_y)
+{
+    if(mouse_x >= rect->x && mouse_x <= rect->x + rect->w && mouse_y >= rect->y && mouse_y <= rect->y + rect->h) {
+        return true;
+    }
+    return false;
+}
+
 // User input for ip address och port number
 int main_menu(App* app, TTF_Font* font)
 {

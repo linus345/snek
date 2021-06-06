@@ -262,17 +262,26 @@ bool collison_with_wall(Snake *snake)
     return false;
 }
 
-bool collison_with_snake(Snake *snake)
+bool collison_with_snake(Snake *client_snake, Snake *remote_snake)
 {
+    // checks collision with snake head
+    if (client_snake->head.pos.x == remote_snake->head.pos.x &&
+        client_snake->head.pos.y == remote_snake->head.pos.y) {
+        // collision detected
+        return true;
+    }
+
     // Checks collison with snake body
-    for (int i = 0; i < snake->body_length; i++) {
-        if (snake->head.pos.x == snake->body[i].pos.x && snake->head.pos.y == snake->body[i].pos.y) {
-        // Collison detected
-        return true; 
+    for (int j = 0; j < remote_snake->body_length; j++) {
+        if (client_snake->head.pos.x == remote_snake->body[j].pos.x &&
+            client_snake->head.pos.y == remote_snake->body[j].pos.y) {
+            // Collison detected
+            return true; 
         }
     }
     // Checks collison with snake tail
-    if (snake->head.pos.x == snake->tail.pos.x && snake->head.pos.y == snake->tail.pos.y) {
+    if (client_snake->head.pos.x == remote_snake->tail.pos.x &&
+        client_snake->head.pos.y == remote_snake->tail.pos.y) {
         // Collison detected
         return true; 
     }

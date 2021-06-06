@@ -184,6 +184,23 @@ void update_snake_pos_from_req(Uint8 *data, Player *players[])
     players[id]->snake->head.angle = angle;
 }
 
+void handle_color_change(Uint8 *data, Player *players[])
+{
+    int type, id, packet_nr, new_color;
+    // format: type id packet_nr new_color
+    sscanf((char *) data, "%d %d %d %d", &type, &id, &packet_nr, &new_color);
+    printf("color change from %d to color: %d\n", id, new_color);
+    if(players[id]->last_received_packet_nr > packet_nr) {
+        // return early because we've already received a newer packet
+        printf("newer packet exists\n");
+        return;
+    }
+    // update last received packet number to the packet number we just got
+    players[id]->last_received_packet_nr = packet_nr;
+    // update player with new color from request
+    players[id]->color = new_color;
+}
+
 void handle_received_ticks(Uint8 *data, unsigned *current_time)
 {
     int type;
@@ -215,6 +232,7 @@ void handle_ate_fruit(App *app, Uint8 *data, Player *players[], Game_State *game
 void send_packet(UDPsocket udp_sock, UDPpacket *pack_send) {
     int sent;
     sent = SDLNet_UDP_Send(udp_sock, pack_send->channel, pack_send);
+    log_packet(pack_send);
     if (!sent) {
         // TODO: better error handling
         fprintf(stderr, "Error: SDLNet_UDP_Send %s\n", SDLNet_GetError());
@@ -256,6 +274,27 @@ void send_snake_position(UDPsocket socket, IPaddress server_addr, UDPpacket *pac
     memcpy(pack_send->data, msg, sizeof(msg));
     pack_send->channel = -1;
     pack_send->len = sizeof(pack_send->data)+24;
+    pack_send->maxlen = 1024;
+    pack_send->address = server_addr;
+
+    send_packet(socket, pack_send);
+
+    // free packet data
+    /* free(pack_send->data); */
+}
+
+void send_color_change(UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, Player *player)
+{
+    char msg[PACKET_DATA_SIZE] = {0};
+    // increment how many packets client have sent
+    player->packet_nr++;
+    printf("sending packet_nr: %d from: %d\n", player->packet_nr, player->client_id);
+    // format: type id packet_nr new_color
+    sprintf(msg, "%d %d %d %d", COLOR_CHANGE, player->client_id, player->packet_nr, player->color);
+    /* strcpy(pack_send->data, msg); */
+    memcpy(pack_send->data, msg, sizeof(msg));
+    pack_send->channel = -1;
+    pack_send->len = sizeof(msg);
     pack_send->maxlen = 1024;
     pack_send->address = server_addr;
 

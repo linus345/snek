@@ -21,3 +21,26 @@ Player *new_player(int id)
 
     return player;
 }
+
+void next_player_color(Player* player)
+{
+    // go to next color
+    player->color++;
+    // start over from 0 if at the end of colors
+    if(player->color >= NR_OF_COLORS) {
+        player->color = 0;
+    }
+    printf("color: %d\n", player->color);
+}
+
+void prev_player_color(Player* player)
+{
+    int temp_color = player->color;
+    // go to previous color
+    temp_color--;
+    // go to last color if less than 0
+    if(temp_color < 0) {
+        temp_color = NR_OF_COLORS - 1;
+    }
+    player->color = temp_color;
+}

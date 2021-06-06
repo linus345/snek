@@ -89,5 +89,5 @@ void free_menu(Menu* menu);
 void render_scoreboard(App* app, Scoreboard* scoreboard);
 void render_end_of_round(App* app, Scoreboard* scoreboard);
 void render_fruits(App* app, Fruit* fruits[], SDL_Texture* fruit_sprite_tex, Pos fruit_texture[]);
-void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* snake_sprite_tex, Pos snake_texture[]);
+void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* snake_sprite_textures[], Pos snake_texture[]);
 #endif

@@ -93,7 +93,8 @@ void main_loop(App* app, Game_State* game_state)
 
 int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 {
-    int Mx, My, text_width, text_height;
+    int Mx, My;
+    enum Menu_selection next_menu_state = LOBBY;
     bool playsound = true;
 
     TTF_Font* small_font = TTF_OpenFont("./resources/Fonts/adventure.otf", 150);
@@ -117,19 +118,30 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 
     SDL_Texture* snake_sprite_textures[5];
     // green snake texture
-    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-green.png");
+    load_texture(app, &snake_sprite_textures[0], "./resources/Textures/snake-sprite-green.png");
     // blue snake texture
-    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-blue.png");
+    load_texture(app, &snake_sprite_textures[1], "./resources/Textures/snake-sprite-blue.png");
     // purple snake texture
-    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-purple.png");
+    load_texture(app, &snake_sprite_textures[2], "./resources/Textures/snake-sprite-purple.png");
     // yellow snake texture
-    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-yellow.png");
+    load_texture(app, &snake_sprite_textures[3], "./resources/Textures/snake-sprite-yellow.png");
     // orange snake texture
-    load_texture(app, &snake_sprite_textures, "./resources/Textures/snake-sprite-orange.png");
+    load_texture(app, &snake_sprite_textures[4], "./resources/Textures/snake-sprite-orange.png");
 
     // arrow texture
     SDL_Texture* arrow_tex;
     load_texture(app, &arrow_tex, "./resources/Textures/menu_arrow.png");
+    SDL_Rect arrow_left_dst[MAX_PLAYERS], arrow_right_dst[MAX_PLAYERS];
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        arrow_left_dst[i].w = CELL_SIZE;
+        arrow_left_dst[i].h = CELL_SIZE;
+        arrow_left_dst[i].x = 450 - CELL_SIZE * 2;
+        arrow_left_dst[i].y = 25 + 100 * i;
+        arrow_right_dst[i].w = CELL_SIZE;
+        arrow_right_dst[i].h = CELL_SIZE;
+        arrow_right_dst[i].x = 450 + CELL_SIZE * 4;
+        arrow_right_dst[i].y = 25 + 100 * i;
+    }
 
     Screen_item* background = menu_button_background(app, "./resources/Textures/background.png");
     Screen_item* start_button = menu_button_text(app, "Start", font, white);
@@ -141,9 +153,6 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
     SDL_Rect players_screen_snake[MAX_PLAYERS][3];
     for(int i = 0; i < MAX_PLAYERS; i++) {
         players_screen_name[i] = NULL;
-        /* for(int j = 0; j < 3; j++) { */
-        /*     players_screen_snake[i][j] = NULL; */
-        /* } */
     }
 
     // allocate memory for sent packet
@@ -163,7 +172,7 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
     // used when client connecting and in main loop
     int request_type;
 
-    while (app->running) {
+    while (app->running && next_menu_state == LOBBY) {
         //SDL_MouseButtonEvent mouse_event;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -176,28 +185,30 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
                     if (hover_state(start_button, Mx, My)) {            /* START */
                         // Plays button press effect
                         play_sound(app->sound->press);
-                        // Makes space on the heap
-                        //free(button1);
-                        free(background);
-                        free(start_button);
-                        free(exit_button);
-                        return START_GAME;
+                        // go to other menu, exits loop
+                        next_menu_state = START_GAME;
                     } else if (hover_state(exit_button, Mx, My)) {      /* EXIT */
                         // Plays button press effect
                         play_sound(app->sound->back);
-                        // Makes space on the heap
-                        //free(button1);
-                        free(background);
-                        free(start_button);
-                        free(exit_button);
-                        return MAIN_MENU;
+                        // go to other menu, exits loop
+                        next_menu_state = MAIN_MENU;
+                    } else if (is_hovering_over(&arrow_left_dst[game_state->client_id], Mx, My)) {      /* ARROW LEFT PLAYER0 */
+                        // Plays button press effect
+                        play_sound(app->sound->back);
+                        prev_player_color(game_state->players[game_state->client_id]);
+                        send_color_change(udp_sock, server_addr, pack_send, game_state->players[game_state->client_id]);
+                    } else if (is_hovering_over(&arrow_right_dst[game_state->client_id], Mx, My)) {      /* ARROW RIGHT PLAYER0 */
+                        // Plays button press effect
+                        play_sound(app->sound->back);
+                        next_player_color(game_state->players[game_state->client_id]);
+                        send_color_change(udp_sock, server_addr, pack_send, game_state->players[game_state->client_id]);
                     }
                     break;
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                         case SDLK_ESCAPE:
-                            // exit main loop
-                            return MAIN_MENU;
+                            // return to main menu
+                            next_menu_state = MAIN_MENU;
                             break;
                     }
                     break;
@@ -225,6 +236,9 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
                     exit(EXIT_FAILURE);
                     // update time for new request
                     time_when_req_sent = SDL_GetTicks();
+                    break;
+                case COLOR_CHANGE:
+                    handle_color_change(pack_recv->data, game_state->players);
                     break;
             }
         }
@@ -257,18 +271,23 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 
             players_screen_name[i] = menu_button_text(app, game_state->players[i]->name, small_font, white);
 
-            render_item(app, &players_screen_name[i]->rect, players_screen_name[i]->texture, NULL, 20, 25*i, TEXT_W, TEXT_H);
+            render_item(app, &players_screen_name[i]->rect, players_screen_name[i]->texture, NULL, 20, 100*i, TEXT_W, TEXT_H);
+            // render left arrow
+            SDL_RenderCopyEx(app->renderer, arrow_tex, NULL, &arrow_left_dst[game_state->client_id], 0, NULL, SDL_FLIP_NONE);
             for (int j = 0; j < 3; j++) {
                 /* if(players_screen_snake[i][j] == NULL) */
                 /*     continue; */
 
                 /* render_item(app, &players_screen_snake[i][j], snake_sprite_textures[game_state->players[i]->color][j], NULL, 100 + CELL_SIZE * j, 25*i, CELL_SIZE, CELL_SIZE); */
+                // render snake body color preview
                 snake_src.x = snake_texture[j].x;
                 snake_src.y = snake_texture[j].y;
-                snake_dst.x = 100 + CELL_SIZE * j;
-                snake_dst.y = 25 * i;
+                snake_dst.x = 450 + CELL_SIZE * j;
+                snake_dst.y = 25 + 100 * i;
                 SDL_RenderCopyEx(app->renderer, snake_sprite_textures[game_state->players[i]->color], &snake_src, &snake_dst, 90, NULL, SDL_FLIP_NONE);
             }
+            // render right arrow
+            SDL_RenderCopyEx(app->renderer, arrow_tex, NULL, &arrow_right_dst[game_state->client_id], 0, NULL, SDL_FLIP_HORIZONTAL);
         }
 
         //If-state for wether the text should switch color on hover or not
@@ -297,18 +316,18 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 
     // free allocated memory on heap
     for(int i = 0; i < 5; i++) {
-        free(snake_sprite_textures[i]);
+        SDL_DestroyTexture(snake_sprite_textures[i]);
     }
     TTF_CloseFont(small_font);
     free(arrow_tex);
-    free(background->texture);
+    SDL_DestroyTexture(background->texture);
     free(background);
-    free(start_button->texture);
+    SDL_DestroyTexture(start_button->texture);
     free(start_button);
-    free(exit_button->texture);
+    SDL_DestroyTexture(exit_button->texture);
     free(exit_button);
 
-    return START_GAME;  
+    return next_menu_state;  
 }
 
 int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
@@ -336,8 +355,12 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
     snake_texture[5].x = 64;
     snake_texture[5].y = 32;
 
-    SDL_Texture* snake_sprite_tex;
-    load_texture(app, &snake_sprite_tex, "./resources/Textures/snake-sprite-green.png");
+    SDL_Texture* snake_sprite_textures[NR_OF_COLORS];
+    load_texture(app, &snake_sprite_textures[0], "./resources/Textures/snake-sprite-green.png");
+    load_texture(app, &snake_sprite_textures[1], "./resources/Textures/snake-sprite-blue.png");
+    load_texture(app, &snake_sprite_textures[2], "./resources/Textures/snake-sprite-purple.png");
+    load_texture(app, &snake_sprite_textures[3], "./resources/Textures/snake-sprite-yellow.png");
+    load_texture(app, &snake_sprite_textures[4], "./resources/Textures/snake-sprite-orange.png");
 
     Pos fruit_texture[4];
     //cherry
@@ -525,13 +548,21 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
             //show_scoreboard = true; // Remove once multiplayer has been implimented
         }
         // Checks if any collisons has occured with a snake
-        if (collison_with_snake(game_state->players[game_state->client_id]->snake)) {
-            game_state->players[game_state->client_id]->alive = false;
-            send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
-            if (!app->sound->muted) {
-                play_sound(app->sound->wall_collison); // plays wall collison sound effect
+        for(int i = 0; i < MAX_PLAYERS; i++) {
+            if(game_state->players[i] == NULL)
+                continue;
+
+            if(game_state->client_id == i)
+                continue;
+
+            if(collison_with_snake(game_state->players[game_state->client_id]->snake, game_state->players[i]->snake)) {
+                game_state->players[game_state->client_id]->alive = false;
+                send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
+                if (!app->sound->muted) {
+                    play_sound(app->sound->wall_collison); // plays wall collison sound effect
+                }
+                //show_scoreboard = true; // Remove once multiplayer has been implimented
             }
-            //show_scoreboard = true; // Remove once multiplayer has been implimented
         }
 
         if (game_state->players[game_state->client_id]->alive && game_state->current_time > game_state->last_time + game_state->players[game_state->client_id]->snake->speed) {
@@ -565,7 +596,7 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
 
             render_fruits(app, game_state->fruits, fruit_sprite_tex, fruit_texture);
             // render all snakes
-            render_snakes(app, game_state->players, game_state->nr_of_players, snake_sprite_tex, snake_texture);
+            render_snakes(app, game_state->players, game_state->nr_of_players, snake_sprite_textures, snake_texture);
         }
 
         // present on screen

@@ -25,7 +25,8 @@ enum Request_Type {
     RANDOM_POS = 5,
     RECEIVE_TICKS = 6,
     COLLISION = 7,
-    ATE_FRUIT = 8
+    ATE_FRUIT = 8,
+    COLOR_CHANGE = 9
 };
 
 void free_net(UDPsocket udp_sock, UDPpacket *pack_recv, UDPpacket *pack_send);
@@ -39,12 +40,14 @@ void get_client_id(UDPpacket *pack_recv, int *client_id);
 void successfully_connected(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][5]);
 void new_client_joined(Uint8 *data, Game_State *game_state, Player *players[], Screen_item *players_screen_name[], Screen_item *players_screen_snake[][5]);
 void update_snake_pos_from_req(Uint8 *data, Player *players[]);
+void handle_color_change(Uint8 *data, Player *players[]);
 void handle_received_ticks(Uint8 *data, unsigned *current_time);
 void handle_collision(Uint8 *data, Player *players[]);
 void handle_ate_fruit(App *app, Uint8 *data, Player *players[], Game_State *game_state);
 void send_packet(UDPsocket udp_sock, UDPpacket *pack_send);
 void join_game_request(UDPsocket udp_sock, IPaddress server_addr, UDPpacket *pack_send);
 void send_snake_position(UDPsocket socket, IPaddress server_addr, UDPpacket *packet, Player *player);
+void send_color_change(UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, Player *player);
 void send_collision(UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, int client_id);
 void send_ate_fruit(UDPsocket socket, IPaddress server_addr, UDPpacket *pack_send, int client_id, int fruit_index);
 

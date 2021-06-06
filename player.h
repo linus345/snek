@@ -5,6 +5,7 @@
 #include "snake.h"
 
 #define MAX_NAME_LENGTH 20
+#define NR_OF_COLORS 5
 
 enum Colors {
     GREEN = 0,
@@ -26,5 +27,7 @@ typedef struct {
 } Player;
 
 Player *new_player(int id);
+void next_player_color(Player* player);
+void prev_player_color(Player* player);
 
 #endif
