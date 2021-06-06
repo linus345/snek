@@ -325,7 +325,7 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
 {
     int Mx, My;
-    bool end_of_round = false, playsound_col_once = true;
+    bool end_of_round = false, playsound_col_once = true, playsound_end_once = true;
 
     Pos snake_texture[6];
     // head
@@ -585,6 +585,10 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
         end_of_round = signs_of_life(game_state, game_state->players); // Checks if everybody is alive or not
 
         if (end_of_round) {
+            if (!app->sound->muted && playsound_end_once) {
+                play_sound(app->sound->scoreboard); // plays wall collison sound effect
+                playsound_end_once = false; // Makes sure collison sound doesnt go on repeat in spectator mode
+            }
             // clear screen before next render
             SDL_RenderClear(app->renderer);
             render_end_of_round(app, game_state->scoreboard);
@@ -651,8 +655,8 @@ Scoreboard* create_scoreboard(App* app, TTF_Font* font, Player* players[])
 
         // TODO: use players[i]->name instead of app->player_name
         /* scoreboard->name[i] = menu_button_text(app, players[i]->name, font, green); */
-        scoreboard->name[i] = menu_button_text(app, players[i]->name, font, green);
-        scoreboard->score[i] = menu_button_text(app, "0", font, green);
+        scoreboard->name[i] = menu_button_text(app, players[i]->name, font, white);
+        scoreboard->score[i] = menu_button_text(app, "0", font, white);
     }
 
     scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
@@ -703,7 +707,7 @@ void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
         free(scoreboard->score[i]);
 
         // create new score text
-        scoreboard->score[i] = menu_button_text(app, buffer, font, green);
+        scoreboard->score[i] = menu_button_text(app, buffer, font, white);
     }
 
     TTF_CloseFont(font);
