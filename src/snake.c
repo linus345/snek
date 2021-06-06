@@ -262,10 +262,10 @@ bool collison_with_wall(Snake *snake)
     return false;
 }
 
-bool collison_with_snake(Snake *client_snake, Snake *remote_snake)
+bool collison_with_snake(Snake *client_snake, Snake *remote_snake, int client_id, int index)
 {
     // checks collision with snake head
-    if (client_snake->head.pos.x == remote_snake->head.pos.x &&
+    if (client_id != index && client_snake->head.pos.x == remote_snake->head.pos.x &&
         client_snake->head.pos.y == remote_snake->head.pos.y) {
         // collision detected
         return true;

@@ -548,10 +548,10 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
             if(game_state->players[i] == NULL)
                 continue;
 
-            if(game_state->client_id == i || !game_state->players[i]->alive)
+            if(!game_state->players[i]->alive)
                 continue;
 
-            if(collison_with_snake(game_state->players[game_state->client_id]->snake, game_state->players[i]->snake)) {
+            if(collison_with_snake(game_state->players[game_state->client_id]->snake, game_state->players[i]->snake, game_state->client_id, i)) {
                 game_state->players[game_state->client_id]->alive = false;
                 send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
                 if (!app->sound->muted) {
