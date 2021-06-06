@@ -114,17 +114,17 @@ void render_menu(App* app, Menu* menu)
 
 void free_menu(Menu* menu)
 {
-    free(menu->background->texture);
+    SDL_DestroyTexture(menu->background->texture);
     free(menu->background);
-    free(menu->button->texture);
+    SDL_DestroyTexture(menu->button->texture);
     free(menu->button);
-    free(menu->text1->texture);
+    SDL_DestroyTexture(menu->text1->texture);
     free(menu->text1);
-    free(menu->text2->texture);
+    SDL_DestroyTexture(menu->text2->texture);
     free(menu->text2);
-    free(menu->text3->texture);
+    SDL_DestroyTexture(menu->text3->texture);
     free(menu->text3);
-    free(menu->return_button->texture);
+    SDL_DestroyTexture(menu->return_button->texture);
     free(menu->return_button);
 
     free(menu);
