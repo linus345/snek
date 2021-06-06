@@ -212,10 +212,11 @@ void render_snakes(App* app, Player* players[], int nr_of_players, SDL_Texture* 
     SDL_Rect tail_dst;
     SDL_RendererFlip flip;
     int rotation;
-    for (int i = 0; i < nr_of_players; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         if (players[i] == NULL) {
             // skip current player if player doesn't exist
             continue;
+
         } else if (!players[i]->alive) {
             // skip current player if player is dead
             continue;
