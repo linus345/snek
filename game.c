@@ -174,7 +174,8 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
                         // Plays button press effect
                         play_sound(app->sound->press);
                         // go to other menu, exits loop
-                        next_menu_state = START_GAME;
+                        send_start_game(udp_sock, server_addr, pack_send);
+                        /* next_menu_state = START_GAME; */
                     } else if (hover_state(exit_button, Mx, My)) {      /* EXIT */
                         // Plays button press effect
                         play_sound(app->sound->back);
@@ -227,6 +228,9 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
                     break;
                 case COLOR_CHANGE:
                     handle_color_change(pack_recv->data, game_state->players);
+                    break;
+                case START_GAME:
+                    next_menu_state = START_GAME;
                     break;
             }
         }

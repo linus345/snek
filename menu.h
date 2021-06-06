@@ -17,9 +17,9 @@ enum Menu_selection {
     JOIN_MULTIPLAYER = 3,
     HIGH_SCORE = 4,
     SETTINGS = 5,
-    START_GAME = 6,
-    TYPE_NAME = 7,
-    LOBBY = 8
+    /* START_GAME = 6, */
+    TYPE_NAME = 6,
+    LOBBY = 7
 };
 
 void menu_init(App* app, SDL_Texture* background, SDL_Texture* newGame, SDL_Texture* exit);

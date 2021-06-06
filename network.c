@@ -201,6 +201,10 @@ void handle_color_change(Uint8 *data, Player *players[])
     players[id]->color = new_color;
 }
 
+/* void handle_start_game(Uint8 *data, Game_State *game_state) */
+/* { */
+/* } */
+
 void handle_received_ticks(Uint8 *data, unsigned *current_time)
 {
     int type;
@@ -253,6 +257,24 @@ void join_game_request(UDPsocket udp_sock, IPaddress server_addr, UDPpacket *pac
     pack_send->channel = -1;
     pack_send->len = sizeof(pack_send->data)+1;
     pack_send->maxlen = sizeof(pack_send->data)+1;
+    pack_send->address = server_addr;
+
+    send_packet(udp_sock, pack_send);    
+
+    // free packet data
+    /* free(pack_send->data); */
+}
+
+void send_start_game(UDPsocket udp_sock, IPaddress server_addr, UDPpacket *pack_send)
+{
+    char msg[PACKET_DATA_SIZE] = {0};
+    // format: type
+    sprintf(msg, "%d", START_GAME);
+
+    memcpy(pack_send->data, msg, sizeof(msg));
+    pack_send->channel = -1;
+    pack_send->len = sizeof(msg);
+    pack_send->maxlen = sizeof(msg);
     pack_send->address = server_addr;
 
     send_packet(udp_sock, pack_send);    
