@@ -89,7 +89,7 @@ void get_fruit_pos_and_spawn(Uint8 *data, Fruit *fruits[], int *nr_of_fruits, in
 
     // create new fruit
     fruits[fruit_index] = new_fruit(fruits, random_x, random_y, random_type, players);
-    if(fruits[fruit_index] == NULL) {
+    if(fruits[fruit_index] != NULL) {
         printf("created new fruit\n");
         printf("x: %d, y: %d, type: %d\n", fruits[fruit_index]->pos.x, fruits[fruit_index]->pos.y, fruits[fruit_index]->type);
         // increment nr_of_fruits
