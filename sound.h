@@ -13,6 +13,7 @@ typedef struct sound_effects {
     Mix_Chunk* eat;
     Mix_Chunk* wall_collison;
     Mix_Chunk* scoreboard;
+    Mix_Music* song;
     bool muted;
 } Sound_effects;
 

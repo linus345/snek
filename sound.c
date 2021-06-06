@@ -20,6 +20,9 @@ Sound_effects* init_sounds()
     sound->wall_collison = Mix_LoadWAV("./resources/Sound_Effects/Slap effect.wav");
     sound->scoreboard = Mix_LoadWAV("./resources/Sound_Effects/Scoreboard_effect.wav");
 
+    // Song
+    sound->song = Mix_LoadMUS("./resources/Sound_Effects/Scoreboard_effect.wav");
+
     sound->muted = false;
 
     return sound;
@@ -28,6 +31,11 @@ Sound_effects* init_sounds()
 void play_sound(Mix_Chunk* sound)
 {
     Mix_PlayChannel(-1, sound, 0);
+}
+
+void play_song(Mix_Music* song)
+{
+    Mix_
 }
 
 void play_hover_sound(Sound_effects* sound, bool *playsound)
@@ -46,4 +54,5 @@ void free_sound_effects(Sound_effects* sound)
     Mix_FreeChunk(sound->eat);
     Mix_FreeChunk(sound->wall_collison);
     Mix_FreeChunk(sound->scoreboard);
+    Mix_FreeSound(sound->song);
 }

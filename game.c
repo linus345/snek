@@ -132,7 +132,7 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
     SDL_Texture* arrow_tex;
     load_texture(app, &arrow_tex, "./resources/Textures/menu_arrow.png");
     SDL_Rect arrow_left_dst[MAX_PLAYERS], arrow_right_dst[MAX_PLAYERS];
-    for(int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         arrow_left_dst[i].w = CELL_SIZE;
         arrow_left_dst[i].h = CELL_SIZE;
         arrow_left_dst[i].x = 450 - CELL_SIZE * 2;
@@ -151,15 +151,15 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
     Screen_item* players_screen_name[MAX_PLAYERS];
     // player snake selected color for each connected player
     SDL_Rect players_screen_snake[MAX_PLAYERS][3];
-    for(int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         players_screen_name[i] = NULL;
     }
 
     // allocate memory for sent packet
-    UDPpacket *pack_send = allocate_packet(PACKET_DATA_SIZE);
+    UDPpacket* pack_send = allocate_packet(PACKET_DATA_SIZE);
 
     // allocate memory for received packet
-    UDPpacket *pack_recv = allocate_packet(PACKET_DATA_SIZE);
+    UDPpacket* pack_recv = allocate_packet(PACKET_DATA_SIZE);
 
     // resolve server address TODO: bind address?
     int server_port = atoi(app->port);
@@ -177,69 +177,69 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_QUIT:
-                    // exit main loop
-                    app->running = false;
+            case SDL_QUIT:
+                // exit main loop
+                app->running = false;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (hover_state(start_button, Mx, My)) { /* START */
+                    // Plays button press effect
+                    play_sound(app->sound->press);
+                    // go to other menu, exits loop
+                    next_menu_state = START_GAME;
+                } else if (hover_state(exit_button, Mx, My)) { /* EXIT */
+                    // Plays button press effect
+                    play_sound(app->sound->back);
+                    // go to other menu, exits loop
+                    next_menu_state = MAIN_MENU;
+                } else if (is_hovering_over(&arrow_left_dst[game_state->client_id], Mx, My)) { /* ARROW LEFT PLAYER0 */
+                    // Plays button press effect
+                    play_sound(app->sound->back);
+                    prev_player_color(game_state->players[game_state->client_id]);
+                    send_color_change(udp_sock, server_addr, pack_send, game_state->players[game_state->client_id]);
+                } else if (is_hovering_over(&arrow_right_dst[game_state->client_id], Mx, My)) { /* ARROW RIGHT PLAYER0 */
+                    // Plays button press effect
+                    play_sound(app->sound->back);
+                    next_player_color(game_state->players[game_state->client_id]);
+                    send_color_change(udp_sock, server_addr, pack_send, game_state->players[game_state->client_id]);
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                    // return to main menu
+                    next_menu_state = MAIN_MENU;
                     break;
-                case SDL_MOUSEBUTTONDOWN:
-                    if (hover_state(start_button, Mx, My)) {            /* START */
-                        // Plays button press effect
-                        play_sound(app->sound->press);
-                        // go to other menu, exits loop
-                        next_menu_state = START_GAME;
-                    } else if (hover_state(exit_button, Mx, My)) {      /* EXIT */
-                        // Plays button press effect
-                        play_sound(app->sound->back);
-                        // go to other menu, exits loop
-                        next_menu_state = MAIN_MENU;
-                    } else if (is_hovering_over(&arrow_left_dst[game_state->client_id], Mx, My)) {      /* ARROW LEFT PLAYER0 */
-                        // Plays button press effect
-                        play_sound(app->sound->back);
-                        prev_player_color(game_state->players[game_state->client_id]);
-                        send_color_change(udp_sock, server_addr, pack_send, game_state->players[game_state->client_id]);
-                    } else if (is_hovering_over(&arrow_right_dst[game_state->client_id], Mx, My)) {      /* ARROW RIGHT PLAYER0 */
-                        // Plays button press effect
-                        play_sound(app->sound->back);
-                        next_player_color(game_state->players[game_state->client_id]);
-                        send_color_change(udp_sock, server_addr, pack_send, game_state->players[game_state->client_id]);
-                    }
-                    break;
-                case SDL_KEYDOWN:
-                    switch (event.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                            // return to main menu
-                            next_menu_state = MAIN_MENU;
-                            break;
-                    }
-                    break;
+                }
+                break;
             }
         }
 
         // check for successful connection and if other clients have joined
-        if(SDLNet_UDP_Recv(udp_sock, pack_recv)) {
+        if (SDLNet_UDP_Recv(udp_sock, pack_recv)) {
             // get request type from packet
-            sscanf((char *) pack_recv->data, "%d", &request_type);
-            switch(request_type) {
-                // these are the only expected types at this point
-                case SUCCESSFUL_CONNECTION:
-                    successfully_connected(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
-                    break;
-                case NEW_CLIENT_JOINED:
-                    // adds new player and increments nr_of_players
-                    new_client_joined(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
-                    break;
-                case FAILED_CONNECTION:
-                    // TODO: handle it differently if it failed because 4 clients
-                    // already is connected
-                    printf("Failed to connect, retrying...\n");
-                    // TODO: temporary exit until fixing above todo
-                    exit(EXIT_FAILURE);
-                    // update time for new request
-                    time_when_req_sent = SDL_GetTicks();
-                    break;
-                case COLOR_CHANGE:
-                    handle_color_change(pack_recv->data, game_state->players);
-                    break;
+            sscanf((char*)pack_recv->data, "%d", &request_type);
+            switch (request_type) {
+            // these are the only expected types at this point
+            case SUCCESSFUL_CONNECTION:
+                successfully_connected(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
+                break;
+            case NEW_CLIENT_JOINED:
+                // adds new player and increments nr_of_players
+                new_client_joined(pack_recv->data, game_state, game_state->players, players_screen_name, players_screen_snake);
+                break;
+            case FAILED_CONNECTION:
+                // TODO: handle it differently if it failed because 4 clients
+                // already is connected
+                printf("Failed to connect, retrying...\n");
+                // TODO: temporary exit until fixing above todo
+                exit(EXIT_FAILURE);
+                // update time for new request
+                time_when_req_sent = SDL_GetTicks();
+                break;
+            case COLOR_CHANGE:
+                handle_color_change(pack_recv->data, game_state->players);
+                break;
             }
         }
 
@@ -264,14 +264,14 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
                 continue;
 
             // free if not NULL before giving it a new value
-            if(players_screen_name[i] != NULL) {
+            if (players_screen_name[i] != NULL) {
                 free(players_screen_name[i]->texture);
                 free(players_screen_name[i]);
             }
 
             players_screen_name[i] = menu_button_text(app, game_state->players[i]->name, small_font, white);
 
-            render_item(app, &players_screen_name[i]->rect, players_screen_name[i]->texture, NULL, 20, 100*i, TEXT_W, TEXT_H);
+            render_item(app, &players_screen_name[i]->rect, players_screen_name[i]->texture, NULL, 20, 100 * i, TEXT_W, TEXT_H);
             // render left arrow
             SDL_RenderCopyEx(app->renderer, arrow_tex, NULL, &arrow_left_dst[game_state->client_id], 0, NULL, SDL_FLIP_NONE);
             for (int j = 0; j < 3; j++) {
@@ -315,7 +315,7 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
     SDL_StopTextInput();
 
     // free allocated memory on heap
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
         SDL_DestroyTexture(snake_sprite_textures[i]);
     }
     TTF_CloseFont(small_font);
@@ -327,13 +327,13 @@ int lobby(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
     SDL_DestroyTexture(exit_button->texture);
     free(exit_button);
 
-    return next_menu_state;  
+    return next_menu_state;
 }
 
-int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
+int game(App* app, TTF_Font* font, Game_State* game_state, UDPsocket udp_sock)
 {
     int Mx, My;
-    bool end_of_round = false;
+    bool end_of_round = false, playsound_col_once = true, playscore_end_once = true;
 
     Pos snake_texture[6];
     // head
@@ -386,10 +386,10 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
     //////////// NETWORK ////////////
 
     // allocate memory for sent packet
-    UDPpacket *pack_send = allocate_packet(PACKET_DATA_SIZE);
+    UDPpacket* pack_send = allocate_packet(PACKET_DATA_SIZE);
 
     // allocate memory for received packet
-    UDPpacket *pack_recv = allocate_packet(PACKET_DATA_SIZE);
+    UDPpacket* pack_recv = allocate_packet(PACKET_DATA_SIZE);
 
     // resolve server address TODO: bind address?
     int server_port = atoi(app->port);
@@ -452,7 +452,7 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
     // set global variable thread_done to false before creating thread
     thread_done = false;
     // arguments that thread needs to access
-    Thread_Args args = {udp_sock, pack_recv, pack_send, buf};
+    Thread_Args args = { udp_sock, pack_recv, pack_send, buf };
     // create thread that listens for udp packets
     SDL_Thread* recv_thread = SDL_CreateThread(receive_packets_in_new_thread, "recv_thread", (void*)&args);
     // check if thread creation was successful or not
@@ -505,13 +505,13 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
                 } else if (hover_state(game_state->scoreboard->mute, Mx, My)) {
                     if (app->sound->muted) { // Unmutes all the sounds and changes the speaker icon
                         // free mute before updating it
-                        if(game_state->scoreboard->mute != NULL)
+                        if (game_state->scoreboard->mute != NULL)
                             free(game_state->scoreboard->mute);
                         game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon.png");
                         app->sound->muted = false;
                     } else if (!app->sound->muted) { // Mutes all the sounds and changes the speaker icon
                         // free mute before updating it
-                        if(game_state->scoreboard->mute != NULL)
+                        if (game_state->scoreboard->mute != NULL)
                             free(game_state->scoreboard->mute);
                         game_state->scoreboard->mute = menu_button_background(app, "./resources/Textures/speaker_icon_mute.png");
                         app->sound->muted = true;
@@ -542,26 +542,27 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
         if (collison_with_wall(game_state->players[game_state->client_id]->snake)) {
             game_state->players[game_state->client_id]->alive = false;
             send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
-            if (!app->sound->muted) {
+            if (!app->sound->muted && playsound_col_once) { // makes sure the sound isnt mute and dosent play more than once
                 play_sound(app->sound->wall_collison); // plays wall collison sound effect
+                playsound_col_once = false; // Makes sure collison sound doesnt go on repeat in spectator mode
             }
-            //show_scoreboard = true; // Remove once multiplayer has been implimented
         }
+
         // Checks if any collisons has occured with a snake
-        for(int i = 0; i < MAX_PLAYERS; i++) {
-            if(game_state->players[i] == NULL)
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            if (game_state->players[i] == NULL)
                 continue;
 
-            if(game_state->client_id == i)
+            if (game_state->client_id == i)
                 continue;
 
-            if(collison_with_snake(game_state->players[game_state->client_id]->snake, game_state->players[i]->snake)) {
+            if (collison_with_snake(game_state->players[game_state->client_id]->snake, game_state->players[i]->snake)) {
                 game_state->players[game_state->client_id]->alive = false;
                 send_collision(udp_sock, server_addr, pack_send, game_state->client_id);
-                if (!app->sound->muted) {
+                if (!app->sound->muted && playsound_col_once) { // makes sure the sound isnt mute and dosent play more than once
                     play_sound(app->sound->wall_collison); // plays wall collison sound effect
+                    playsound_col_once = false; // Makes sure collison sound doesnt go on repeat in spectator mode
                 }
-                //show_scoreboard = true; // Remove once multiplayer has been implimented
             }
         }
 
@@ -578,11 +579,16 @@ int game(App* app, TTF_Font* font, Game_State *game_state, UDPsocket udp_sock)
         fruit_collision(app, udp_sock, server_addr, pack_send, game_state->players, game_state->fruits, &game_state->nr_of_fruits, game_state->client_id);
 
         /////////////////////////////////////////////// Rendering section //////////////////////////////////////////////////////
-        
+
         // TODO: maybe only call when fruit is eaten
         update_scoreboard(app, game_state->players, game_state->scoreboard); // updates the scoreboard
 
         if (end_of_round) {
+            if (!app->sound->muted && playscore_end_once) {
+                play_sound(app->sound->scoreboard); // plays wall collison sound effect
+                playscore_end_once = false; // Makes sure collison sound doesnt go on repeat in spectator mode
+            }
+
             // clear screen before next render
             SDL_RenderClear(app->renderer);
             render_end_of_round(app, game_state->scoreboard);
@@ -635,9 +641,9 @@ Scoreboard* create_scoreboard(App* app, TTF_Font* font, Player* players[])
 
     scoreboard->continue_button = menu_button_text(app, "Press to continue", font, white);
 
-    for(int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         // skip if player does not exist
-        if(players[i] == NULL) {
+        if (players[i] == NULL) {
             scoreboard->name[i] = NULL;
             scoreboard->score[i] = NULL;
             continue;
@@ -659,11 +665,11 @@ void free_scoreboard(Scoreboard* scoreboard)
 {
     free(scoreboard->background);
     free(scoreboard->scoreboard);
-    for(int i = 0; i < MAX_PLAYERS; i++) {
-        if(scoreboard->name[i] != NULL)
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (scoreboard->name[i] != NULL)
             free(scoreboard->name[i]);
-        if(scoreboard->score[i] != NULL)
-        free(scoreboard->score[i]);
+        if (scoreboard->score[i] != NULL)
+            free(scoreboard->score[i]);
     }
     free(scoreboard->mute);
     free(scoreboard->return_button);
@@ -674,12 +680,12 @@ void free_scoreboard(Scoreboard* scoreboard)
 void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
 {
     TTF_Font* font = TTF_OpenFont("./resources/Fonts/adventure.otf", 250);
-    if(font == NULL)
+    if (font == NULL)
         return;
     char buffer[50];
 
-    for(int i = 0; i < MAX_PLAYERS; i++) {
-        if(players[i] == NULL)
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (players[i] == NULL)
             continue;
 
         sprintf(buffer, "%d", players[i]->points);
@@ -692,4 +698,18 @@ void update_scoreboard(App* app, Player* players[], Scoreboard* scoreboard)
 
     TTF_CloseFont(font);
     font = NULL;
+}
+
+bool signs_of_life(Game_State* game_state, Player* players[])
+{
+    int tmp = 0;
+    for (int i = 0; i < game_state->nr_of_players; i++) {
+        if (players[i]->alive == false) {
+            tmp++;
+        }
+    }
+    if (tmp == game_state->nr_of_players)
+        return true;
+    else
+        return false;
 }
