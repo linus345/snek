@@ -2,9 +2,11 @@
 #define SNAKE_H
 
 #include <stdbool.h>
-#include "game.h"
+#include "app.h"
 #define MAX_SNAKE_LENGTH 256
 #define SPEED 500      // ms
+
+#define GAME_START_POS 250
 
 typedef struct {
     int angle;
@@ -21,6 +23,7 @@ typedef struct {
     bool mouth_open;
     bool mouth_eating;
     Pos pos;
+    Pos next_pos;
 } Head_Part;
 
 enum Dir {
@@ -44,12 +47,12 @@ typedef struct {
     Body_Part tail;
 } Snake;
 
-Snake *new_snake(int player_nr);
+Snake *new_snake(int id);
 void change_snake_velocity(Snake *snake);
-void new_snake_pos(Snake *snake);
+void new_snake_pos(Snake *snake, bool should_update_head);
 Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_length);
 bool collison_with_wall(Snake *snake);
-bool collison_with_snake(Snake *snake);
+bool collison_with_snake(Snake *client_snake, Snake *remote_snake);
 
 
 #endif

@@ -1,20 +1,21 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include "app.h"
 #include "menu.h"
+#include "sound.h"
 
-App *init_app() {
-
+App* init_app()
+{
     // Allocate memory for the core program features
-    App *app = malloc(sizeof(App));
+    App* app = malloc(sizeof(App));
 
     // initialize window
     app->window = SDL_CreateWindow("Snek", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     // handle for errors
-    if(app->window == NULL) {
+    if (app->window == NULL) {
         // print error
         fprintf(stderr, "Error while initializing window: %s\n", SDL_GetError());
         // exit with failure
@@ -24,7 +25,7 @@ App *init_app() {
     // initialize renderer
     app->renderer = SDL_CreateRenderer(app->window, -1, SDL_RENDERER_ACCELERATED);
     // handle errors
-    if(app->renderer == NULL) {
+    if (app->renderer == NULL) {
         // print error
         fprintf(stderr, "Error while initializing renderer: %s\n", SDL_GetError());
         // exit with failure
@@ -38,28 +39,38 @@ App *init_app() {
         // exit with failure
         exit(EXIT_FAILURE);
     }
-    char tmp[1] = "";
+    char tmp[] = "";
     strcpy(app->ip, tmp);
     strcpy(app->port, tmp);
+    strcpy(app->player_name, tmp);
+
+    // initialize sound
+    app->sound = init_sounds();
 
     // indicate that the app is running, used for main loop
     app->running = true;
 
-    // Indicates wether applicatication is in fullscreen or not
-    app->fullscreen = false;
+    // Indicates wether the application is in fullscreen or not
+    //app->fullscreen = false;
 
     // return pointer
     return app;
 }
 
-void quit_app(App *app) {
-
+void quit_app(App* app)
+{
     printf("Exiting...\n");
-    // destory window and renderer to free memory
+    // destroy window and renderer to free memory
     SDL_DestroyWindow(app->window);
+    SDL_RenderPresent(app->renderer);
     SDL_DestroyRenderer(app->renderer);
-    
-    // cleanup subsystems before exiting
+
+    // free sounds
+    free_sound_effects(app->sound);
+    free(app->sound);
+
+    // cleanup subsystems before exiting'
+    Mix_CloseAudio();
     SDLNet_Quit();
     TTF_Quit();
     SDL_Quit();

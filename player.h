@@ -4,14 +4,30 @@
 #include <stdbool.h>
 #include "snake.h"
 
+#define MAX_NAME_LENGTH 20
+#define NR_OF_COLORS 5
+
+enum Colors {
+    GREEN = 0,
+    BLUE = 1,
+    PURPLE = 2,
+    YELLOW = 3,
+    ORANGE = 4
+};
+
 typedef struct {
     int points;
     bool alive;
-    int host;
-    int port;
+    int client_id;
+    int last_received_packet_nr;
+    int packet_nr;
     Snake *snake;
+    char name[MAX_NAME_LENGTH];
+    enum Colors color;
 } Player;
 
-Player *new_player(int host, int port, int player_nr);
+Player *new_player(int id);
+void next_player_color(Player* player);
+void prev_player_color(Player* player);
 
 #endif

@@ -10,26 +10,29 @@
 // TODO: BANDAID FIX, MUST FIX!!! FIX MUCH IMPORTANT!!!!!!!!!
 void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits);
 
-Snake *new_snake(int player_nr)
+Snake *new_snake(int id)
 {
     // allocate memory on heap
     Snake *snake = malloc(sizeof(Snake));
 
+    printf("new_snake id: %d\n", id);
     snake->body_length = 0;
     // initialize start speed
     snake->speed = SPEED;
     snake->next_dir = None;
     snake->head.has_turned = false;
+    snake->head.next_pos.x = -1;
+    snake->head.next_pos.y = -1;
 
     // position snake differently depending on player
-    switch(player_nr) {
+    switch(id) {
         // position snake top left, moving to the right
-        case 1:
+        case 0:
             snake->vel_x = CELL_SIZE;
             snake->vel_y = 0;
             snake->head.angle = 90;
             snake->tail.angle = 90;
-            snake->head.pos.x = CELL_SIZE * 3;
+            snake->head.pos.x = (CELL_SIZE * 3) + GAME_START_POS;
             snake->head.pos.y = CELL_SIZE;
             snake->dir = Right;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
@@ -37,7 +40,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y;
             break;
         // position snake top right, moving to downwards
-        case 2:
+        case 1:
             snake->vel_x = 0;
             snake->vel_y = CELL_SIZE;
             snake->head.angle = 180;
@@ -51,7 +54,7 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y - CELL_SIZE * 2;
             break;
         // position snake bottom right, moving to the left
-        case 3:
+        case 2:
             snake->vel_x = CELL_SIZE;
             snake->vel_y = 0;
             snake->head.angle = 270;
@@ -65,13 +68,13 @@ Snake *new_snake(int player_nr)
             snake->tail.pos.y = snake->head.pos.y;
             break;
         // position snake bottom left, moving upwards
-        case 4:
+        case 3:
             snake->vel_x = 0;
             snake->vel_y = CELL_SIZE;
             snake->head.angle = 0;
             snake->body[0].angle = 0;
             snake->tail.angle = 0;
-            snake->head.pos.x = CELL_SIZE * 3;
+            snake->head.pos.x = (CELL_SIZE * 3) + GAME_START_POS;
             snake->head.pos.y = WINDOW_HEIGHT - CELL_SIZE * 3;
             snake->dir = Up;
             snake->body[snake->body_length] = new_snake_body_part(&snake->head.pos, snake->head.angle, &snake->body_length);
@@ -123,7 +126,7 @@ void change_snake_velocity(Snake *snake)
     }
 }
 
-void new_snake_pos(Snake *snake)
+void new_snake_pos(Snake *snake, bool should_update_head)
 {
     // update tail position
     snake->tail.pos.x = snake->body[snake->body_length-1].pos.x;
@@ -204,9 +207,12 @@ void new_snake_pos(Snake *snake)
     snake->body[0].pos.x = snake->head.pos.x;
     snake->body[0].pos.y = snake->head.pos.y;
     snake->body[0].angle = snake->head.angle;
+
     // update head position
-    snake->head.pos.x += snake->vel_x;
-    snake->head.pos.y += snake->vel_y;
+    if(should_update_head) {
+        snake->head.pos.x += snake->vel_x;
+        snake->head.pos.y += snake->vel_y;
+    }
     snake->head.has_turned = false;
     snake->head.mouth_open = false;
     snake->head.mouth_eating = false;
@@ -248,7 +254,7 @@ Body_Part new_snake_body_part(Pos *last_body_part_pos, int angle, int *body_leng
 bool collison_with_wall(Snake *snake)
 {
         // Checks collison with walls
-    if (snake->head.pos.x < 0 || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
+    if (snake->head.pos.x < GAME_START_POS || snake->head.pos.y < 0 || snake->head.pos.x > WINDOW_WIDTH - CELL_SIZE || snake->head.pos.y > WINDOW_HEIGHT - CELL_SIZE) {
         // Collison detected
         return true; 
     }
@@ -256,17 +262,26 @@ bool collison_with_wall(Snake *snake)
     return false;
 }
 
-bool collison_with_snake(Snake *snake)
+bool collison_with_snake(Snake *client_snake, Snake *remote_snake)
 {
+    // checks collision with snake head
+    if (client_snake->head.pos.x == remote_snake->head.pos.x &&
+        client_snake->head.pos.y == remote_snake->head.pos.y) {
+        // collision detected
+        return true;
+    }
+
     // Checks collison with snake body
-    for (int i = 0; i < snake->body_length; i++) {
-        if (snake->head.pos.x == snake->body[i].pos.x && snake->head.pos.y == snake->body[i].pos.y) {
-        // Collison detected
-        return true; 
+    for (int j = 0; j < remote_snake->body_length; j++) {
+        if (client_snake->head.pos.x == remote_snake->body[j].pos.x &&
+            client_snake->head.pos.y == remote_snake->body[j].pos.y) {
+            // Collison detected
+            return true; 
         }
     }
     // Checks collison with snake tail
-    if (snake->head.pos.x == snake->tail.pos.x && snake->head.pos.y == snake->tail.pos.y) {
+    if (client_snake->head.pos.x == remote_snake->tail.pos.x &&
+        client_snake->head.pos.y == remote_snake->tail.pos.y) {
         // Collison detected
         return true; 
     }
@@ -276,10 +291,10 @@ bool collison_with_snake(Snake *snake)
 
 void head_adjecent_with_fruit(Head_Part *head, Fruit *fruits[], int nr_of_fruits)
 {
-    for(int i = 0; nr_of_fruits > i; i++) {
-        if (fruits[i]->pos.x == head->pos.x && (fruits[i]->pos.y-CELL_SIZE == head->pos.y || fruits[i]->pos.y+CELL_SIZE == head->pos.y)) {
+    for(int i = 0; i < nr_of_fruits; i++) {
+        if (fruits[i] != NULL && fruits[i]->pos.x == head->pos.x && (fruits[i]->pos.y-CELL_SIZE == head->pos.y || fruits[i]->pos.y+CELL_SIZE == head->pos.y)) {
             head->mouth_open = true;
-        } else if (fruits[i]->pos.y == head->pos.y && (fruits[i]->pos.x-CELL_SIZE == head->pos.x || fruits[i]->pos.x+CELL_SIZE == head->pos.x)) {
+        } else if (fruits[i] != NULL && fruits[i]->pos.y == head->pos.y && (fruits[i]->pos.x-CELL_SIZE == head->pos.x || fruits[i]->pos.x+CELL_SIZE == head->pos.x)) {
             head->mouth_open = true;
         }
     }
